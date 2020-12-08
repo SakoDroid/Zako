@@ -61,10 +61,14 @@ public class Request {
                                 } else bf.close();
                             }
                         }else{
-                            stat = 0;
-                            bf.close();
-                            Logger.glog("request for API " + Host + Path + " received from " + ip + " .",Host);
-                            new SubForwarder(api,tempFile,out,ip,Host + Path);
+                            if (api.length > 1){
+                                stat = 0;
+                                bf.close();
+                                Logger.glog("request for API " + Host + Path + " received from " + ip + " .", Host);
+                                new SubForwarder(api, tempFile, out, ip, Host + Path);
+                            }else {
+                                Path = api[0];
+                            }
                         }
                     }else if (status == 1){
                         stat = 0;

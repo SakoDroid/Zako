@@ -300,8 +300,6 @@ public class Configs {
     public static String[] getForwardAddress(String host){
         return HostFrAdd.get(host);
     }
-<<<<<<< HEAD
+
 }
-=======
-}
->>>>>>> 5755d6ee9bf3d39f0cce7b70e2d8da7afb0f5801
+
