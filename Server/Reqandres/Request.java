@@ -64,7 +64,7 @@ public class Request {
                             stat = 0;
                             bf.close();
                             Logger.glog("request for API " + Host + Path + " received from " + ip + " .",Host);
-                            new SubForwarder(api,tempFile,out,ip,Host);
+                            new SubForwarder(api,tempFile,out,ip,Host + Path);
                         }
                     }else if (status == 1){
                         stat = 0;
