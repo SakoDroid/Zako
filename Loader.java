@@ -15,6 +15,8 @@ public class Loader {
         Server.Utils.Configs.load();
         Logger.ilog("Loading permissions ...");
         Perms.load();
+        Logger.ilog("Loading APIs configuration ...");
+        APIConfigs.load();
         if (Server.Utils.Configs.isLBOn()) LoadBalancer.Configs.load();
         try(BufferedReader bf = new BufferedReader(new FileReader(Configs.getCWD() + "/src/CFGS/Main.cfg"))){
             String cfgs = "",line;

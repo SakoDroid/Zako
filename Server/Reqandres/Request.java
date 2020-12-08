@@ -45,20 +45,28 @@ public class Request {
                 default -> {
                     if (!basicUtils.LocalHostIP.isEmpty()) Host = Host.replace(basicUtils.LocalHostIP,Configs.MainHost);
                     Host = Host.replace("127.0.0.1","localhost");
-                    int stat = Configs.getHostStatus(Host);
-                    if (stat == 0) {
-                        sit = Perms.isDirPerm(Configs.getMainDir(Host) + Path);
-                        if (sit < 300) {
-                            if (this.method == Methods.POST){
-                                String postLength;
-                                if ((postLength = (String)headers.get("Content-Length")) != null){
-                                    long length = Long.parseLong(postLength);
-                                    if (length < Configs.postBodySize) parseBody();
-                                    else sit = 413;
-                                }else sit = 411;
-                            }else bf.close();
+                    int status = Configs.getHostStatus(Host);
+                    if (status == 0) {
+                        String[] api = APIConfigs.getAPIAddress(Host + Path);
+                        if (api == null){
+                            sit = Perms.isDirPerm(Configs.getMainDir(Host) + Path);
+                            if (sit < 300) {
+                                if (this.method == Methods.POST) {
+                                    String postLength;
+                                    if ((postLength = (String) headers.get("Content-Length")) != null) {
+                                        long length = Long.parseLong(postLength);
+                                        if (length < Configs.postBodySize) parseBody();
+                                        else sit = 413;
+                                    } else sit = 411;
+                                } else bf.close();
+                            }
+                        }else{
+                            stat = 0;
+                            bf.close();
+                            Logger.glog("request for API " + Host + Path + " received from " + ip + " .",Host);
+                            new SubForwarder(api,tempFile,out,ip,Host);
                         }
-                    }else if (stat == 1){
+                    }else if (status == 1){
                         stat = 0;
                         bf.close();
                         Logger.glog("request for " + Host + " received from " + ip + " .",Host);

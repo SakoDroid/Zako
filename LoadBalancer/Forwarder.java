@@ -1,7 +1,10 @@
 package LoadBalancer;
 
 import Server.DDOS.Interface;
+import Server.Reqandres.Senders.FileSender;
 import Server.Utils.*;
+import Server.Utils.Configs;
+
 import java.net.*;
 import java.io.*;
 
@@ -11,6 +14,7 @@ public class Forwarder extends Thread {
     private Socket client;
     private Socket server;
     private String ip;
+    private DataOutputStream clientOut;
 
     public Forwarder(Socket s){
         try {
@@ -19,6 +23,7 @@ public class Forwarder extends Thread {
             this.server = new Socket(sv[0],Integer.parseInt(sv[1]));
             this.ip = s.getInetAddress().getHostAddress();
             this.serverip = sv[0];
+            this.clientOut = new DataOutputStream(client.getOutputStream());
             this.start();
         }catch(Exception ex){
             String t = "";
@@ -34,7 +39,6 @@ public class Forwarder extends Thread {
     public void run(){
         try{
             InputStream clientIn = client.getInputStream();
-            OutputStream clientOut = client.getOutputStream();
             if (clientIn.available() > 0){
                 if (Perms.isIPAllowed(ip)){
                     if (Interface.checkIP(ip, clientIn.available())) {
@@ -75,7 +79,15 @@ public class Forwarder extends Thread {
             }
             t += ex.toString();
             Logger.ilog(t);
+            if (ex.toString().contains("Timeout")) this.sendCode(504);
+            else this.sendCode(502);
         }
+    }
 
+    private void sendCode(int code){
+        FileSender.setProt("HTTP/1.1");
+        FileSender.setContentType("text/html");
+        FileSender.setStatus(code);
+        FileSender.sendFile(Methods.GET,new File(Configs.getCWD() + "/src/default_pages/" + code + ".html"),clientOut,ip,0,"NA");
     }
 }
