@@ -13,6 +13,7 @@ public class Configs {
     private static int webServer;
     private static int LBPort = 80;
     private static int WSPort = 80;
+    private static int SSL = 0;
 
     public static long generalSize = Long.MAX_VALUE;
     public static long fileSize = Long.MAX_VALUE;
@@ -165,7 +166,7 @@ public class Configs {
 
     private static void loadMain(){
         Logger.ilog("Loading main configs ...");
-        try(BufferedReader bf = new BufferedReader(new FileReader(getCWD() + "/src/CFGS/Main.cfg"))){
+        try(BufferedReader bf = new BufferedReader(new FileReader(getCWD() + "/src/CFGS/Zako.cfg"))){
             String cfgs = "";
             String line;
             while((line = bf.readLine()) != null){
@@ -179,6 +180,7 @@ public class Configs {
             String wb = "1";
             String lbp = "80";
             String wsp = "80";
+            String ssl = "0";
             if (mc.find()) cpln = mc.group().replace("CAPTCHA-LENGTH=","");
             ptn = Pattern.compile("CAPTCHA-HARDNESS=.*");
             mc = ptn.matcher(cfgs);
@@ -192,6 +194,9 @@ public class Configs {
             ptn = Pattern.compile("Load_Balancer_Port=.*");
             mc = ptn.matcher(cfgs);
             if (mc.find()) lbp = mc.group().replace("Load_Balancer_Port=","");
+            ptn = Pattern.compile("SSL=.*");
+            mc = ptn.matcher(cfgs);
+            if (mc.find()) ssl = mc.group().replace("SSL=","");
             ptn = Pattern.compile("Server_Port=.*");
             mc = ptn.matcher(cfgs);
             if (mc.find()) wsp = mc.group().replace("Server_Port=","");
@@ -201,6 +206,7 @@ public class Configs {
             loadBalancer = Integer.parseInt(ld);
             captchaLength = Integer.parseInt(cpln);
             captchaHardness = Integer.parseInt(cphr);
+            SSL = Integer.parseInt(ssl);
         }catch(Exception ex){
             String t = "";
             for (StackTraceElement a : ex.getStackTrace()){
@@ -287,6 +293,8 @@ public class Configs {
     }
 
     public static boolean isWSOn(){return webServer == 1;}
+
+    public static boolean isSSLOn(){return SSL == 1;}
 
     public static int getLBPort(){return LBPort;}
 

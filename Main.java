@@ -7,7 +7,10 @@ public class Main{
             Logger.ilog("Loading requirements ...");
             Loader.load();
             if (Configs.isLBOn()) new LoadBalancerMainThread();
-            if (Configs.isWSOn()) new WebServerMainThread();
+            if (Configs.isWSOn()){
+                if (Configs.isSSLOn()) new HttpsServerMainThread();
+                else new HttpServerMainThread();
+            }
         } catch (Exception ex) {
             String t = "";
             for (StackTraceElement a : ex.getStackTrace()){

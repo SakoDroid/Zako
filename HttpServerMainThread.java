@@ -1,21 +1,21 @@
-import Server.Handler;
+import Server.HttpHandler;
 import Server.Utils.Configs;
 import Server.Utils.Logger;
 
 import java.net.ServerSocket;
 
-public class WebServerMainThread extends Thread{
+public class HttpServerMainThread extends Thread{
 
-    public WebServerMainThread(){
+    public HttpServerMainThread(){
         this.start();
     }
 
     @Override
     public void run(){
         try{
-            ServerSocket ss = new ServerSocket(Configs.getWSPort());
-            Logger.ilog("Server thread is now running ...");
-            while(true) new Handler(ss.accept());
+            ServerSocket serverSocket = new ServerSocket(Configs.getWSPort());
+            Logger.ilog("Http server thread is now running ...");
+            while(true) new HttpHandler(serverSocket.accept());
         }catch (Exception ex) {
             String t = "";
             for (StackTraceElement a : ex.getStackTrace()){

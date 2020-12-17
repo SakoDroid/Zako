@@ -31,8 +31,9 @@ public class Request {
         try{
             tempFile = new File(Configs.getCWD() + "/src/Temp/temp-" + id + ".tmp");
             FileWriter fw = new FileWriter(tempFile, true);
-            while (in.available() != 0) {
+            while (true) {
                 fw.write(in.read());
+                if (in.available() == 0) break;
             }
             fw.flush();
             fw.close();

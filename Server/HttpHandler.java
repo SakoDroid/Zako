@@ -7,11 +7,11 @@ import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.net.Socket;
 
-public class Handler extends Thread{
+public class HttpHandler extends Thread{
 
     private Socket s;
 
-    public Handler(Socket s){
+    public HttpHandler(Socket s){
         this.s = s;
         this.start();
     }
@@ -24,7 +24,6 @@ public class Handler extends Thread{
             Logger.glog(s.getRemoteSocketAddress().toString() + " Connected." + "  ; id = " + id, "not available");
             DataOutputStream out = new DataOutputStream(s.getOutputStream());
             InputStream in = s.getInputStream();
-            if(in.available() > 0){
                 if (in.available() < Configs.generalSize) {
                     if (Perms.isIPAllowed(ip)) {
                         if (Interface.checkIP(ip, in.available())) {
@@ -56,7 +55,6 @@ public class Handler extends Thread{
                     out.flush();
                     out.close();
                 }
-            }else s.close();
         }catch(Exception ex){
             String t = "";
             for (StackTraceElement a : ex.getStackTrace()){

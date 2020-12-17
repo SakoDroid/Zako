@@ -44,7 +44,6 @@ public class FileSender extends Sender {
 
     public static void sendFile(Methods method, byte[] file, DataOutputStream out, String ip, int id, String host){
         Logger.glog("Sending binary file to " + ip + "  ; id = " + id,host);
-        System.out.println(file.length);
         try{
             out.writeBytes(generateHeaders(file.length));
             if(method != Methods.HEAD) out.write(file);
