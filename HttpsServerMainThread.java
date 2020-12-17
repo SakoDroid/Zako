@@ -11,11 +11,11 @@ public class HttpsServerMainThread extends Thread{
     @Override
     public void run(){
         try{
-            System.setProperty("javax.net.ssl.keyStore","/mnt/E8A8DC6AA8DC3930/Projects/tmrin/nj.jks");
-            System.setProperty("javax.net.ssl.keyStorePassword", "shit123");
+            System.setProperty("javax.net.ssl.keyStore",SSLConfigs.getJKS());
+            System.setProperty("javax.net.ssl.keyStorePassword", SSLConfigs.getPass());
             SSLServerSocketFactory sslServerSocketfactory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
             SSLServerSocket sslServerSocket = (SSLServerSocket) sslServerSocketfactory.createServerSocket(Configs.getWSPort());
-            Logger.ilog("Https server thread is now running ...");
+            Logger.ilog("Https server thread is now running (jks : " + SSLConfigs.getJKS() + " ,, jks pass : " + SSLConfigs.getPass() +") ...");
             while (true) new HttpHandler(sslServerSocket.accept());
         }catch (Exception ex) {
             String t = "";

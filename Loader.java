@@ -40,6 +40,10 @@ public class Loader {
             t += ex.toString();
             Logger.ilog(t);
         }
+        if (Configs.isSSLOn()){
+            Logger.ilog("Loading ssl configurations ...");
+            SSLConfigs.load();
+        }
         Logger.ilog("ALL OK!");
     }
 }

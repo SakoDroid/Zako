@@ -18,7 +18,7 @@ public class Request {
     public String rawHeaders = "";
     public String ip;
     public File tempFile;
-    public HashMap headers;
+    public final HashMap headers = new HashMap();
     private int id;
     public String Host;
     public String Path;
@@ -31,53 +31,59 @@ public class Request {
         try{
             tempFile = new File(Configs.getCWD() + "/src/Temp/temp-" + id + ".tmp");
             FileWriter fw = new FileWriter(tempFile, true);
-            while (true) {
+            fw.write(in.read());
+            while (in.available() != 0) {
                 fw.write(in.read());
-                if (in.available() == 0) break;
             }
             fw.flush();
             fw.close();
             bf = new RandomAccessFile(tempFile,"r");
-            this.headers = this.parseHeaders();
-            switch (this.method){
-                case CONNECT -> this.sit = 200;
-                case PUT -> this.handlePUT();
-                case DELETE -> this.handleDELETE();
-                default -> {
-                    if (!basicUtils.LocalHostIP.isEmpty()) Host = Host.replace(basicUtils.LocalHostIP,Configs.MainHost);
-                    Host = Host.replace("127.0.0.1","localhost");
-                    int status = Configs.getHostStatus(Host);
-                    if (status == 0) {
-                        String[] api = APIConfigs.getAPIAddress(Host + Path);
-                        if (api == null){
-                            sit = Perms.isDirPerm(Configs.getMainDir(Host) + Path);
-                            if (sit < 300) {
-                                if (this.method == Methods.POST) {
-                                    String postLength;
-                                    if ((postLength = (String) headers.get("Content-Length")) != null) {
-                                        long length = Long.parseLong(postLength);
-                                        if (length < Configs.postBodySize) parseBody();
-                                        else sit = 413;
-                                    } else sit = 411;
-                                } else bf.close();
+            this.parseHeaders();
+            if (this.stat == 1){
+                switch (this.method) {
+                    case CONNECT -> this.sit = 200;
+                    case PUT -> this.handlePUT();
+                    case DELETE -> this.handleDELETE();
+                    default -> {
+                        if (!basicUtils.LocalHostIP.isEmpty())
+                            Host = Host.replace(basicUtils.LocalHostIP, Configs.MainHost);
+                        Host = Host.replace("127.0.0.1", "localhost");
+                        int status = Configs.getHostStatus(Host);
+                        if (status == 0) {
+                            String[] api = APIConfigs.getAPIAddress(Host + Path);
+                            if (api == null) {
+                                sit = Perms.isDirPerm(Configs.getMainDir(Host) + Path);
+                                if (sit < 300) {
+                                    if (this.method == Methods.POST) {
+                                        String postLength;
+                                        if ((postLength = (String) headers.get("Content-Length")) != null) {
+                                            long length = Long.parseLong(postLength);
+                                            if (length < Configs.postBodySize) parseBody();
+                                            else sit = 413;
+                                        } else sit = 411;
+                                    } else bf.close();
+                                }
+                            } else {
+                                if (api.length > 1) {
+                                    stat = 0;
+                                    bf.close();
+                                    Logger.glog("request for API " + Host + Path + " received from " + ip + " .", Host);
+                                    new SubForwarder(api, tempFile, out, ip, Host + Path);
+                                } else {
+                                    Path = api[0];
+                                }
                             }
-                        }else{
-                            if (api.length > 1){
-                                stat = 0;
-                                bf.close();
-                                Logger.glog("request for API " + Host + Path + " received from " + ip + " .", Host);
-                                new SubForwarder(api, tempFile, out, ip, Host + Path);
-                            }else {
-                                Path = api[0];
-                            }
-                        }
-                    }else if (status == 1){
-                        stat = 0;
-                        bf.close();
-                        Logger.glog("request for " + Host + " received from " + ip + " .",Host);
-                        new SubForwarder(Configs.getForwardAddress(Host),tempFile,out,ip,Host);
-                    }else sit = 500;
+                        } else if (status == 1) {
+                            stat = 0;
+                            bf.close();
+                            Logger.glog("request for " + Host + " received from " + ip + " .", Host);
+                            new SubForwarder(Configs.getForwardAddress(Host), tempFile, out, ip, Host);
+                        } else sit = 500;
+                    }
                 }
+            }else {
+                out.flush();
+                out.close();
             }
         }catch(IOException ex){
             this.sit = 500;
@@ -91,43 +97,43 @@ public class Request {
     }
 
 
-    private HashMap parseHeaders(){
-        HashMap head = new HashMap();
+    private void parseHeaders(){
         try{
-            String line;
-            boolean firstlineparsed = false;
-            while(!(line = bf.readLine()).isEmpty()){
+            String line = bf.readLine();
+            if (line != null){
                 rawHeaders += line;
-                if(!firstlineparsed){
-                    String[] p = line.split(" ", 3);
-                    String mth = p[0];
-                    switch (mth){
-                        case "GET" -> this.method = Methods.GET;
-                        case "POST" -> this.method = Methods.POST;
-                        case "PUT" -> this.method = Methods.PUT;
-                        case "HEAD" -> this.method = Methods.HEAD;
-                        case "DELETE" -> this.method = Methods.DELETE;
-                        case "CONNECT" -> this.method = Methods.CONNECT;
-                        case "OPTIONS" -> this.method = Methods.OPTIONS;
-                        case "TRACE" -> this.method = Methods.TRACE;
-                    }
-                    head.put("Method", this.method);
-                    head.put("URL", p[1]);
-                    head.put("Version", p[2]);
-                    firstlineparsed = true;
-                }else{
-                    String[] tmp = line.split(":", 2);
-                    if (tmp.length != 1) head.put(tmp[0].trim(), tmp[1].trim());
+                String[] p = line.split(" ", 3);
+                String mth = p[0];
+                switch (mth){
+                    case "GET" -> this.method = Methods.GET;
+                    case "POST" -> this.method = Methods.POST;
+                    case "PUT" -> this.method = Methods.PUT;
+                    case "HEAD" -> this.method = Methods.HEAD;
+                    case "DELETE" -> this.method = Methods.DELETE;
+                    case "CONNECT" -> this.method = Methods.CONNECT;
+                    case "OPTIONS" -> this.method = Methods.OPTIONS;
+                    case "TRACE" -> this.method = Methods.TRACE;
                 }
-            }
-            if(this.method != Methods.CONNECT && this.method != Methods.OPTIONS){
-                String prt = (String) head.get("Version");
-                String url = prt.split("/")[0] + "://" + head.get("Host") + URLDecoder.decode((String) head.get("URL"), StandardCharsets.UTF_8);
-                URL u = new URL(url);
-                Host = u.getHost().replace("www.", "").replace("ww2.", "");
-                if (u.getPort() != -1) Host += ":" + u.getPort();
-                Path = u.getPath();
-                head.replace("URL", u);
+                headers.put("Method", this.method);
+                headers.put("URL", p[1]);
+                headers.put("Version", p[2]);
+                while(!(line = bf.readLine()).isEmpty()){
+                    rawHeaders += line;
+                    String[] tmp = line.split(":", 2);
+                    if (tmp.length != 1) headers.put(tmp[0].trim(), tmp[1].trim());
+                }
+                if(this.method != Methods.CONNECT && this.method != Methods.OPTIONS){
+                    String prt = (String) headers.get("Version");
+                    String url = prt.split("/")[0] + "://" + headers.get("Host") + URLDecoder.decode((String) headers.get("URL"), StandardCharsets.UTF_8);
+                    URL u = new URL(url);
+                    Host = u.getHost().replace("www.", "").replace("ww2.", "");
+                    if (u.getPort() != -1) Host += ":" + u.getPort();
+                    Path = u.getPath();
+                    headers.replace("URL", u);
+                }
+            }else {
+                this.stat = 0;
+                bf.close();
             }
         }catch(Exception ex){
             this.sit = 500;
@@ -138,7 +144,6 @@ public class Request {
             t += ex.toString();
             Logger.ilog(t);
         }
-        return head;
     }
 
     private void handleDELETE(){
