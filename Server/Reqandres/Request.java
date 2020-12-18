@@ -206,9 +206,9 @@ public class Request {
                     if(line.startsWith(bnd)){
                         String detailLine = bf.readLine();
                         if (detailLine == null) break;
-                        ptn = Pattern.compile("filename=.*");
+                        ptn = Pattern.compile("filename=\\w+");
                         mc = ptn.matcher(detailLine);
-                        Pattern nameptn = Pattern.compile("name=.*");
+                        Pattern nameptn = Pattern.compile("name=\\w+");
                         Matcher namemc = nameptn.matcher(detailLine);
                         if(mc.find()){
                             String fileName = mc.group().replace("filename=","").replace("\"","");
