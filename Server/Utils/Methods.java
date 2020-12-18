@@ -8,5 +8,6 @@ public enum Methods {
     CONNECT,
     OPTIONS,
     HEAD,
-    TRACE
+    TRACE,
+    UNKNOWN
 }

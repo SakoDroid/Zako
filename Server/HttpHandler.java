@@ -3,6 +3,7 @@ package Server;
 import Server.Reqandres.*;
 import Server.Utils.*;
 import Server.DDOS.Interface;
+import javax.net.ssl.SSLSocket;
 import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.net.Socket;
@@ -10,9 +11,15 @@ import java.net.Socket;
 public class HttpHandler extends Thread{
 
     private Socket s;
+    private SSLSocket ss;
 
     public HttpHandler(Socket s){
         this.s = s;
+        this.start();
+    }
+
+    public HttpHandler(SSLSocket s){
+        this.ss = s;
         this.start();
     }
 
@@ -20,41 +27,53 @@ public class HttpHandler extends Thread{
     public void run(){
         try{
             int id = basicUtils.getID();
-            String ip = s.getInetAddress().getHostAddress();
-            Logger.glog(s.getRemoteSocketAddress().toString() + " Connected." + "  ; id = " + id, "not available");
-            DataOutputStream out = new DataOutputStream(s.getOutputStream());
-            InputStream in = s.getInputStream();
-                if (in.available() < Configs.generalSize) {
-                    if (Perms.isIPAllowed(ip)) {
-                        if (Interface.checkIP(ip, in.available())) {
-                            if (Runtime.getRuntime().freeMemory() > 1000) {
-                                Request rq = new Request(out,in, id, s.getInetAddress().getHostAddress());
-                                if (rq.stat == 1) new Response(rq, out, id);
-                                //rq.tempFile.delete();
-                            } else {
-                                Logger.glog(s.getRemoteSocketAddress().toString() + " request rejected due to server overload." + "  ; id = " + id, "not available");
-                                out.writeBytes(HTMLGen.genOverLoad());
-                                out.flush();
-                                out.close();
-                            }
+            String ip;
+            String fullip;
+            DataOutputStream out;
+            InputStream in;
+            if (s != null){
+                ip = s.getInetAddress().getHostAddress();
+                fullip = s.getRemoteSocketAddress().toString();
+                out = new DataOutputStream(s.getOutputStream());
+                in = s.getInputStream();
+            }else{
+                ip = ss.getInetAddress().getHostAddress();
+                fullip = ss.getRemoteSocketAddress().toString();
+                out = new DataOutputStream(ss.getOutputStream());
+                in = ss.getInputStream();
+            }
+            Logger.glog(fullip + " Connected." + "  ; id = " + id, "not available");
+            if (in.available() < Configs.generalSize) {
+                if (Perms.isIPAllowed(ip)) {
+                    if (Interface.checkIP(ip, in.available())) {
+                        if (Runtime.getRuntime().freeMemory() > 1000) {
+                            Request rq = new Request(out,in, id, ip,Configs.isSSLOn());
+                            if (rq.stat == 1) new Response(rq, out, id);
+                            //rq.tempFile.delete();
                         } else {
-                            Logger.glog(s.getRemoteSocketAddress().toString() + " request rejected due to DDOS protection." + "  ; id = " + id, "not available");
-                            out.writeBytes(HTMLGen.genTooManyRequests(ip));
+                            Logger.glog(fullip + " request rejected due to server overload." + "  ; id = " + id, "not available");
+                            out.writeBytes(HTMLGen.genOverLoad());
                             out.flush();
                             out.close();
                         }
                     } else {
-                        Logger.glog(s.getRemoteSocketAddress().toString() + " request rejected due to ip ban." + "  ; id = " + id, "not available");
-                        out.writeBytes(HTMLGen.genIPBan(ip));
+                        Logger.glog(fullip + " request rejected due to DDOS protection." + "  ; id = " + id, "not available");
+                        out.writeBytes(HTMLGen.genTooManyRequests(ip));
                         out.flush();
                         out.close();
                     }
                 } else {
-                    Logger.glog(s.getRemoteSocketAddress().toString() + " request rejected due to over size." + "  ; id = " + id, "not available");
-                    out.writeBytes(HTMLGen.gen413());
+                    Logger.glog(fullip + " request rejected due to ip ban." + "  ; id = " + id, "not available");
+                    out.writeBytes(HTMLGen.genIPBan(ip));
                     out.flush();
                     out.close();
                 }
+            } else {
+                Logger.glog(fullip + " request rejected due to over size." + "  ; id = " + id, "not available");
+                out.writeBytes(HTMLGen.gen413());
+                out.flush();
+                out.close();
+            }
         }catch(Exception ex){
             String t = "";
             for (StackTraceElement a : ex.getStackTrace()){

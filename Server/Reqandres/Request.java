@@ -25,21 +25,26 @@ public class Request {
     public int sit = 0;
     public int stat = 1;
 
-    public Request(DataOutputStream out,InputStream in,int id,String ip){
+    public Request(DataOutputStream out,InputStream in,int id,String ip,boolean ssl){
         this.id = id;
         this.ip = ip;
         try{
-            tempFile = new File(Configs.getCWD() + "/src/Temp/temp-" + id + ".tmp");
-            FileWriter fw = new FileWriter(tempFile, true);
-            fw.write(in.read());
-            while (in.available() != 0) {
+            tempFile = new File(Configs.getCWD() + "/src/Temp/temp" + id + ".tmp");
+            FileOutputStream fw =  new FileOutputStream(tempFile,true);
+            if (ssl){
                 fw.write(in.read());
+                while(in.available() > 0) {
+                    fw.write(in.read());
+                }
+            }else {
+                fw.write(in.read());
+                while (in.available() != 0) fw.write(in.read());
             }
             fw.flush();
             fw.close();
             bf = new RandomAccessFile(tempFile,"r");
-            this.parseHeaders();
-            if (this.stat == 1){
+            if (this.tempFile.length() > 10){
+                this.parseHeaders();
                 switch (this.method) {
                     case CONNECT -> this.sit = 200;
                     case PUT -> this.handlePUT();
@@ -84,6 +89,8 @@ public class Request {
             }else {
                 out.flush();
                 out.close();
+                this.tempFile.delete();
+                this.stat = 0;
             }
         }catch(IOException ex){
             this.sit = 500;
@@ -100,40 +107,35 @@ public class Request {
     private void parseHeaders(){
         try{
             String line = bf.readLine();
-            if (line != null){
+            rawHeaders += line;
+            String[] p = line.split(" ", 3);
+            this.method = switch (p[0]){
+                case "GET" -> Methods.GET;
+                case "POST" -> Methods.POST;
+                case "PUT" -> Methods.PUT;
+                case "HEAD" -> Methods.HEAD;
+                case "DELETE" -> Methods.DELETE;
+                case "CONNECT" -> Methods.CONNECT;
+                case "OPTIONS" -> Methods.OPTIONS;
+                case "TRACE" -> Methods.TRACE;
+                default -> Methods.UNKNOWN;
+            };
+            headers.put("Method", this.method);
+            headers.put("URL", p[1]);
+            headers.put("Version", p[2]);
+            while(!(line = bf.readLine()).isEmpty()){
                 rawHeaders += line;
-                String[] p = line.split(" ", 3);
-                String mth = p[0];
-                switch (mth){
-                    case "GET" -> this.method = Methods.GET;
-                    case "POST" -> this.method = Methods.POST;
-                    case "PUT" -> this.method = Methods.PUT;
-                    case "HEAD" -> this.method = Methods.HEAD;
-                    case "DELETE" -> this.method = Methods.DELETE;
-                    case "CONNECT" -> this.method = Methods.CONNECT;
-                    case "OPTIONS" -> this.method = Methods.OPTIONS;
-                    case "TRACE" -> this.method = Methods.TRACE;
-                }
-                headers.put("Method", this.method);
-                headers.put("URL", p[1]);
-                headers.put("Version", p[2]);
-                while(!(line = bf.readLine()).isEmpty()){
-                    rawHeaders += line;
-                    String[] tmp = line.split(":", 2);
-                    if (tmp.length != 1) headers.put(tmp[0].trim(), tmp[1].trim());
-                }
-                if(this.method != Methods.CONNECT && this.method != Methods.OPTIONS){
-                    String prt = (String) headers.get("Version");
-                    String url = prt.split("/")[0] + "://" + headers.get("Host") + URLDecoder.decode((String) headers.get("URL"), StandardCharsets.UTF_8);
-                    URL u = new URL(url);
-                    Host = u.getHost().replace("www.", "").replace("ww2.", "");
-                    if (u.getPort() != -1) Host += ":" + u.getPort();
-                    Path = u.getPath();
-                    headers.replace("URL", u);
-                }
-            }else {
-                this.stat = 0;
-                bf.close();
+                String[] tmp = line.split(":", 2);
+                if (tmp.length != 1) headers.put(tmp[0].trim(), tmp[1].trim());
+            }
+            if(this.method != Methods.CONNECT && this.method != Methods.OPTIONS){
+                String prt = (String) headers.get("Version");
+                String url = prt.split("/")[0] + "://" + headers.get("Host") + URLDecoder.decode((String) headers.get("URL"), StandardCharsets.UTF_8);
+                URL u = new URL(url);
+                Host = u.getHost().replace("www.", "").replace("ww2.", "");
+                if (u.getPort() != -1) Host += ":" + u.getPort();
+                Path = u.getPath();
+                headers.replace("URL", u);
             }
         }catch(Exception ex){
             this.sit = 500;
