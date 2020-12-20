@@ -101,6 +101,7 @@ public class Response {
                                                 cmds.add(fl.getAbsolutePath());
                                                 new CGIExecuter(cmds, fl, id, Host, headers, url, out, req.Body, ip);
                                             } else {
+                                                fl = new File(Configs.getMainDir(Host) + path);
                                                 FileSender.setProt(prot);
                                                 if (ext.equals(".js")) FileSender.setContentType(FileTypes.getContentType(".js"));
                                                 else FileSender.setContentType("text/plain");

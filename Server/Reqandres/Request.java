@@ -5,7 +5,6 @@ import java.io.*;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.*;
@@ -16,7 +15,6 @@ public class Request {
     private RandomAccessFile bf;
     private Methods method;
     public String Body = "";
-    //public String rawHeaders = "";
     public String ip;
     public File tempFile;
     public final HashMap headers = new HashMap();
