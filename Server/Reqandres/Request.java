@@ -5,6 +5,7 @@ import java.io.*;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.*;
@@ -15,7 +16,7 @@ public class Request {
     private RandomAccessFile bf;
     private Methods method;
     public String Body = "";
-    public String rawHeaders = "";
+    //public String rawHeaders = "";
     public String ip;
     public File tempFile;
     public final HashMap headers = new HashMap();
@@ -25,25 +26,28 @@ public class Request {
     public int sit = 0;
     public int stat = 1;
 
-    public Request(DataOutputStream out,InputStream in,int id,String ip,boolean ssl){
+    public Request(DataOutputStream out,DataInputStream in,int id,String ip,boolean ssl){
         this.id = id;
         this.ip = ip;
         try{
             tempFile = new File(Configs.getCWD() + "/src/Temp/temp" + id + ".tmp");
             FileOutputStream fw =  new FileOutputStream(tempFile,true);
-            if (ssl){
-                fw.write(in.read());
-                while(in.available() > 0) {
+            try{
+                if (ssl) {
+                    System.out.println("here");
+                    //int i;
+                    //while ((i = in.read()) != -1) fw.write(i);
+                    while(true) fw.write(in.readByte());
+                } else {
                     fw.write(in.read());
+                    while (in.available() != 0) fw.write(in.read());
                 }
-            }else {
-                fw.write(in.read());
-                while (in.available() != 0) fw.write(in.read());
-            }
+            }catch(Exception ex){System.out.println(ex.toString());}
+            System.out.println("done");
             fw.flush();
             fw.close();
             bf = new RandomAccessFile(tempFile,"r");
-            if (this.tempFile.length() > 10){
+            if (bf.length() > 10){
                 this.parseHeaders();
                 switch (this.method) {
                     case CONNECT -> this.sit = 200;
@@ -92,8 +96,8 @@ public class Request {
                 this.tempFile.delete();
                 this.stat = 0;
             }
-        }catch(IOException ex){
-            this.sit = 500;
+        }catch(Exception ex){
+            //this.sit = 500;
             String t = "";
             for (StackTraceElement a : ex.getStackTrace()){
                 t += a.toString() + " ;; ";
@@ -107,7 +111,7 @@ public class Request {
     private void parseHeaders(){
         try{
             String line = bf.readLine();
-            rawHeaders += line;
+            //rawHeaders += line;
             String[] p = line.split(" ", 3);
             this.method = switch (p[0]){
                 case "GET" -> Methods.GET;
@@ -124,7 +128,7 @@ public class Request {
             headers.put("URL", p[1]);
             headers.put("Version", p[2]);
             while(!(line = bf.readLine()).isEmpty()){
-                rawHeaders += line;
+                //rawHeaders += line;
                 String[] tmp = line.split(":", 2);
                 if (tmp.length != 1) headers.put(tmp[0].trim(), tmp[1].trim());
             }

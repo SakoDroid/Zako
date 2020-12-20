@@ -4,8 +4,7 @@ import Server.Reqandres.*;
 import Server.Utils.*;
 import Server.DDOS.Interface;
 import javax.net.ssl.SSLSocket;
-import java.io.DataOutputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.net.Socket;
 
 public class HttpHandler extends Thread{
@@ -32,11 +31,13 @@ public class HttpHandler extends Thread{
             DataOutputStream out;
             InputStream in;
             if (s != null){
+                //s.setSoTimeout(1);
                 ip = s.getInetAddress().getHostAddress();
                 fullip = s.getRemoteSocketAddress().toString();
                 out = new DataOutputStream(s.getOutputStream());
                 in = s.getInputStream();
             }else{
+                //ss.setSoTimeout(1);
                 ip = ss.getInetAddress().getHostAddress();
                 fullip = ss.getRemoteSocketAddress().toString();
                 out = new DataOutputStream(ss.getOutputStream());
@@ -47,7 +48,7 @@ public class HttpHandler extends Thread{
                 if (Perms.isIPAllowed(ip)) {
                     if (Interface.checkIP(ip, in.available())) {
                         if (Runtime.getRuntime().freeMemory() > 1000) {
-                            Request rq = new Request(out,in, id, ip,Configs.isSSLOn());
+                            Request rq = new Request(out, new DataInputStream(in), id, ip, Configs.isSSLOn());
                             if (rq.stat == 1) new Response(rq, out, id);
                             //rq.tempFile.delete();
                         } else {
