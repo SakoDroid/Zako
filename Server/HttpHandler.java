@@ -48,7 +48,7 @@ public class HttpHandler extends Thread{
                 if (Perms.isIPAllowed(ip)) {
                     if (Interface.checkIP(ip, in.available())) {
                         if (Runtime.getRuntime().freeMemory() > 1000) {
-                            Request rq = new Request(out, new DataInputStream(in), id, ip, Configs.isSSLOn());
+                            Request rq = new Request(out, in, id, ip, Configs.isSSLOn());
                             if (rq.stat == 1) new Response(rq, out, id);
                             //rq.tempFile.delete();
                         } else {

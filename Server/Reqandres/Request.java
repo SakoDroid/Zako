@@ -24,27 +24,28 @@ public class Request {
     public int sit = 0;
     public int stat = 1;
 
-    public Request(DataOutputStream out,DataInputStream in,int id,String ip,boolean ssl){
+    public Request(DataOutputStream out,InputStream in,int id,String ip,boolean ssl){
         this.id = id;
         this.ip = ip;
         try{
             tempFile = new File(Configs.getCWD() + "/src/Temp/temp" + id + ".tmp");
-            FileOutputStream fw =  new FileOutputStream(tempFile,true);
+            FileWriter fw =  new FileWriter(tempFile,true);
             try{
                 if (ssl) {
                     System.out.println("here");
                     //int i;
                     //while ((i = in.read()) != -1) fw.write(i);
-                    while(true) fw.write(in.readByte());
+                    //while(true) fw.write(in.readByte());
                 } else {
                     fw.write(in.read());
                     while (in.available() != 0) fw.write(in.read());
                 }
             }catch(Exception ex){System.out.println(ex.toString());}
-            System.out.println("done");
+            //System.out.println("done");
             fw.flush();
             fw.close();
             bf = new RandomAccessFile(tempFile,"r");
+            System.out.println(bf.length());
             if (bf.length() > 10){
                 this.parseHeaders();
                 switch (this.method) {
@@ -95,7 +96,6 @@ public class Request {
                 this.stat = 0;
             }
         }catch(Exception ex){
-            //this.sit = 500;
             String t = "";
             for (StackTraceElement a : ex.getStackTrace()){
                 t += a.toString() + " ;; ";
@@ -109,7 +109,6 @@ public class Request {
     private void parseHeaders(){
         try{
             String line = bf.readLine();
-            //rawHeaders += line;
             String[] p = line.split(" ", 3);
             this.method = switch (p[0]){
                 case "GET" -> Methods.GET;
@@ -126,7 +125,6 @@ public class Request {
             headers.put("URL", p[1]);
             headers.put("Version", p[2]);
             while(!(line = bf.readLine()).isEmpty()){
-                //rawHeaders += line;
                 String[] tmp = line.split(":", 2);
                 if (tmp.length != 1) headers.put(tmp[0].trim(), tmp[1].trim());
             }
@@ -140,7 +138,6 @@ public class Request {
                 headers.replace("URL", u);
             }
         }catch(Exception ex){
-            this.sit = 500;
             String t = "";
             for (StackTraceElement a : ex.getStackTrace()) {
                 t += a.toString() + " ;; ";
@@ -160,7 +157,6 @@ public class Request {
                 } else this.sit = 404;
             }else this.sit = 405;
         }catch(Exception ex){
-            this.sit = 500;
             String t = "";
             for (StackTraceElement a : ex.getStackTrace()){
                 t += a.toString() + " ;; ";
@@ -185,7 +181,6 @@ public class Request {
                 this.sit = 201;
             }else this.sit = 405;
         }catch(Exception ex){
-            this.sit = 500;
             String t = "";
             for (StackTraceElement a : ex.getStackTrace()){
                 t += a.toString() + " ;; ";
@@ -208,9 +203,9 @@ public class Request {
                     if(line.startsWith(bnd)){
                         String detailLine = bf.readLine();
                         if (detailLine == null) break;
-                        ptn = Pattern.compile("filename=\\w+");
+                        ptn = Pattern.compile("filename=\"[^\"]+");
                         mc = ptn.matcher(detailLine);
-                        Pattern nameptn = Pattern.compile("name=\\w+");
+                        Pattern nameptn = Pattern.compile("name=\"[^\"]+");
                         Matcher namemc = nameptn.matcher(detailLine);
                         if(mc.find()){
                             String fileName = mc.group().replace("filename=","").replace("\"","");
@@ -249,7 +244,6 @@ public class Request {
             bf.close();
             if (!files.isEmpty()) new FileFixer(files,tempFile);
         }catch(Exception ex){
-            this.sit = 500;
             String t = "";
             for (StackTraceElement a : ex.getStackTrace()){
                 t += a.toString() + " ;; ";
