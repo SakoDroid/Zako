@@ -31,13 +31,13 @@ public class HttpHandler extends Thread{
             DataOutputStream out;
             InputStream in;
             if (s != null){
-                //s.setSoTimeout(1);
+                s.setSoTimeout(Configs.timeout);
                 ip = s.getInetAddress().getHostAddress();
                 fullip = s.getRemoteSocketAddress().toString();
                 out = new DataOutputStream(s.getOutputStream());
                 in = s.getInputStream();
             }else{
-                //ss.setSoTimeout(1);
+                ss.setSoTimeout(Configs.timeout);
                 ip = ss.getInetAddress().getHostAddress();
                 fullip = ss.getRemoteSocketAddress().toString();
                 out = new DataOutputStream(ss.getOutputStream());

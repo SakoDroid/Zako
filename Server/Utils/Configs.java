@@ -9,19 +9,19 @@ public class Configs {
     private static HashMap<String,HashMap<String,String>> Configs = new HashMap<>();
     private static HashMap<String,Integer> hostsStatus = new HashMap<>();
     private static HashMap<String,String[]> HostFrAdd = new HashMap<>();
-    private static int loadBalancer;
-    private static int webServer;
+    private static boolean loadBalancer;
+    private static boolean webServer;
     private static int LBPort = 80;
     private static int WSPort = 80;
-    private static int SSL = 0;
+    private static boolean SSL = false;
 
     public static long generalSize = Long.MAX_VALUE;
     public static long fileSize = Long.MAX_VALUE;
     public static long postBodySize = Long.MAX_VALUE;
+    public static int timeout;
     public static int captchaLength = 5;
     public static int captchaHardness = 5;
     public static String MainHost;
-
 
     private Configs(){}
 
@@ -200,13 +200,16 @@ public class Configs {
             ptn = Pattern.compile("Server_Port=.*");
             mc = ptn.matcher(cfgs);
             if (mc.find()) wsp = mc.group().replace("Server_Port=","");
+            ptn = Pattern.compile("Sockets-Timeout=.*");
+            mc = ptn.matcher(cfgs);
+            if (mc.find()) timeout = Integer.parseInt(mc.group().replace("Sockets-Timeout=",""));
             LBPort = Integer.parseInt(lbp);
             WSPort = Integer.parseInt(wsp);
-            webServer = Integer.parseInt(wb);
-            loadBalancer = Integer.parseInt(ld);
+            webServer = Integer.parseInt(wb) == 1;
+            loadBalancer = Integer.parseInt(ld) == 1;
             captchaLength = Integer.parseInt(cpln);
             captchaHardness = Integer.parseInt(cphr);
-            SSL = Integer.parseInt(ssl);
+            SSL = Integer.parseInt(ssl) == 1;
         }catch(Exception ex){
             String t = "";
             for (StackTraceElement a : ex.getStackTrace()){
@@ -289,12 +292,12 @@ public class Configs {
     }
 
     public static boolean isLBOn(){
-        return loadBalancer == 1;
+        return loadBalancer;
     }
 
-    public static boolean isWSOn(){return webServer == 1;}
+    public static boolean isWSOn(){return webServer;}
 
-    public static boolean isSSLOn(){return SSL == 1;}
+    public static boolean isSSLOn(){return SSL;}
 
     public static int getLBPort(){return LBPort;}
 
