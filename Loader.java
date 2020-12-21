@@ -32,6 +32,10 @@ public class Loader {
             long time = 200;
             if (mc.find()) time = Long.parseLong(mc.group().replace("DDOS-Allowable-Time-Between-Requests=","").replace("\"",""));
             Interface.load(ddos,time);
+            Logger.ilog("Killing processes on port " + Server.Utils.Configs.getWSPort() + " , " + Server.Utils.Configs.getLBPort() + " and 8560 ...");
+            Runtime.getRuntime().exec(new String[]{"fuser","-k",Server.Utils.Configs.getWSPort() + "/tcp"});
+            Runtime.getRuntime().exec(new String[]{"fuser","-k",Server.Utils.Configs.getLBPort() + "/tcp"});
+            Runtime.getRuntime().exec(new String[]{"fuser","-k","8560/tcp"});
         }catch(Exception ex){
             String t = "";
             for (StackTraceElement a : ex.getStackTrace()) {
