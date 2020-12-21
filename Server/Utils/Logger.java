@@ -37,7 +37,7 @@ public class Logger {
                 }
                 case 2 -> {
                     String out = df.format(new Date()) + " | " + log + "\n------------------------------------\n";
-                    writeInFile(new File(Configs.getCWD() + "/src/Data/Internal-Logs.log"),out);
+                    writeInFile(new File(Configs.getCWD() + "/Data/Internal-Logs.log"),out);
                 }
                 case 3 -> {
                     String out = df.format(new Date()) + " | " + filename + " | " + log + "\n------------------------------------\n";

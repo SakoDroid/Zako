@@ -10,7 +10,7 @@ public class SSLConfigs {
     private static String pss;
 
     public static void load(){
-        try(BufferedReader bf = new BufferedReader(new FileReader(Configs.getCWD() + "/src/CFGS/ssl.cfg"))){
+        try(BufferedReader bf = new BufferedReader(new FileReader(Configs.getCWD() + "/CFGS/ssl.cfg"))){
             String line;
             String cfgs = "";
             while((line = bf.readLine()) != null){

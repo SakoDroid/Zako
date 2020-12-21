@@ -12,7 +12,7 @@ public class Perms {
     public static void load(){
         try{
             Logger.ilog("Loading static directories ...");
-            BufferedReader bf = new BufferedReader(new FileReader(Configs.getCWD() + "/src/CFGS/Statics.cfg"));
+            BufferedReader bf = new BufferedReader(new FileReader(Configs.getCWD() + "/CFGS/Statics.cfg"));
             String line;
             while((line = bf.readLine()) != null){
                 if (!line.startsWith("#") && !line.isEmpty()){
@@ -22,13 +22,13 @@ public class Perms {
             }
             bf.close();
             Logger.ilog("Loading ip black list ...");
-            bf = new BufferedReader(new FileReader(Configs.getCWD() + "/src/CFGS/IP-Blacklist.cfg"));
+            bf = new BufferedReader(new FileReader(Configs.getCWD() + "/CFGS/IP-Blacklist.cfg"));
             while((line = bf.readLine()) != null){
                 if (!line.startsWith("#") && !line.isEmpty()) ipblacklist.add(line);
             }
             bf.close();
             Logger.ilog("Loading authorized ips for PUT and DELETE method ...");
-            bf = new BufferedReader(new FileReader(Configs.getCWD() + "/src/CFGS/IP_List_PUT_DELETE.cfg"));
+            bf = new BufferedReader(new FileReader(Configs.getCWD() + "/CFGS/IP_List_PUT_DELETE.cfg"));
             while((line = bf.readLine()) != null){
                 if (!line.startsWith("#") && !line.isEmpty()) ipsAuthorizedForPUTAndDelete.add(line);
             }
@@ -86,7 +86,7 @@ public class Perms {
 
     public static void addIPToBlackList(String ip){
         ipblacklist.add(ip);
-        try(FileWriter fw = new FileWriter(Configs.getCWD() + "/src/CFGS/IP-Blacklist.cfg",true)){
+        try(FileWriter fw = new FileWriter(Configs.getCWD() + "/CFGS/IP-Blacklist.cfg",true)){
             fw.write("\n" + ip);
             fw.flush();
         }catch(Exception ex){

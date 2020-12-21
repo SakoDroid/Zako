@@ -33,7 +33,7 @@ public class Configs {
     }
 
     public static void load(){
-        try(BufferedReader bf = new BufferedReader(new FileReader(Server.Utils.Configs.getCWD() + "/src/CFGS/Load_Balancer.cfg"))){
+        try(BufferedReader bf = new BufferedReader(new FileReader(Server.Utils.Configs.getCWD() + "/CFGS/Load_Balancer.cfg"))){
             Logger.ilog("Loading load balancer ...");
             String cfgs = "";
             String line;

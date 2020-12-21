@@ -9,6 +9,7 @@ public class Configs {
     private static HashMap<String,HashMap<String,String>> Configs = new HashMap<>();
     private static HashMap<String,Integer> hostsStatus = new HashMap<>();
     private static HashMap<String,String[]> HostFrAdd = new HashMap<>();
+
     private static boolean loadBalancer;
     private static boolean webServer;
     private static int LBPort = 80;
@@ -78,8 +79,8 @@ public class Configs {
     }
 
     private static void loadDirs(){
-        try(FileReader bf = new FileReader(System.getProperty("user.dir") + "/src/CFGS/Dirs.cfg")){
-            File tempdir = new File(getCWD() + "/src/Temp");
+        try(FileReader bf = new FileReader(System.getProperty("user.dir") + "/CFGS/Dirs.cfg")){
+            File tempdir = new File(getCWD() + "/Temp");
             if (!tempdir.isDirectory()) tempdir.mkdir();
             String cfg = "";
             int i;
@@ -110,7 +111,7 @@ public class Configs {
 
     private static void loadHosts(){
         Logger.ilog("Loading subdomains ...");
-        try(BufferedReader bf = new BufferedReader(new FileReader(System.getProperty("user.dir") + "/src/CFGS/Hosts.cfg"))){
+        try(BufferedReader bf = new BufferedReader(new FileReader(System.getProperty("user.dir") + "/CFGS/Hosts.cfg"))){
             String line;
             while((line = bf.readLine()) != null){
                 if(!line.startsWith("#")){
@@ -138,7 +139,7 @@ public class Configs {
 
     private static void loadSizes(){
         Logger.ilog("Loading Size.cfg ...");
-        try(BufferedReader bf = new BufferedReader(new FileReader(getCWD() + "/src/CFGS/Size.cfg"))){
+        try(BufferedReader bf = new BufferedReader(new FileReader(getCWD() + "/CFGS/Size.cfg"))){
             String line;
             String cfgs = "";
             while((line = bf.readLine()) != null){
@@ -166,7 +167,7 @@ public class Configs {
 
     private static void loadMain(){
         Logger.ilog("Loading main configs ...");
-        try(BufferedReader bf = new BufferedReader(new FileReader(getCWD() + "/src/CFGS/Zako.cfg"))){
+        try(BufferedReader bf = new BufferedReader(new FileReader(getCWD() + "/CFGS/Zako.cfg"))){
             String cfgs = "";
             String line;
             while((line = bf.readLine()) != null){

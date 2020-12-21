@@ -26,8 +26,8 @@ class Core {
             try{
                 synchronized (obj){
                     while (true) {
-                        for (int i = 0; i < 29; i++) {
-                            obj.wait(10000);
+                        for (int i = 0; i < 200; i++) {
+                            obj.wait(15000);
                             requests.clear();
                         }
                         warnings.clear();
@@ -68,7 +68,7 @@ class Core {
         }
 
         private void checkWarning(){
-            if (warnings.get(ip) > 50){
+            if (warnings.get(ip) > 25){
                 Logger.tlog(ip + " warning numbers passed 50. ip has been blocked.");
                 Perms.addIPToBlackList(ip);
             }
@@ -80,12 +80,12 @@ class Core {
         if (requests.get(ip) != null){
             requests.get(ip)[0]++;
             requests.get(ip)[1] += requestSize;
-            if (requests.get(ip)[0] > 200){
+            if (requests.get(ip)[0] > 150){
                 Logger.tlog("Possible DDOS or DOS attack detected from " + ip + ". Access has been disabled Temporarily . Tracking ip activity...");
                 perm = false;
                 new HandleWarnings(ip);
             }
-            else if (requests.get(ip)[1] > 2000000000){
+            else if (requests.get(ip)[1] > 1500000000){
                 Logger.tlog("Possible DDOS or DOS attack detected from " + ip + ". Access has been disabled Temporarily . Tracking ip activity...");
                 perm = false;
                 new HandleWarnings(ip);
@@ -94,6 +94,7 @@ class Core {
             long[] temp = {1,requestSize};
             requests.put(ip,temp);
         }
+        System.out.println(requests.get(ip)[0]);
         return perm;
     }
 }

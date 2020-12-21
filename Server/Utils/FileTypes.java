@@ -13,7 +13,7 @@ public class FileTypes {
 
     public static String getContentType(String ext){
         try{
-            if (cnts == null) cnts = (HashMap<String,String>)new ObjectInputStream(new FileInputStream(Configs.getCWD() + "/src/Data/content-types.sak")).readObject();
+            if (cnts == null) cnts = (HashMap<String,String>)new ObjectInputStream(new FileInputStream(Configs.getCWD() + "/Data/content-types.sak")).readObject();
         }catch (Exception ex){
             String t = "";
             for (StackTraceElement a : ex.getStackTrace()) {

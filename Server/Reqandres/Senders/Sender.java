@@ -67,7 +67,7 @@ public class Sender {
         try{
             Logger.glog("Sending back options method response to " + ip + "  ; id = " + id,host);
             out.writeBytes(prot + " 200 OK\nDate: " + df.format(new Date()) + "\nServer: Zako 0.1\nAllow: GET,HEAD,POST,OPTIONS,TRACE,CONNECT,PUT,DELETE\nIPS-Allowed-For-PUT-DELETE: ");
-            BufferedReader bf = new BufferedReader(new FileReader(Configs.getCWD() + "/src/CFGS/IP_List_PUT_DELETE.cfg"));
+            BufferedReader bf = new BufferedReader(new FileReader(Configs.getCWD() + "/CFGS/IP_List_PUT_DELETE.cfg"));
             String line;
             String ips = "";
             while ((line = bf.readLine()) != null){

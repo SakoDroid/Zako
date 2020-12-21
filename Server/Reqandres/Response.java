@@ -151,7 +151,7 @@ public class Response {
         FileSender.setProt(prot);
         FileSender.setContentType("text/html");
         FileSender.setStatus(code);
-        FileSender.sendFile(Method,new File(Configs.getCWD() + "/src/default_pages/" + code + ".html"),out,ip,id,Host);
+        FileSender.sendFile(Method,new File(Configs.getCWD() + "/default_pages/" + code + ".html"),out,ip,id,Host);
     }
 
 }

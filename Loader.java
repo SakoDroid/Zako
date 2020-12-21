@@ -18,7 +18,7 @@ public class Loader {
         Logger.ilog("Loading APIs configuration ...");
         APIConfigs.load();
         if (Server.Utils.Configs.isLBOn()) LoadBalancer.Configs.load();
-        try(BufferedReader bf = new BufferedReader(new FileReader(Configs.getCWD() + "/src/CFGS/Zako.cfg"))){
+        try(BufferedReader bf = new BufferedReader(new FileReader(Configs.getCWD() + "/CFGS/Zako.cfg"))){
             String cfgs = "",line;
             while((line = bf.readLine()) != null){
                 if (!line.startsWith("#"))cfgs += line + "\n";

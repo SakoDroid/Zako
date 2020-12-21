@@ -8,8 +8,8 @@ import java.util.Random;
 
 public class basicUtils {
 
-    private static final File statuses = new File(Configs.getCWD() + "/src/Data/status_codes.sak");
-    private static final File cmds = new File (Configs.getCWD() + "/src/Data/cmds.sak");
+    private static final File statuses = new File(Configs.getCWD() + "/Data/status_codes.sak");
+    private static final File cmds = new File (Configs.getCWD() + "/Data/cmds.sak");
     private static HashMap<Integer,String> codes;
     private static HashMap<String,String> execCmds;
     private static final ArrayList<Integer> ids = new ArrayList<>();
@@ -23,7 +23,7 @@ public class basicUtils {
             codes = (HashMap<Integer,String>) new ObjectInputStream(new FileInputStream(statuses)).readObject();
             execCmds = (HashMap<String,String>) new ObjectInputStream(new FileInputStream(cmds)).readObject();
             for (int code : codes.keySet()){
-                File fl = new File(Configs.getCWD() + "/src/default_pages/" + code +".html");
+                File fl = new File(Configs.getCWD() + "/default_pages/" + code +".html");
                 if (!fl.exists() && code > 399){
                     String des = getStatusCode(code);
                     FileWriter fw = new FileWriter(fl);

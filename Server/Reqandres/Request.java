@@ -28,7 +28,7 @@ public class Request {
         this.id = id;
         this.ip = ip;
         try{
-            tempFile = new File(Configs.getCWD() + "/src/Temp/temp" + id + ".tmp");
+            tempFile = new File(Configs.getCWD() + "/Temp/temp" + id + ".tmp");
             FileWriter fw =  new FileWriter(tempFile,true);
             try{
                 if (ssl) {
@@ -45,7 +45,6 @@ public class Request {
             fw.flush();
             fw.close();
             bf = new RandomAccessFile(tempFile,"r");
-            System.out.println(bf.length());
             if (bf.length() > 10){
                 this.parseHeaders();
                 if (this.sit < 300){
@@ -105,11 +104,12 @@ public class Request {
         }
     }
 
-
     private void parseHeaders(){
         try{
             String line = bf.readLine();
-            if (line.startsWith("HTTP")){
+            Pattern vr = Pattern.compile("HTTP/\\d.\\d");
+            Matcher mct = vr.matcher(line);
+            if (mct.find()){
                 String[] p = line.split(" ", 3);
                 this.method = switch (p[0]){
                     case "GET" -> Methods.GET;
