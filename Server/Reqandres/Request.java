@@ -48,20 +48,20 @@ public class Request {
             System.out.println(bf.length());
             if (bf.length() > 10){
                 this.parseHeaders();
-                switch (this.method) {
-                    case CONNECT -> this.sit = 200;
-                    case PUT -> this.handlePUT();
-                    case DELETE -> this.handleDELETE();
-                    default -> {
-                        if (!basicUtils.LocalHostIP.isEmpty())
-                            Host = Host.replace(basicUtils.LocalHostIP, Configs.MainHost);
-                        Host = Host.replace("127.0.0.1", "localhost");
-                        int status = Configs.getHostStatus(Host);
-                        if (status == 0) {
-                            String[] api = APIConfigs.getAPIAddress(Host + Path);
-                            if (api == null) {
-                                sit = Perms.isDirPerm(Configs.getMainDir(Host) + Path);
-                                if (sit < 300) {
+                if (this.sit < 300){
+                    switch (this.method) {
+                        case CONNECT -> this.sit = 200;
+                        case PUT -> this.handlePUT();
+                        case DELETE -> this.handleDELETE();
+                        default -> {
+                            if (!basicUtils.LocalHostIP.isEmpty())
+                                Host = Host.replace(basicUtils.LocalHostIP, Configs.MainHost);
+                            Host = Host.replace("127.0.0.1", "localhost");
+                            int status = Configs.getHostStatus(Host);
+                            if (status == 0) {
+                                String[] api = APIConfigs.getAPIAddress(Host + Path);
+                                if (api == null) {
+                                    sit = Perms.isDirPerm(Configs.getMainDir(Host) + Path);
                                     if (this.method == Methods.POST) {
                                         String postLength;
                                         if ((postLength = (String) headers.get("Content-Length")) != null) {
@@ -70,23 +70,23 @@ public class Request {
                                             else sit = 413;
                                         } else sit = 411;
                                     } else bf.close();
-                                }
-                            } else {
-                                if (api.length > 1) {
-                                    stat = 0;
-                                    bf.close();
-                                    Logger.glog("request for API " + Host + Path + " received from " + ip + " .", Host);
-                                    new SubForwarder(api, tempFile, out, ip, Host + Path);
                                 } else {
-                                    Path = api[0];
+                                    if (api.length > 1) {
+                                        stat = 0;
+                                        bf.close();
+                                        Logger.glog("request for API " + Host + Path + " received from " + ip + " .", Host);
+                                        new SubForwarder(api, tempFile, out, ip, Host + Path);
+                                    } else {
+                                        Path = api[0];
+                                    }
                                 }
-                            }
-                        } else if (status == 1) {
-                            stat = 0;
-                            bf.close();
-                            Logger.glog("request for " + Host + " received from " + ip + " .", Host);
-                            new SubForwarder(Configs.getForwardAddress(Host), tempFile, out, ip, Host);
-                        } else sit = 500;
+                            } else if (status == 1) {
+                                stat = 0;
+                                bf.close();
+                                Logger.glog("request for " + Host + " received from " + ip + " .", Host);
+                                new SubForwarder(Configs.getForwardAddress(Host), tempFile, out, ip, Host);
+                            } else sit = 500;
+                        }
                     }
                 }
             }else {
@@ -109,34 +109,36 @@ public class Request {
     private void parseHeaders(){
         try{
             String line = bf.readLine();
-            String[] p = line.split(" ", 3);
-            this.method = switch (p[0]){
-                case "GET" -> Methods.GET;
-                case "POST" -> Methods.POST;
-                case "PUT" -> Methods.PUT;
-                case "HEAD" -> Methods.HEAD;
-                case "DELETE" -> Methods.DELETE;
-                case "CONNECT" -> Methods.CONNECT;
-                case "OPTIONS" -> Methods.OPTIONS;
-                case "TRACE" -> Methods.TRACE;
-                default -> Methods.UNKNOWN;
-            };
-            headers.put("Method", this.method);
-            headers.put("URL", p[1]);
-            headers.put("Version", p[2]);
-            while(!(line = bf.readLine()).isEmpty()){
-                String[] tmp = line.split(":", 2);
-                if (tmp.length != 1) headers.put(tmp[0].trim(), tmp[1].trim());
-            }
-            if(this.method != Methods.CONNECT && this.method != Methods.OPTIONS){
-                String prt = (String) headers.get("Version");
-                String url = prt.split("/")[0] + "://" + headers.get("Host") + URLDecoder.decode((String) headers.get("URL"), StandardCharsets.UTF_8);
-                URL u = new URL(url);
-                Host = u.getHost().replace("www.", "").replace("ww2.", "");
-                if (u.getPort() != -1) Host += ":" + u.getPort();
-                Path = u.getPath();
-                headers.replace("URL", u);
-            }
+            if (line.startsWith("HTTP")){
+                String[] p = line.split(" ", 3);
+                this.method = switch (p[0]){
+                    case "GET" -> Methods.GET;
+                    case "POST" -> Methods.POST;
+                    case "PUT" -> Methods.PUT;
+                    case "HEAD" -> Methods.HEAD;
+                    case "DELETE" -> Methods.DELETE;
+                    case "CONNECT" -> Methods.CONNECT;
+                    case "OPTIONS" -> Methods.OPTIONS;
+                    case "TRACE" -> Methods.TRACE;
+                    default -> Methods.UNKNOWN;
+                };
+                headers.put("Method", this.method);
+                headers.put("URL", p[1]);
+                headers.put("Version", p[2]);
+                while(!(line = bf.readLine()).isEmpty()){
+                    String[] tmp = line.split(":", 2);
+                    if (tmp.length != 1) headers.put(tmp[0].trim(), tmp[1].trim());
+                }
+                if(this.method != Methods.CONNECT && this.method != Methods.OPTIONS){
+                    String prt = (String) headers.get("Version");
+                    String url = prt.split("/")[0] + "://" + headers.get("Host") + URLDecoder.decode((String) headers.get("URL"), StandardCharsets.UTF_8);
+                    URL u = new URL(url);
+                    Host = u.getHost().replace("www.", "").replace("ww2.", "");
+                    if (u.getPort() != -1) Host += ":" + u.getPort();
+                    Path = u.getPath();
+                    headers.replace("URL", u);
+                }
+            }else this.sit = 400;
         }catch(Exception ex){
             String t = "";
             for (StackTraceElement a : ex.getStackTrace()) {
@@ -252,6 +254,7 @@ public class Request {
             Logger.ilog(t);
         }
     }
+
     private void addToCGIBody(String data){
         if(Body.isEmpty()) Body += data;
         else Body += "&" + data;
