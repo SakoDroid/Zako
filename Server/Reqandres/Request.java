@@ -91,9 +91,11 @@ public class Request {
                         }
                     }
                 }
+                bf.close();
             }else {
                 out.flush();
                 out.close();
+                bf.close();
                 this.tempFile.delete();
                 this.stat = 0;
             }
@@ -129,9 +131,11 @@ public class Request {
                     headers.put("Method", this.method);
                     headers.put("URL", p[1]);
                     headers.put("Version", p[2]);
-                    while (!(line = bf.readLine()).isEmpty()) {
-                        String[] tmp = line.split(":", 2);
-                        if (tmp.length != 1) headers.put(tmp[0].trim(), tmp[1].trim());
+                    while ((line = bf.readLine()) != null) {
+                        if (!line.isEmpty()) {
+                            String[] tmp = line.split(":", 2);
+                            if (tmp.length != 1) headers.put(tmp[0].trim(), tmp[1].trim());
+                        }else break;
                     }
                     if (this.method != Methods.CONNECT && this.method != Methods.OPTIONS) {
                         String prt = (String) headers.get("Version");
