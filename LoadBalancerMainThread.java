@@ -13,7 +13,7 @@ public class LoadBalancerMainThread extends Thread{
     public void run(){
         try{
             ServerSocket ss = new ServerSocket(Configs.getLBPort());
-            Logger.ilog("Load balancer thread is now running ...");
+            Logger.ilog("Load balancer thread is now running on port " + Configs.getLBPort() + " ...");
             while(true) new Forwarder(ss.accept());
         }catch (Exception ex) {
             String t = "";

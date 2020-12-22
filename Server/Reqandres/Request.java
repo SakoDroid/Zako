@@ -1,5 +1,6 @@
 package Server.Reqandres;
 
+import Server.Reqandres.Senders.FileSender;
 import Server.Utils.*;
 import java.io.*;
 import java.net.URL;
@@ -52,6 +53,8 @@ public class Request {
                         case CONNECT -> this.sit = 200;
                         case PUT -> this.handlePUT();
                         case DELETE -> this.handleDELETE();
+                        case OPTIONS -> this.handleOptions(out);
+                        case TRACE -> this.handleTrace(out);
                         default -> {
                             if (!basicUtils.LocalHostIP.isEmpty())
                                 Host = Host.replace(basicUtils.LocalHostIP, Configs.MainHost);
@@ -122,22 +125,24 @@ public class Request {
                     case "TRACE" -> Methods.TRACE;
                     default -> Methods.UNKNOWN;
                 };
-                headers.put("Method", this.method);
-                headers.put("URL", p[1]);
-                headers.put("Version", p[2]);
-                while(!(line = bf.readLine()).isEmpty()){
-                    String[] tmp = line.split(":", 2);
-                    if (tmp.length != 1) headers.put(tmp[0].trim(), tmp[1].trim());
-                }
-                if(this.method != Methods.CONNECT && this.method != Methods.OPTIONS){
-                    String prt = (String) headers.get("Version");
-                    String url = prt.split("/")[0] + "://" + headers.get("Host") + URLDecoder.decode((String) headers.get("URL"), StandardCharsets.UTF_8);
-                    URL u = new URL(url);
-                    Host = u.getHost().replace("www.", "").replace("ww2.", "");
-                    if (u.getPort() != -1) Host += ":" + u.getPort();
-                    Path = u.getPath();
-                    headers.replace("URL", u);
-                }
+                if (this.method != Methods.UNKNOWN){
+                    headers.put("Method", this.method);
+                    headers.put("URL", p[1]);
+                    headers.put("Version", p[2]);
+                    while (!(line = bf.readLine()).isEmpty()) {
+                        String[] tmp = line.split(":", 2);
+                        if (tmp.length != 1) headers.put(tmp[0].trim(), tmp[1].trim());
+                    }
+                    if (this.method != Methods.CONNECT && this.method != Methods.OPTIONS) {
+                        String prt = (String) headers.get("Version");
+                        String url = prt.split("/")[0] + "://" + headers.get("Host") + URLDecoder.decode((String) headers.get("URL"), StandardCharsets.UTF_8);
+                        URL u = new URL(url);
+                        Host = u.getHost().replace("www.", "").replace("ww2.", "");
+                        if (u.getPort() != -1) Host += ":" + u.getPort();
+                        Path = u.getPath();
+                        headers.replace("URL", u);
+                    }
+                }else this.sit = 400;
             }else this.sit = 400;
         }catch(Exception ex){
             String t = "";
@@ -166,6 +171,20 @@ public class Request {
             t += ex.toString();
             Logger.ilog(t);
         }
+    }
+
+    private void handleOptions(DataOutputStream out){
+        this.stat = 0;
+        FileSender.setProt((String) headers.get("Version"));
+        FileSender.sendOptionsMethod(out,ip,id,Host);
+    }
+
+    private void handleTrace(DataOutputStream out){
+        this.stat = 0;
+        FileSender.setProt((String) headers.get("Version"));
+        FileSender.setContentType("message/http");
+        FileSender.setStatus(200);
+        FileSender.sendFile(this.method,this.tempFile,out,ip,id,Host);
     }
 
     private void handlePUT(){

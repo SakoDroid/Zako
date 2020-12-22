@@ -46,20 +46,10 @@ public class Response {
                         FileSender.setProt(prot);
                         FileSender.sendConnectMethod(out,ip,id,Host);
                     }
-                    case OPTIONS -> {
-                        FileSender.setProt(prot);
-                        FileSender.sendOptionsMethod(out,ip,id,Host);
-                    }
                     case PUT,DELETE -> {
                         FileSender.setProt(prot);
                         FileSender.setStatus(req.sit);
                         FileSender.send(null,out,ip,id,Host);
-                    }
-                    case TRACE -> {
-                        FileSender.setProt(prot);
-                        FileSender.setContentType("message/http");
-                        FileSender.setStatus(200);
-                        FileSender.sendFile(Method,req.tempFile,out,ip,id,Host);
                     }
                     default -> {
                         Logger.glog("Preparing response to " + ip + "  ; id = " + id, Host);

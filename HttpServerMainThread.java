@@ -14,7 +14,7 @@ public class HttpServerMainThread extends Thread{
     public void run(){
         try{
             ServerSocket serverSocket = new ServerSocket(Configs.getWSPort());
-            Logger.ilog("Http server thread is now running ...");
+            Logger.ilog("Http server thread is now running on port " + Configs.getWSPort() + " ...");
             while(true) new HttpHandler(serverSocket.accept());
         }catch (Exception ex) {
             String t = "";

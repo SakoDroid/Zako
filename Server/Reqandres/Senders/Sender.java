@@ -74,7 +74,8 @@ public class Sender {
                 if (!line.startsWith("#")) ips += line + ", ";
             }
             bf.close();
-            out.writeBytes(ips.substring(0,ips.length()-1));
+            if (ips.isEmpty()) out.writeBytes("");
+            else out.writeBytes(ips.substring(0,ips.length()-1));
             out.flush();
             out.close();
             basicUtils.delID(id);
