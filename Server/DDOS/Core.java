@@ -94,7 +94,6 @@ class Core {
             long[] temp = {1,requestSize};
             requests.put(ip,temp);
         }
-        System.out.println(requests.get(ip)[0]);
         return perm;
     }
 }
