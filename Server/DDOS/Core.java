@@ -75,11 +75,14 @@ class Core {
         }
     }
 
-    public boolean trackIP(String ip,long requestSize){
+    public void increaseReqVol(String ip,long size){
+        requests.get(ip)[1] += size;
+    }
+
+    public boolean trackIP(String ip){
         boolean perm = true;
         if (requests.get(ip) != null){
             requests.get(ip)[0]++;
-            requests.get(ip)[1] += requestSize;
             if (requests.get(ip)[0] > 150){
                 Logger.tlog("Possible DDOS or DOS attack detected from " + ip + ". Access has been disabled Temporarily . Tracking ip activity...");
                 perm = false;
@@ -91,7 +94,7 @@ class Core {
                 new HandleWarnings(ip);
             }
         }else{
-            long[] temp = {1,requestSize};
+            long[] temp = {1,0};
             requests.put(ip,temp);
         }
         return perm;

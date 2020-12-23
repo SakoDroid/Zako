@@ -39,7 +39,7 @@ public class Forwarder extends Thread {
         try{
             InputStream clientIn = client.getInputStream();
             if (Perms.isIPAllowed(ip)){
-                if (Interface.checkIP(ip, clientIn.available())) {
+                if (Interface.checkIP(ip)) {
                     Logger.glog(ip + " request received. Forwarding to " + serverip,"not available");
                     OutputStream serverOut = server.getOutputStream();
                     serverOut.write(clientIn.read());

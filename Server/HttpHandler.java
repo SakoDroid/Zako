@@ -28,7 +28,7 @@ public class HttpHandler extends Thread{
         try{
             Logger.glog(req.getFullip() + " Connected." + "  ; id = " + req.getID(), "not available");
             if (Perms.isIPAllowed(req.getIP())) {
-                if (Interface.checkIP(req.getIP(), 0)) {
+                if (Interface.checkIP(req.getIP())) {
                     if (Runtime.getRuntime().freeMemory() > 1000) {
                         RequestProcessor rq = new RequestProcessor(req,this.sh);
                         if (rq.stat == 1) new Response(rq, req);

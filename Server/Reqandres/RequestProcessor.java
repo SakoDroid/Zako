@@ -1,5 +1,6 @@
 package Server.Reqandres;
 
+import Server.DDOS.Interface;
 import Server.Reqandres.Senders.FileSender;
 import Server.Utils.*;
 import java.io.*;
@@ -19,6 +20,7 @@ import java.util.regex.*;
 public class RequestProcessor {
 
     private RandomAccessFile bf;
+    private final Request req;
     private Methods method;
     public String Body = "";
     public String ip;
@@ -28,7 +30,6 @@ public class RequestProcessor {
     public String Path;
     public int sit = 0;
     public int stat = 1;
-    private Request req;
 
     public RequestProcessor(Request rq, SocketChannel client){
         this.req = rq;
@@ -53,6 +54,7 @@ public class RequestProcessor {
             rq.genOutputStream();
             bf = new RandomAccessFile(rq.getCacheFile(),"r");
             if (bf.length() > 10){
+                Interface.addReqVol(ip,bf.length());
                 this.parseHeaders();
                 req.setHost(this.Host);
                 if (this.sit < 300){

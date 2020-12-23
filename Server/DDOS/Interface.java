@@ -17,8 +17,12 @@ public class Interface {
         else status = false;
     }
 
-    public static boolean checkIP(String ip,long reqSize){
-        if (status) return core.trackIP(ip,reqSize);
+    public static boolean checkIP(String ip){
+        if (status) return core.trackIP(ip);
         else return true;
+    }
+
+    public static void addReqVol(String ip, long reqSize){
+        if (core != null) core.increaseReqVol(ip,reqSize);
     }
 }
