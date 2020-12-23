@@ -2,6 +2,7 @@ package Server.Utils;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.regex.*;
 
 public class FileFixer{
 
@@ -24,14 +25,26 @@ public class FileFixer{
         @Override
         public void run() {
             try {
-                BufferedReader in = new BufferedReader(new FileReader(tf));
-                FileOutputStream out = new FileOutputStream(fl[0], true);
+                int ex = 1;
+                String name = fl[0];
+                File tmp = new File(name);
+                while(tmp.exists()){
+                    ex++;
+                    Pattern ptn = Pattern.compile("\\.\\w+");
+                    Matcher mc = ptn.matcher(name);
+                    String ext = "";
+                    if (mc.find()) ext = mc.group();
+                    name = name.replace(ext,"") + ex + ext;
+                    tmp = new File(name);
+                }
+                RandomAccessFile in = new RandomAccessFile(tf,"r");
+                FileOutputStream out = new FileOutputStream(name, true);
                 long on = Long.parseLong(fl[1]);
                 long off = Long.parseLong(fl[2]);
-                in.skip(on);
-                for (long i = on; i < off - 1; i++) {
-                    out.write(in.read());
-                }
+                in.seek(on);
+                byte[] b = new byte[(int)(off - on)];
+                in.read(b,0,(int)(off - on));
+                out.write(b);
                 out.flush();
                 out.close();
                 in.close();
