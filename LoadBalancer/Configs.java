@@ -8,7 +8,6 @@ import java.util.regex.*;
 public class Configs {
 
     public static List<String[]> servers = new ArrayList<>();
-    public static String[] rvrz;
 
     private static void extractZakoServers(String cfgs){
         String ips = "";
@@ -24,13 +23,6 @@ public class Configs {
         }
     }
 
-    private static void extractOtherServer(String cfgs){
-        String ip = "";
-        Pattern ptn = Pattern.compile("Reverse Proxy:[^-]*");
-        Matcher mc = ptn.matcher(cfgs);
-        if (mc.find()) ip = mc.group().replace("Reverse Proxy:","").trim().replace("\n","");
-        rvrz = ip.split(":");
-    }
 
     public static void load(){
         try(BufferedReader bf = new BufferedReader(new FileReader(Server.Utils.Configs.getCWD() + "/CFGS/Load_Balancer.cfg"))){
@@ -41,14 +33,9 @@ public class Configs {
                 if (!line.startsWith("#")) cfgs += line + "\n";
             }
             extractZakoServers(cfgs);
-            extractOtherServer(cfgs);
             if (!servers.isEmpty()){
                 Tracker.start();
                 Logger.ilog("Load balancer is now active!");
-            }
-            else{
-                Tracker.firstServer = rvrz;
-                Logger.ilog("Reverse proxy enabled!");
             }
         }catch(Exception ex){
             String t = "";

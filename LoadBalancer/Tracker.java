@@ -35,6 +35,7 @@ class Tracker {
                                 this.curen = serverMemory;
                             }
                         }
+                        firstServer = bestServer;
                         obj.wait(100);
                     }
                 }

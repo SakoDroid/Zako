@@ -4,7 +4,6 @@ import Server.DDOS.Interface;
 import Server.Reqandres.Senders.FileSender;
 import Server.Utils.*;
 import Server.Utils.Configs;
-
 import java.net.*;
 import java.io.*;
 
@@ -39,38 +38,36 @@ public class Forwarder extends Thread {
     public void run(){
         try{
             InputStream clientIn = client.getInputStream();
-            if (clientIn.available() > 0){
-                if (Perms.isIPAllowed(ip)){
-                    if (Interface.checkIP(ip, clientIn.available())) {
-                        Logger.glog(ip + " request received. Forwarding to " + serverip,"not available");
-                        InputStream serverIn = server.getInputStream();
-                        OutputStream serverOut = server.getOutputStream();
-                        while (clientIn.available() > 0) {
-                            serverOut.write(clientIn.read());
-                        }
-                        serverOut.flush();
-                        int i;
-                        while ((i = serverIn.read()) != -1) {
-                            clientOut.write(i);
-                        }
-                        clientOut.flush();
-                        client.close();
-                        server.close();
-                    } else {
-                        Logger.glog(client.getRemoteSocketAddress().toString() + " request rejected due to DDOS protection.", "not available");
-                        clientOut.write(HTMLGen.genTooManyRequests(ip).getBytes());
-                        clientOut.flush();
-                        clientOut.close();
+            if (Perms.isIPAllowed(ip)){
+                if (Interface.checkIP(ip, clientIn.available())) {
+                    Logger.glog(ip + " request received. Forwarding to " + serverip,"not available");
+                    OutputStream serverOut = server.getOutputStream();
+                    serverOut.write(clientIn.read());
+                    System.out.println(clientIn.available());
+                    while (clientIn.available() > 0) {
+                        serverOut.write(clientIn.read());
                     }
-                }else{
-                    Logger.glog(client.getRemoteSocketAddress().toString() + " request rejected due to ip ban.", "not available");
-                    clientOut.write(HTMLGen.genIPBan(ip).getBytes());
+                    serverOut.flush();
+                    System.out.println("done");
+                    InputStream serverIn = server.getInputStream();
+                    int i;
+                    while ((i = serverIn.read()) != -1) {
+                        clientOut.write(i);
+                    }
+                    clientOut.flush();
+                    client.close();
+                    server.close();
+                } else {
+                    Logger.glog(client.getRemoteSocketAddress().toString() + " request rejected due to DDOS protection.", "not available");
+                    clientOut.write(HTMLGen.genTooManyRequests(ip).getBytes());
                     clientOut.flush();
                     clientOut.close();
                 }
             }else{
-                client.close();
-                server.close();
+                Logger.glog(client.getRemoteSocketAddress().toString() + " request rejected due to ip ban.", "not available");
+                clientOut.write(HTMLGen.genIPBan(ip).getBytes());
+                clientOut.flush();
+                clientOut.close();
             }
         }catch(Exception ex){
             String t = "";
