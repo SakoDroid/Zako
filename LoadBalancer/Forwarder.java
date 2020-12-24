@@ -6,23 +6,24 @@ import Server.Utils.*;
 import Server.Utils.Configs;
 import java.net.*;
 import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.*;
 
 public class Forwarder extends Thread {
 
     private String serverip;
-    private Socket client;
+    private SocketChannel client;
     private Socket server;
     private String ip;
     private DataOutputStream clientOut;
 
-    public Forwarder(Socket s){
+    public Forwarder(SocketChannel s){
         try {
             this.client = s;
             String[] sv = Tracker.getServer();
             this.server = new Socket(sv[0],Integer.parseInt(sv[1]));
-            this.ip = s.getInetAddress().getHostAddress();
+            this.ip = s.socket().getInetAddress().getHostAddress();
             this.serverip = sv[0];
-            this.clientOut = new DataOutputStream(client.getOutputStream());
             this.start();
         }catch(Exception ex){
             String t = "";
@@ -37,18 +38,20 @@ public class Forwarder extends Thread {
     @Override
     public void run(){
         try{
-            InputStream clientIn = client.getInputStream();
             if (Perms.isIPAllowed(ip)){
                 if (Interface.checkIP(ip)) {
                     Logger.glog(ip + " request received. Forwarding to " + serverip,"not available");
                     OutputStream serverOut = server.getOutputStream();
-                    serverOut.write(clientIn.read());
-                    System.out.println(clientIn.available());
-                    while (clientIn.available() > 0) {
-                        serverOut.write(clientIn.read());
+                    this.client.configureBlocking(false);
+                    ByteBuffer bf = ByteBuffer.allocate(1024);
+                    while (client.read(bf) > 0){
+                        bf.flip();
+                        serverOut.write(bf.array());
+                        bf.clear();
                     }
+                    this.client.configureBlocking(true);
                     serverOut.flush();
-                    System.out.println("done");
+                    clientOut = new DataOutputStream(this.client.socket().getOutputStream());
                     InputStream serverIn = server.getInputStream();
                     int i;
                     while ((i = serverIn.read()) != -1) {
@@ -58,13 +61,15 @@ public class Forwarder extends Thread {
                     client.close();
                     server.close();
                 } else {
-                    Logger.glog(client.getRemoteSocketAddress().toString() + " request rejected due to DDOS protection.", "not available");
+                    clientOut = new DataOutputStream(this.client.socket().getOutputStream());
+                    Logger.glog(client.socket().getRemoteSocketAddress().toString() + " request rejected due to DDOS protection.", "not available");
                     clientOut.write(HTMLGen.genTooManyRequests(ip).getBytes());
                     clientOut.flush();
                     clientOut.close();
                 }
             }else{
-                Logger.glog(client.getRemoteSocketAddress().toString() + " request rejected due to ip ban.", "not available");
+                clientOut = new DataOutputStream(this.client.socket().getOutputStream());
+                Logger.glog(client.socket().getRemoteSocketAddress().toString() + " request rejected due to ip ban.", "not available");
                 clientOut.write(HTMLGen.genIPBan(ip).getBytes());
                 clientOut.flush();
                 clientOut.close();
@@ -82,6 +87,16 @@ public class Forwarder extends Thread {
     }
 
     private void sendCode(int code){
+        try{
+            clientOut = new DataOutputStream(this.client.socket().getOutputStream());
+        }catch(Exception ex){
+            String t = "";
+            for (StackTraceElement a : ex.getStackTrace()) {
+                t += a.toString() + " ;; ";
+            }
+            t += ex.toString();
+            Logger.ilog(t);
+        }
         FileSender.setProt("HTTP/1.1");
         FileSender.setContentType("text/html");
         FileSender.setStatus(code);
