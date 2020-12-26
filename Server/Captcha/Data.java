@@ -19,7 +19,14 @@ public class Data {
             String ans = "";
             if (mc.find()) ans = mc.group().replace("Ans=", "");
             if (!ans.isEmpty()) {
-                if (ipans.get(ip).equals(ans.toLowerCase())) temp = "OK";
+                String an = ipans.get(ip);
+                if (an != null){
+                    if (an.equals(ans.toLowerCase())){
+                        temp = "OK";
+                        ipans.remove(ip);
+                    }
+                }
+                else temp = "NA";
             }
         }
         return temp;
