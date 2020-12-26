@@ -35,8 +35,6 @@ public class RequestProcessor {
             bf = new RandomAccessFile(rq.getCacheFile(),"r");
             if (bf.length() > 10){
                 Interface.addReqVol(ip,bf.length());
-                //this.parseHeaders();
-                //req.setHost(this.Host);
                 if (this.sit < 300){
                     switch (this.method) {
                         case CONNECT -> this.sit = 200;
@@ -124,7 +122,6 @@ public class RequestProcessor {
             Pattern vr = Pattern.compile("HTTP/\\d.\\d");
             Matcher mct = vr.matcher(line);
             if (mct.find()){
-                System.out.println("in if");
                 String[] p = line.split(" ", 3);
                 this.method = switch (p[0]){
                     case "GET" -> Methods.GET;
@@ -138,7 +135,6 @@ public class RequestProcessor {
                     default -> Methods.UNKNOWN;
                 };
                 if (this.method != Methods.UNKNOWN){
-                    System.out.println("if 2 if");
                     headers.put("Method", this.method);
                     headers.put("URL", p[1]);
                     headers.put("Version", p[2]);

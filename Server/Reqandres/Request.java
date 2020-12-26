@@ -23,6 +23,7 @@ public class Request {
         this.fullip = client.getRemoteSocketAddress().toString();
         this.TempFile = new File(Configs.getCWD() + "/Temp/temp" + id + ".tmp");
         try{
+            this.sck.setSoTimeout(Configs.timeout);
             this.is = client.getInputStream();
             this.out = new DataOutputStream(client.getOutputStream());
         }catch(Exception ex){

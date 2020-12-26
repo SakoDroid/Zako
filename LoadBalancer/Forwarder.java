@@ -49,10 +49,7 @@ public class Forwarder extends Thread {
                     Logger.glog(ip + " request received. Forwarding to " + serverip,"not available");
                     read(client.getInputStream(),new DataOutputStream(server.getOutputStream()));
                     InputStream serverIn = server.getInputStream();
-                    int i;
-                    while ((i = serverIn.read()) != -1) {
-                        clientOut.write(i);
-                    }
+                    serverIn.transferTo(clientOut);
                     clientOut.flush();
                     client.close();
                     server.close();
@@ -87,15 +84,17 @@ public class Forwarder extends Thread {
             out.writeBytes(line + "\r\n");
             while ((line = this.readLine(in)) != null) {
                 if (!line.isEmpty()) {
-                    out.writeBytes((line + "\r\n"));
+                    out.writeBytes((line + "\n\r"));
                     if (line.contains("Content-Length")){
-                        len = Integer.parseInt(line.split(":",2)[1]);
+                        len = Integer.parseInt(line.split(":",2)[1].trim());
                     }
                 }else break;
             }
-            out.write(in.readNBytes(len+1));
+            out.writeBytes("\n\r");
+            if (len != 0){
+                out.write(in.readNBytes(len+1));
+            }
             out.flush();
-            out.close();
         }catch(Exception ex){
             String t = "";
             for (StackTraceElement a : ex.getStackTrace()) {
