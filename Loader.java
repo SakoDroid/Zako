@@ -8,6 +8,7 @@ import Server.DDOS.Interface;
 public class Loader {
 
     public static void load(){
+        basicUtils.killPrcs();
         new Reporter();
         Logger.ilog("Loading basic utilities ...");
         basicUtils.load();

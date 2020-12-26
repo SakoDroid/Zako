@@ -91,4 +91,50 @@ public class basicUtils {
         ids.remove((Integer) id);
     }
 
+    public static void killPrcs(){
+        ArrayList<String> cmds = new ArrayList<>();
+        try{
+            if (Configs.isLBOn()){
+                cmds.clear();
+                cmds.add("fuser");
+                cmds.add(Configs.getLBPort() + "/tcp");
+                ProcessBuilder pb = new ProcessBuilder(cmds);
+                Process p = pb.start();
+                InputStream in = p.getInputStream();
+                String prcs = new String(in.readAllBytes());
+                if (!prcs.isEmpty()){
+                    Runtime.getRuntime().exec(new String[]{"fuser","-k",Configs.getLBPort() + "/tcp"});
+                }
+            }
+            if (Configs.isWSOn()){
+                cmds.clear();
+                cmds.add("fuser");
+                cmds.add(Configs.getWSPort() + "/tcp");
+                ProcessBuilder pb = new ProcessBuilder(cmds);
+                Process p = pb.start();
+                InputStream in = p.getInputStream();
+                String prcs = new String(in.readAllBytes());
+                if (!prcs.isEmpty()){
+                    Runtime.getRuntime().exec(new String[]{"fuser","-k",Configs.getWSPort() + "/tcp"});
+                }
+            }
+            cmds.clear();
+            cmds.add("fuser");
+            cmds.add("8560/tcp");
+            ProcessBuilder pb = new ProcessBuilder(cmds);
+            Process p = pb.start();
+            InputStream in = p.getInputStream();
+            String prcs = new String(in.readAllBytes());
+            if (!prcs.isEmpty()){
+                Runtime.getRuntime().exec(new String[]{"fuser","-k","8560/tcp"});
+            }
+        }catch(Exception ex){
+            String t = "";
+            for (StackTraceElement a : ex.getStackTrace()){
+                t += a.toString() + " ;; ";
+            }
+            t += ex.toString();
+            Logger.ilog(t);
+        }
+    }
 }
