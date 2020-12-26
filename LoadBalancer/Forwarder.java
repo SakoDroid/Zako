@@ -8,22 +8,28 @@ import java.net.*;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
+import java.nio.charset.StandardCharsets;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Forwarder extends Thread {
 
     private String serverip;
-    private SocketChannel client;
+    private Socket client;
     private Socket server;
     private String ip;
     private DataOutputStream clientOut;
 
-    public Forwarder(SocketChannel s){
+    public Forwarder(Socket s){
         try {
             this.client = s;
+            this.client.setSoTimeout(Configs.timeout);
             String[] sv = Tracker.getServer();
             this.server = new Socket(sv[0],Integer.parseInt(sv[1]));
-            this.ip = s.socket().getInetAddress().getHostAddress();
+            this.server.setSoTimeout(Configs.timeout);
+            this.ip = s.getInetAddress().getHostAddress();
             this.serverip = sv[0];
+            clientOut = new DataOutputStream(this.client.getOutputStream());
             this.start();
         }catch(Exception ex){
             String t = "";
@@ -41,17 +47,7 @@ public class Forwarder extends Thread {
             if (Perms.isIPAllowed(ip)){
                 if (Interface.checkIP(ip)) {
                     Logger.glog(ip + " request received. Forwarding to " + serverip,"not available");
-                    OutputStream serverOut = server.getOutputStream();
-                    this.client.configureBlocking(false);
-                    ByteBuffer bf = ByteBuffer.allocate(1024);
-                    while (client.read(bf) > 0){
-                        bf.flip();
-                        serverOut.write(bf.array());
-                        bf.clear();
-                    }
-                    this.client.configureBlocking(true);
-                    serverOut.flush();
-                    clientOut = new DataOutputStream(this.client.socket().getOutputStream());
+                    read(client.getInputStream(),new DataOutputStream(server.getOutputStream()));
                     InputStream serverIn = server.getInputStream();
                     int i;
                     while ((i = serverIn.read()) != -1) {
@@ -61,15 +57,13 @@ public class Forwarder extends Thread {
                     client.close();
                     server.close();
                 } else {
-                    clientOut = new DataOutputStream(this.client.socket().getOutputStream());
-                    Logger.glog(client.socket().getRemoteSocketAddress().toString() + " request rejected due to DDOS protection.", "not available");
+                    Logger.glog(client.getRemoteSocketAddress().toString() + " request rejected due to DDOS protection.", "not available");
                     clientOut.write(HTMLGen.genTooManyRequests(ip).getBytes());
                     clientOut.flush();
                     clientOut.close();
                 }
             }else{
-                clientOut = new DataOutputStream(this.client.socket().getOutputStream());
-                Logger.glog(client.socket().getRemoteSocketAddress().toString() + " request rejected due to ip ban.", "not available");
+                Logger.glog(client.getRemoteSocketAddress().toString() + " request rejected due to ip ban.", "not available");
                 clientOut.write(HTMLGen.genIPBan(ip).getBytes());
                 clientOut.flush();
                 clientOut.close();
@@ -86,9 +80,22 @@ public class Forwarder extends Thread {
         }
     }
 
-    private void sendCode(int code){
+    private void read(InputStream in,DataOutputStream out){
         try{
-            clientOut = new DataOutputStream(this.client.socket().getOutputStream());
+            int len = 0;
+            String line = this.readLine(in);
+            out.writeBytes(line + "\r\n");
+            while ((line = this.readLine(in)) != null) {
+                if (!line.isEmpty()) {
+                    out.writeBytes((line + "\r\n"));
+                    if (line.contains("Content-Length")){
+                        len = Integer.parseInt(line.split(":",2)[1]);
+                    }
+                }else break;
+            }
+            out.write(in.readNBytes(len+1));
+            out.flush();
+            out.close();
         }catch(Exception ex){
             String t = "";
             for (StackTraceElement a : ex.getStackTrace()) {
@@ -97,6 +104,31 @@ public class Forwarder extends Thread {
             t += ex.toString();
             Logger.ilog(t);
         }
+    }
+
+    private String readLine(InputStream in){
+        StringBuilder sb = new StringBuilder();
+        int i;
+        try{
+            i = in.read();
+            if (i == -1) return null;
+            while (i != 13){
+                if (i != 10 ) sb.append((char)i);
+                i = in.read();
+                if (i == -1) break;
+            }
+        }catch(Exception ex){
+            String t = "";
+            for (StackTraceElement a : ex.getStackTrace()) {
+                t += a.toString() + " ;; ";
+            }
+            t += ex.toString();
+            Logger.ilog(t);
+        }
+        return sb.toString();
+    }
+
+    private void sendCode(int code){
         FileSender.setProt("HTTP/1.1");
         FileSender.setContentType("text/html");
         FileSender.setStatus(code);

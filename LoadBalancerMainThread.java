@@ -13,8 +13,7 @@ public class LoadBalancerMainThread extends Thread{
     @Override
     public void run(){
         try{
-            //ServerSocketChannel ss = new ServerSocket(Configs.getLBPort());
-            ServerSocketChannel gate = ServerSocketChannel.open().bind(new InetSocketAddress(Configs.getLBPort()));
+            ServerSocket gate = new ServerSocket(Configs.getLBPort());
             Logger.ilog("Load balancer thread is now running on port " + Configs.getLBPort() + " ...");
             while(true) new Forwarder(gate.accept());
         }catch (Exception ex) {

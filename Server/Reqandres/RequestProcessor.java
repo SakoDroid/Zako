@@ -117,10 +117,8 @@ public class RequestProcessor {
 
     private void read(){
         try{
-            //FileWriter fw = new FileWriter(req.getCacheFile(),true);
             FileOutputStream fw = new FileOutputStream(req.getCacheFile(),true);
             InputStream reader  = req.is;
-            //BufferedReader reader = new BufferedReader(new InputStreamReader(req.is));
             String line = this.readLine(reader);
             fw.write((line + "\r\n").getBytes());
             Pattern vr = Pattern.compile("HTTP/\\d.\\d");
