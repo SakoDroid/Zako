@@ -25,11 +25,11 @@ public class Captcha {
     }
 
     private String getRandomString(int length){
-        String out = "";
+        StringBuilder out = new StringBuilder();
         for (int i = 0 ; i < length ; i++){
-            out += chars[rnd.nextInt(chars.length)];
+            out.append(chars[rnd.nextInt(chars.length)]);
         }
-        return out;
+        return out.toString();
     }
 
     private byte[] getPicture(String cap){
