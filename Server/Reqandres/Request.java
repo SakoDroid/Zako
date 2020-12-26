@@ -2,9 +2,8 @@ package Server.Reqandres;
 
 import Server.Utils.*;
 
-import java.io.DataOutputStream;
 import java.io.*;
-import java.nio.channels.SocketChannel;
+import java.net.Socket;
 
 public class Request {
 
@@ -12,16 +11,28 @@ public class Request {
     private final String ip;
     private final String fullip;
     private String Host;
-    private final SocketChannel sh;
+    private final Socket sck;
     private final File TempFile;
-    private DataOutputStream out;
+    public DataOutputStream out;
+    public InputStream is;
 
-    public Request (SocketChannel client){
+    public Request (Socket client){
         this.id = basicUtils.getID();
-        this.sh = client;
-        this.ip = client.socket().getInetAddress().getHostAddress();
-        this.fullip = client.socket().getRemoteSocketAddress().toString();
+        this.sck = client;
+        this.ip = client.getInetAddress().getHostAddress();
+        this.fullip = client.getRemoteSocketAddress().toString();
         this.TempFile = new File(Configs.getCWD() + "/Temp/temp" + id + ".tmp");
+        try{
+            this.is = client.getInputStream();
+            this.out = new DataOutputStream(client.getOutputStream());
+        }catch(Exception ex){
+            String t = "";
+            for (StackTraceElement a : ex.getStackTrace()) {
+                t += a.toString() + " ;; ";
+            }
+            t += ex.toString();
+            Logger.ilog(t);
+        }
     }
 
     public void setHost(String host){
@@ -48,33 +59,7 @@ public class Request {
         return this.TempFile;
     }
 
-    public void setBlockingMode(boolean mode){
-        try{
-            this.sh.configureBlocking(mode);
-        }catch(IOException ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()){
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
-        }
-    }
-
-    public void genOutputStream(){
-        try{
-            if (out == null) out = new DataOutputStream(this.sh.socket().getOutputStream());
-        }catch(Exception ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()){
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
-        }
-    }
-
-    public DataOutputStream getOutputStream(){
-        return this.out;
+    public Socket getSock(){
+        return this.sck;
     }
 }

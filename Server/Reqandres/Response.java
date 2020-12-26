@@ -40,12 +40,12 @@ public class Response {
                 switch (Method){
                     case CONNECT -> {
                         FileSender.setProt(prot);
-                        FileSender.sendConnectMethod(request.getOutputStream(),request.getIP(),request.getID(),Host);
+                        FileSender.sendConnectMethod(request.out,request.getIP(),request.getID(),Host);
                     }
                     case PUT,DELETE -> {
                         FileSender.setProt(prot);
                         FileSender.setStatus(reqes.sit);
-                        FileSender.send(null,request.getOutputStream(),request.getIP(),request.getID(),Host);
+                        FileSender.send(null,request.out,request.getIP(),request.getID(),Host);
                     }
                     default -> {
                         Logger.glog("Preparing response to " + request.getIP() + "  ; id = " + request.getID(), Host);
@@ -55,19 +55,19 @@ public class Response {
                                     FileSender.setProt(prot);
                                     FileSender.setContentType("text/html");
                                     FileSender.setStatus(200);
-                                    FileSender.sendFile(Method, new File(Configs.getMainDir(Host) + "/index.html"), request.getOutputStream(), request.getIP(), request.getID(), Host);
+                                    FileSender.sendFile(Method, new File(Configs.getMainDir(Host) + "/index.html"), request.out, request.getIP(), request.getID(), Host);
                                 }
                                 case "/getcp" -> {
                                     FileSender.setProt(prot);
                                     FileSender.setContentType("image/png");
                                     FileSender.setStatus(200);
-                                    FileSender.sendFile(Method, new Captcha(request.getIP(),Host).image,request.getOutputStream(),request.getIP(),request.getID(),Host);
+                                    FileSender.sendFile(Method, new Captcha(request.getIP(),Host).image,request.out,request.getIP(),request.getID(),Host);
                                 }
                                 case "/chkcp" -> {
                                     FileSender.setProt(prot);
                                     FileSender.setStatus(200);
                                     FileSender.setContentType("text/plain");
-                                    FileSender.send(Data.checkAnswer(request.getIP(),reqes.Body),request.getOutputStream(),request.getIP(),request.getID(),Host);
+                                    FileSender.send(Data.checkAnswer(request.getIP(),reqes.Body),request.out,request.getIP(),request.getID(),Host);
                                 }
                                 default -> {
                                     Pattern pt = Pattern.compile("\\.\\w+");
@@ -85,14 +85,14 @@ public class Response {
                                                 List<String> cmds = new ArrayList<>();
                                                 cmds.add(cmd);
                                                 cmds.add(fl.getAbsolutePath());
-                                                new CGIExecuter(cmds, fl, request.getID(), Host, headers, url, request.getOutputStream(), reqes.Body, request.getIP());
+                                                new CGIExecuter(cmds, fl, request.getID(), Host, headers, url, request.out, reqes.Body, request.getIP());
                                             } else {
                                                 fl = new File(Configs.getMainDir(Host) + path);
                                                 FileSender.setProt(prot);
                                                 if (ext.equals(".js")) FileSender.setContentType(FileTypes.getContentType(".js"));
                                                 else FileSender.setContentType("text/plain");
                                                 FileSender.setStatus(200);
-                                                FileSender.sendFile(Method, fl, request.getOutputStream(), request.getIP(), request.getID(), Host);
+                                                FileSender.sendFile(Method, fl, request.out, request.getIP(), request.getID(), Host);
                                             }
                                         } else {
                                             fl = new File(Configs.getMainDir(Host) + path);
@@ -100,7 +100,7 @@ public class Response {
                                                 FileSender.setProt(prot);
                                                 FileSender.setContentType(tempCntc);
                                                 FileSender.setStatus(200);
-                                                FileSender.sendFile(Method, fl, request.getOutputStream(), request.getIP(), request.getID(), Host);
+                                                FileSender.sendFile(Method, fl, request.out, request.getIP(), request.getID(), Host);
                                             } else this.sendCode(404);
                                         }
                                     } else {
@@ -109,7 +109,7 @@ public class Response {
                                             FileSender.setProt(prot);
                                             FileSender.setContentType(FileTypes.getContentType(".bin"));
                                             FileSender.setStatus(200);
-                                            FileSender.sendFile(Method, fl, request.getOutputStream(), request.getIP(), request.getID(), Host);
+                                            FileSender.sendFile(Method, fl, request.out, request.getIP(), request.getID(), Host);
                                         } else this.sendCode(404);
                                     }
                                 }
@@ -129,7 +129,7 @@ public class Response {
             FileSender.setProt(prot);
             FileSender.setStatus(200);
             FileSender.setContentType("text/plain");
-            FileSender.send(null,request.getOutputStream(),request.getIP(),request.getID(),Host);
+            FileSender.send(null,request.out,request.getIP(),request.getID(),Host);
         }
     }
     
@@ -137,7 +137,7 @@ public class Response {
         FileSender.setProt(prot);
         FileSender.setContentType("text/html");
         FileSender.setStatus(code);
-        FileSender.sendFile(Method,new File(Configs.getCWD() + "/default_pages/" + code + ".html"),request.getOutputStream(),request.getIP(),request.getID(),Host);
+        FileSender.sendFile(Method,new File(Configs.getCWD() + "/default_pages/" + code + ".html"),request.out,request.getIP(),request.getID(),Host);
     }
 
 }

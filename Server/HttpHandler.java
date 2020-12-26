@@ -4,22 +4,23 @@ import Server.Reqandres.*;
 import Server.Utils.*;
 import Server.DDOS.Interface;
 import javax.net.ssl.SSLSocket;
-import java.nio.channels.SocketChannel;
+import java.net.Socket;
 
 public class HttpHandler extends Thread{
 
-    private SocketChannel sh;
+    private Socket sh;
     private SSLSocket ss;
     private Request req;
 
-    public HttpHandler(SocketChannel client){
+    public HttpHandler(Socket client){
         this.sh = client;
         this.req = new Request(client);
         this.start();
     }
 
-    public HttpHandler(SSLSocket s){
-        this.ss = s;
+    public HttpHandler(SSLSocket client){
+        this.ss = client;
+        this.req = new Request(client);
         this.start();
     }
 
@@ -30,29 +31,26 @@ public class HttpHandler extends Thread{
             if (Perms.isIPAllowed(req.getIP())) {
                 if (Interface.checkIP(req.getIP())) {
                     if (Runtime.getRuntime().freeMemory() > 1000) {
-                        RequestProcessor rq = new RequestProcessor(req,this.sh);
+                        RequestProcessor rq = new RequestProcessor(req);
                         if (rq.stat == 1) new Response(rq, req);
                         //req.getCacheFile().delete();
                     } else {
-                        req.genOutputStream();
                         Logger.glog(req.getFullip() + " request rejected due to server overload." + "  ; id = " + req.getID(), "not available");
-                        req.getOutputStream().writeBytes(HTMLGen.genOverLoad());
-                        req.getOutputStream().flush();
-                        req.getOutputStream().close();
+                        req.out.writeBytes(HTMLGen.genOverLoad());
+                        req.out.flush();
+                        req.out.close();
                     }
                 } else {
-                    req.genOutputStream();
                     Logger.glog(req.getFullip() + " request rejected due to DDOS protection." + "  ; id = " + req.getID(), "not available");
-                    req.getOutputStream().writeBytes(HTMLGen.genTooManyRequests(req.getIP()));
-                    req.getOutputStream().flush();
-                    req.getOutputStream().close();
+                    req.out.writeBytes(HTMLGen.genTooManyRequests(req.getIP()));
+                    req.out.flush();
+                    req.out.close();
                 }
             } else {
-                req.genOutputStream();
                 Logger.glog(req.getFullip() + " request rejected due to ip ban." + "  ; id = " + req.getID(), "not available");
-                req.getOutputStream().writeBytes(HTMLGen.genIPBan(req.getIP()));
-                req.getOutputStream().flush();
-                req.getOutputStream().close();
+                req.out.writeBytes(HTMLGen.genIPBan(req.getIP()));
+                req.out.flush();
+                req.out.close();
             }
         }catch(Exception ex){
             String t = "";
