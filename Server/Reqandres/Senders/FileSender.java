@@ -28,7 +28,6 @@ public class FileSender extends Sender {
                 in.close();
             }
             out.flush();
-            out.close();
             Logger.glog(ip + "'s request handled successfully!" + "  ; id = " + id,host);
             basicUtils.delID(id);
         }catch(Exception ex){
