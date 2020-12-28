@@ -12,7 +12,7 @@ public class FileSender extends Sender {
 
     private static String generateHeaders(long contentLength){
         String out = prot + " " + status + "\nDate: " + df.format(new Date()) + "\nServer: Zako 0.1" +
-                "\nContent-Length: " + contentLength + "\nContent-Type: " + contentType + "\nConnection: closed";
+                "\nContent-Length: " + contentLength + "\nContent-Type: " + contentType + "\nConnection: close";
         if (cookie != null) out += "\nSet-Cookie: " + cookie;
         out += "\n\n";
         return out;
@@ -24,9 +24,8 @@ public class FileSender extends Sender {
             out.writeBytes(generateHeaders(file.length()));
             if(method != Methods.HEAD){
                 FileInputStream in = new FileInputStream(file);
-                while (in.available() != 0) {
-                    out.write(in.read());
-                }
+                in.transferTo(out);
+                in.close();
             }
             out.flush();
             out.close();
