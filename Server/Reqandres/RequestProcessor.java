@@ -115,75 +115,81 @@ public class RequestProcessor {
 
     private void read(){
         try{
-            FileOutputStream fw = new FileOutputStream(req.getCacheFile(),true);
             InputStream reader  = req.is;
             String line = this.readLine(reader);
-            fw.write((line + "\r\n").getBytes());
-            Pattern vr = Pattern.compile("HTTP/\\d.\\d");
-            Matcher mct = vr.matcher(line);
-            if (mct.find()){
-                String[] p = line.split(" ", 3);
-                this.method = switch (p[0]){
-                    case "GET" -> Methods.GET;
-                    case "POST" -> Methods.POST;
-                    case "PUT" -> Methods.PUT;
-                    case "HEAD" -> Methods.HEAD;
-                    case "DELETE" -> Methods.DELETE;
-                    case "CONNECT" -> Methods.CONNECT;
-                    case "OPTIONS" -> Methods.OPTIONS;
-                    case "TRACE" -> Methods.TRACE;
-                    default -> Methods.UNKNOWN;
-                };
-                if (this.method != Methods.UNKNOWN){
-                    headers.put("Method", this.method);
-                    headers.put("URL", p[1]);
-                    headers.put("Version", p[2]);
-                    while ((line = this.readLine(reader)) != null) {
-                        if (!line.isEmpty()) {
-                            fw.write((line + "\r\n").getBytes());
-                            String[] tmp = line.split(":", 2);
-                            if (tmp.length != 1) headers.put(tmp[0].trim(), tmp[1].trim());
-                        }else break;
-                    }
-                    fw.write((line + "\r\n").getBytes());
-                    if (this.method != Methods.CONNECT && this.method != Methods.OPTIONS) {
-                        String prt = (String) headers.get("Version");
-                        String url = prt.split("/")[0] + "://" + headers.get("Host") + URLDecoder.decode((String) headers.get("URL"), StandardCharsets.UTF_8);
-                        URL u = new URL(url);
-                        Host = u.getHost().replace("www.", "").replace("ww2.", "");
-                        req.setHost(Host);
-                        if (u.getPort() != -1) Host += ":" + u.getPort();
-                        Path = u.getPath();
-                        headers.replace("URL", u);
-                    }
-                    if (this.method == Methods.POST || this.method == Methods.PUT){
-                        if (headers.get("Content-Length") != null){
-                            int length = Integer.parseInt((String)headers.get("Content-Length"));
-                            if (length < Configs.postBodySize){
-                                try{
+            if (line != null){
+                FileOutputStream fw = new FileOutputStream(req.getCacheFile(),true);
+                fw.write((line + "\r\n").getBytes());
+                Pattern vr = Pattern.compile("HTTP/\\d.\\d");
+                Matcher mct = vr.matcher(line);
+                if (mct.find()) {
+                    String[] p = line.split(" ", 3);
+                    this.method = switch (p[0]) {
+                        case "GET" -> Methods.GET;
+                        case "POST" -> Methods.POST;
+                        case "PUT" -> Methods.PUT;
+                        case "HEAD" -> Methods.HEAD;
+                        case "DELETE" -> Methods.DELETE;
+                        case "CONNECT" -> Methods.CONNECT;
+                        case "OPTIONS" -> Methods.OPTIONS;
+                        case "TRACE" -> Methods.TRACE;
+                        default -> Methods.UNKNOWN;
+                    };
+                    if (this.method != Methods.UNKNOWN) {
+                        headers.put("Method", this.method);
+                        headers.put("URL", p[1]);
+                        headers.put("Version", p[2]);
+                        while ((line = this.readLine(reader)) != null) {
+                            if (!line.isEmpty()) {
+                                fw.write((line + "\r\n").getBytes());
+                                String[] tmp = line.split(":", 2);
+                                if (tmp.length != 1) headers.put(tmp[0].trim(), tmp[1].trim());
+                            } else break;
+                        }
+                        fw.write((line + "\r\n").getBytes());
+                        if (this.method != Methods.CONNECT && this.method != Methods.OPTIONS) {
+                            String prt = (String) headers.get("Version");
+                            String url = prt.split("/")[0] + "://" + headers.get("Host") + URLDecoder.decode((String) headers.get("URL"), StandardCharsets.UTF_8);
+                            URL u = new URL(url);
+                            Host = u.getHost().replace("www.", "").replace("ww2.", "");
+                            req.setHost(Host);
+                            if (u.getPort() != -1) Host += ":" + u.getPort();
+                            Path = u.getPath();
+                            headers.replace("URL", u);
+                        }
+                        if (this.method == Methods.POST || this.method == Methods.PUT) {
+                            if (headers.get("Content-Length") != null) {
+                                int length = Integer.parseInt((String) headers.get("Content-Length"));
+                                if (length < Configs.postBodySize) {
+                                    try {
 
-                                    //Uses less ram but it is slower
-                                    /*for (int l = 0 ; l < length ; ++l){
-                                        fw.write(reader.read());
-                                    }*/
+                                        //Uses less ram but it is slower
+                                        /*for (int l = 0 ; l < length ; ++l){
+                                            fw.write(reader.read());
+                                        }*/
 
-                                    //Uses more ram but it's faster.
-                                    fw.write(reader.readNBytes(length+1));
-                                }catch(Exception ex){
-                                    String t = "";
-                                    for (StackTraceElement a : ex.getStackTrace()) {
-                                        t += a.toString() + " ;; ";
+                                        //Uses more ram but it's faster.
+                                        fw.write(reader.readNBytes(length + 1));
+                                    } catch (Exception ex) {
+                                        String t = "";
+                                        for (StackTraceElement a : ex.getStackTrace()) {
+                                            t += a.toString() + " ;; ";
+                                        }
+                                        t += ex.toString();
+                                        Logger.ilog(t);
                                     }
-                                    t += ex.toString();
-                                    Logger.ilog(t);
-                                }
-                            }else this.sit = 413;
-                        }else this.sit = 411;
-                    }
-                }else this.sit = 400;
-            }else this.stat = 400;
-            fw.flush();
-            fw.close();
+                                } else this.sit = 413;
+                            } else this.sit = 411;
+                        }
+                    } else this.sit = 400;
+                } else this.stat = 400;
+                fw.flush();
+                fw.close();
+            }else{
+                req.getSock().close();
+                req.getCacheFile().delete();
+                this.sit = 0;
+            }
         }catch(Exception ex){
             String t = "";
             for (StackTraceElement a : ex.getStackTrace()) {

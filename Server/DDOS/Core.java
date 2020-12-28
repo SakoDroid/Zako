@@ -69,14 +69,15 @@ class Core {
 
         private void checkWarning(){
             if (warnings.get(ip) > 25){
-                Logger.tlog(ip + " warning numbers passed 50. ip has been blocked.");
+                Logger.tlog(ip + " warning numbers passed 25. ip has been blocked.");
                 Perms.addIPToBlackList(ip);
             }
         }
     }
 
     public void increaseReqVol(String ip,long size){
-        requests.get(ip)[1] += size;
+        long[] tmp = requests.get(ip);
+        if (tmp != null) requests.get(ip)[1] += size;
     }
 
     public boolean trackIP(String ip){
