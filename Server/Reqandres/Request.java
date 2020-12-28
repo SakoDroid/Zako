@@ -11,10 +11,12 @@ public class Request {
     private final String ip;
     private final String fullip;
     private String Host;
+    private String Prot;
     private final Socket sck;
     private final File TempFile;
     public DataOutputStream out;
     public InputStream is;
+    public String Path;
 
     public Request (Socket client){
         this.id = basicUtils.getID();
@@ -34,6 +36,14 @@ public class Request {
             t += ex.toString();
             Logger.ilog(t);
         }
+    }
+
+    public void setProt(String prot){
+        this.Prot = prot;
+    }
+
+    public String getProt(){
+        return this.Prot;
     }
 
     public void setHost(String host){

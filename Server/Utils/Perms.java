@@ -54,6 +54,7 @@ public class Perms {
             temp = 200;
         }
         else{
+            if (!dir.endsWith("/")) dir += "/";
             try {
                 File fl = new File(dir);
                 if (fl.isDirectory()) {

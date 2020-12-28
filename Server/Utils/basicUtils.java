@@ -1,5 +1,8 @@
 package Server.Utils;
 
+import Server.Reqandres.Request;
+import Server.Reqandres.Senders.FileSender;
+
 import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
@@ -89,6 +92,13 @@ public class basicUtils {
 
     public static void delID(int id){
         ids.remove((Integer) id);
+    }
+
+    public static void sendCode(int code, Request req){
+        FileSender.setProt(req.getProt());
+        FileSender.setContentType("text/html");
+        FileSender.setStatus(code);
+        FileSender.sendFile(Methods.GET,new File(Configs.getCWD() + "/default_pages/" + code + ".html"),req.out,req.getIP(),req.getID(),req.getHost());
     }
 
     public static void killPrcs(){

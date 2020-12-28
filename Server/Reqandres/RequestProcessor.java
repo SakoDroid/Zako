@@ -1,6 +1,7 @@
 package Server.Reqandres;
 
 import Server.DDOS.Interface;
+import Server.Method.Factory;
 import Server.Reqandres.Senders.FileSender;
 import Server.Utils.*;
 import java.io.*;
@@ -14,9 +15,9 @@ import java.util.regex.*;
 
 public class RequestProcessor {
 
-    private RandomAccessFile bf;
+    public RandomAccessFile bf;
     private final Request req;
-    private Methods method;
+    public Methods method;
     public String Body = "";
     public String ip;
     public final HashMap headers = new HashMap();
@@ -32,11 +33,12 @@ public class RequestProcessor {
         this.ip = rq.getIP();
         try{
             this.read();
-            bf = new RandomAccessFile(rq.getCacheFile(),"r");
-            if (bf.length() > 10){
-                Interface.addReqVol(ip,bf.length());
-                if (this.sit < 300){
-                    switch (this.method) {
+            if (this.stat != 0){
+                bf = new RandomAccessFile(rq.getCacheFile(), "r");
+                if (bf.length() > 10) {
+                    Interface.addReqVol(ip, bf.length());
+                    if (this.sit < 300) {
+                    /*switch (this.method) {
                         case CONNECT -> this.sit = 200;
                         case PUT -> this.handlePUT();
                         case DELETE -> this.handleDELETE();
@@ -71,15 +73,17 @@ public class RequestProcessor {
                                 new SubForwarder(Configs.getForwardAddress(Host), rq.getCacheFile(), rq.out, ip, Host);
                             } else sit = 500;
                         }
+                    }*/
+                        Factory.getMt(this.method).run(req, this);
                     }
+                    bf.close();
+                } else {
+                    rq.out.flush();
+                    rq.out.close();
+                    bf.close();
+                    rq.getCacheFile().delete();
+                    this.stat = 0;
                 }
-                bf.close();
-            }else {
-                rq.out.flush();
-                rq.out.close();
-                bf.close();
-                rq.getCacheFile().delete();
-                this.stat = 0;
             }
         }catch(Exception ex){
             String t = "";
@@ -136,6 +140,7 @@ public class RequestProcessor {
                         default -> Methods.UNKNOWN;
                     };
                     if (this.method != Methods.UNKNOWN) {
+                        req.setProt(p[2]);
                         headers.put("Method", this.method);
                         headers.put("URL", p[1]);
                         headers.put("Version", p[2]);
@@ -152,8 +157,8 @@ public class RequestProcessor {
                             String url = prt.split("/")[0] + "://" + headers.get("Host") + URLDecoder.decode((String) headers.get("URL"), StandardCharsets.UTF_8);
                             URL u = new URL(url);
                             Host = u.getHost().replace("www.", "").replace("ww2.", "");
-                            req.setHost(Host);
                             if (u.getPort() != -1) Host += ":" + u.getPort();
+                            req.setHost(Host);
                             Path = u.getPath();
                             headers.replace("URL", u);
                         }
@@ -186,9 +191,8 @@ public class RequestProcessor {
                 fw.flush();
                 fw.close();
             }else{
-                req.getSock().close();
-                req.getCacheFile().delete();
-                this.sit = 0;
+                req.out.flush();
+                this.stat = 0;
             }
         }catch(Exception ex){
             String t = "";
@@ -257,7 +261,7 @@ public class RequestProcessor {
         }
     }
 
-    private void parseBody(){
+    public void parseBody(){
         try{
             Pattern ptn = Pattern.compile("boundary=[^\n]+");
             Matcher mc = ptn.matcher((String)headers.get("Content-Type"));

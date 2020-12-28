@@ -24,6 +24,8 @@ public class LoadBalancerMainThread extends Thread{
             t += ex.toString();
             Logger.ilog(t);
         }
+
+        Logger.ilog("Load balancer is shutting down ...");
     }
 
 }

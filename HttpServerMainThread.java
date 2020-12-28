@@ -23,5 +23,7 @@ public class HttpServerMainThread extends Thread{
             t += ex.toString();
             Logger.ilog(t);
         }
+
+        Logger.ilog("Server is shutting down ...");
     }
 }
