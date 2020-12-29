@@ -30,8 +30,12 @@ public class RequestProcessor {
                 bf = new RandomAccessFile(rq.getCacheFile(), "r");
                 if (bf.length() > 5) {
                     Interface.addReqVol(req.getIP(), bf.length());
-                    if (this.sit < 300) {
-                        Factory.getMt(this.method).run(req, this);
+                    if (this.sit < 400) {
+                        this.stat = Factory.getMt(this.method).run(req, this);
+                    }else{
+                        basicUtils.sendCode(this.sit,req);
+                        this.stat = 0;
+                        req.getCacheFile().delete();
                     }
                     bf.close();
                 } else {
@@ -41,6 +45,9 @@ public class RequestProcessor {
                     rq.getCacheFile().delete();
                     this.stat = 0;
                 }
+            }else {
+                bf.close();
+                rq.getCacheFile().delete();
             }
         }catch(Exception ex){
             String t = "";

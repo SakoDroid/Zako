@@ -18,10 +18,8 @@ public class Response {
 
     private void handleRes(){
         try{
-            if (reqes.sit < 300) {
-                Logger.glog("Preparing response to " + request.getIP() + "  ; id = " + request.getID(), request.getHost());
-                Server.API.Factory.getAPI(request.Path).init(request, reqes);
-            } else this.sendCode(reqes.sit);
+            Logger.glog("Preparing response to " + request.getIP() + "  ; id = " + request.getID(), request.getHost());
+            Server.API.Factory.getAPI(request.Path).init(request, reqes);
         }catch (Exception ex) {
             String t = "";
             for (StackTraceElement a : ex.getStackTrace()) {
