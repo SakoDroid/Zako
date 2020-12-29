@@ -31,7 +31,7 @@ public class Def implements Method{
                         new SubForwarder(api, req.getCacheFile(), req.out, req.getIP(), Host + Path);
                         rtn = 0;
                     } else {
-                        reqp.Path = api[0];
+                        req.Path = api[0];
                     }
                 }
             } else if (status == 1) {

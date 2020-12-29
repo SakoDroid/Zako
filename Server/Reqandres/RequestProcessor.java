@@ -2,7 +2,6 @@ package Server.Reqandres;
 
 import Server.DDOS.Interface;
 import Server.Method.Factory;
-import Server.Reqandres.Senders.FileSender;
 import Server.Utils.*;
 import java.io.*;
 import java.net.URL;
@@ -19,61 +18,19 @@ public class RequestProcessor {
     private final Request req;
     public Methods method;
     public String Body = "";
-    public String ip;
     public final HashMap headers = new HashMap();
-    private int id;
-    public String Host;
-    public String Path;
     public int sit = 0;
     public int stat = 1;
 
     public RequestProcessor(Request rq){
         this.req = rq;
-        this.id = rq.getID();
-        this.ip = rq.getIP();
         try{
             this.read();
             if (this.stat != 0){
                 bf = new RandomAccessFile(rq.getCacheFile(), "r");
-                if (bf.length() > 10) {
-                    Interface.addReqVol(ip, bf.length());
+                if (bf.length() > 5) {
+                    Interface.addReqVol(req.getIP(), bf.length());
                     if (this.sit < 300) {
-                    /*switch (this.method) {
-                        case CONNECT -> this.sit = 200;
-                        case PUT -> this.handlePUT();
-                        case DELETE -> this.handleDELETE();
-                        case OPTIONS -> this.handleOptions(rq.out);
-                        case TRACE -> this.handleTrace(rq.out);
-                        default -> {
-                            if (!basicUtils.LocalHostIP.isEmpty())
-                                Host = Host.replace(basicUtils.LocalHostIP, Configs.MainHost);
-                            Host = Host.replace("127.0.0.1", "localhost");
-                            int status = Configs.getHostStatus(Host);
-                            if (status == 0) {
-                                String[] api = APIConfigs.getAPIAddress(Host + Path);
-                                if (api == null) {
-                                    sit = Perms.isDirPerm(Configs.getMainDir(Host) + Path);
-                                    if (this.method == Methods.POST) {
-                                        parseBody();
-                                    } else bf.close();
-                                } else {
-                                    if (api.length > 1) {
-                                        stat = 0;
-                                        bf.close();
-                                        Logger.glog("request for API " + Host + Path + " received from " + ip + " .", Host);
-                                        new SubForwarder(api, rq.getCacheFile(), rq.out, ip, Host + Path);
-                                    } else {
-                                        Path = api[0];
-                                    }
-                                }
-                            } else if (status == 1) {
-                                stat = 0;
-                                bf.close();
-                                Logger.glog("request for " + Host + " received from " + ip + " .", Host);
-                                new SubForwarder(Configs.getForwardAddress(Host), rq.getCacheFile(), rq.out, ip, Host);
-                            } else sit = 500;
-                        }
-                    }*/
                         Factory.getMt(this.method).run(req, this);
                     }
                     bf.close();
@@ -139,6 +96,7 @@ public class RequestProcessor {
                         case "TRACE" -> Methods.TRACE;
                         default -> Methods.UNKNOWN;
                     };
+                    req.setMethod(this.method);
                     if (this.method != Methods.UNKNOWN) {
                         req.setProt(p[2]);
                         headers.put("Method", this.method);
@@ -156,11 +114,12 @@ public class RequestProcessor {
                             String prt = (String) headers.get("Version");
                             String url = prt.split("/")[0] + "://" + headers.get("Host") + URLDecoder.decode((String) headers.get("URL"), StandardCharsets.UTF_8);
                             URL u = new URL(url);
-                            Host = u.getHost().replace("www.", "").replace("ww2.", "");
+                            String Host = u.getHost().replace("www.", "").replace("ww2.", "");
                             if (u.getPort() != -1) Host += ":" + u.getPort();
                             req.setHost(Host);
-                            Path = u.getPath();
                             headers.replace("URL", u);
+                            req.setURL(u);
+                            req.Path = u.getPath();
                         }
                         if (this.method == Methods.POST || this.method == Methods.PUT) {
                             if (headers.get("Content-Length") != null) {
@@ -197,63 +156,6 @@ public class RequestProcessor {
         }catch(Exception ex){
             String t = "";
             for (StackTraceElement a : ex.getStackTrace()) {
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
-        }
-    }
-
-    private void handleDELETE(){
-        try{
-            if(Perms.isIPAllowedForPUTAndDelete(ip)){
-                File fl = new File(Configs.getMainDir(Host) + Path);
-                if (fl.exists()) {
-                    fl.delete();
-                    this.sit = 200;
-                } else this.sit = 404;
-            }else this.sit = 405;
-        }catch(Exception ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()){
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
-        }
-    }
-
-    private void handleOptions(DataOutputStream out){
-        this.stat = 0;
-        FileSender.setProt((String) headers.get("Version"));
-        FileSender.sendOptionsMethod(out,ip,id,Host);
-    }
-
-    private void handleTrace(DataOutputStream out){
-        this.stat = 0;
-        FileSender.setProt((String) headers.get("Version"));
-        FileSender.setContentType("message/http");
-        FileSender.setStatus(200);
-        FileSender.sendFile(this.method,req.getCacheFile(),req.out,ip,id,Host);
-    }
-
-    private void handlePUT(){
-        try{
-            if(Perms.isIPAllowedForPUTAndDelete(ip)){
-                File fl = new File(Configs.getMainDir(Host) + Path);
-                FileOutputStream fos = new FileOutputStream(fl);
-                int i;
-                while ((i = bf.read()) != -1) {
-                    fos.write(i);
-                }
-                fos.flush();
-                fos.close();
-                bf.close();
-                this.sit = 201;
-            }else this.sit = 405;
-        }catch(Exception ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()){
                 t += a.toString() + " ;; ";
             }
             t += ex.toString();

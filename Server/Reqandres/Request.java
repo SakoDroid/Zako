@@ -4,16 +4,19 @@ import Server.Utils.*;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.URL;
 
 public class Request {
 
     private final int id;
     private final String ip;
     private final String fullip;
-    private String Host;
-    private String Prot;
     private final Socket sck;
     private final File TempFile;
+    private String Host;
+    private String Prot;
+    private URL url;
+    private Methods method;
     public DataOutputStream out;
     public InputStream is;
     public String Path;
@@ -36,6 +39,22 @@ public class Request {
             t += ex.toString();
             Logger.ilog(t);
         }
+    }
+
+    public void setURL(URL ur){
+        this.url = ur;
+    }
+
+    public URL getURL(){
+        return this.url;
+    }
+
+    public void setMethod(Methods method){
+        this.method = method;
+    }
+
+    public Methods getMethod(){
+        return this.method;
     }
 
     public void setProt(String prot){
