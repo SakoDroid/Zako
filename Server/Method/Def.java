@@ -9,13 +9,13 @@ public class Def implements Method{
 
     @Override
     public int run(Request req, RequestProcessor reqp){
-        String Host = req.getHost();
-        String Path = req.Path;
         int rtn = 1;
         try{
             if (!basicUtils.LocalHostIP.isEmpty())
                 req.setHost(req.getHost().replace(basicUtils.LocalHostIP, Configs.MainHost));
             req.setHost(req.getHost().replace("127.0.0.1", "localhost"));
+            String Host = req.getHost();
+            String Path = req.Path;
             int status = Configs.getHostStatus(Host);
             if (status == 0) {
                 String[] api = APIConfigs.getAPIAddress(Host + Path);
