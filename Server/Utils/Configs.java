@@ -24,6 +24,7 @@ public class Configs {
     public static int captchaLength = 5;
     public static int captchaHardness = 5;
     public static String MainHost;
+
     private Configs(){}
 
     private static void parseCfg(String cfg){
