@@ -19,7 +19,7 @@ public class Sender {
     protected static String cookie;
 
     private static String generateResponse(String body){
-        String out = prot + " " + status + "\nDate: " + df.format(new Date()) + "\nServer: Zako 0.1";
+        String out = prot + " " + status + "\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako;
         if (body != null) out += "\nContent-Length: " + body.length();
         if (contentType != null) out += "\nContent-Type: " + contentType;
         if (cookie != null) out += "\nSet-Cookie: " + cookie;
@@ -48,7 +48,7 @@ public class Sender {
     public static void redirect(String location, DataOutputStream out, String ip, int id, String host){
         Logger.glog("Redirecting " + ip + " to " + location + "  ; id = " + id,host);
         try{
-            out.writeBytes(prot + " " + status + "\nDate: " + df.format(new Date()) + "\nServer: Zako 0.1" + "\nLocation: " + location + "\n");
+            out.writeBytes(prot + " " + status + "\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako + "\nLocation: " + location + "\n");
             out.flush();
             out.close();
             basicUtils.delID(id);
@@ -66,7 +66,7 @@ public class Sender {
     public static void sendOptionsMethod(DataOutputStream out,String ip,int id,String host){
         try{
             Logger.glog("Sending back options method response to " + ip + "  ; id = " + id,host);
-            out.writeBytes(prot + " 200 OK\nDate: " + df.format(new Date()) + "\nServer: Zako 0.1\nAllow: GET,HEAD,POST,OPTIONS,TRACE,CONNECT,PUT,DELETE\nIPS-Allowed-For-PUT-DELETE: ");
+            out.writeBytes(prot + " 200 OK\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako + "\nAllow: GET,HEAD,POST,OPTIONS,TRACE,CONNECT,PUT,DELETE\nIPS-Allowed-For-PUT-DELETE: ");
             BufferedReader bf = new BufferedReader(new FileReader(Configs.getCWD() + "/CFGS/IP_List_PUT_DELETE.cfg"));
             String line;
             String ips = "";
@@ -93,7 +93,7 @@ public class Sender {
     public static void sendConnectMethod(DataOutputStream out,String ip,int id,String host){
         try{
             Logger.glog("Sending back connect method response to " + ip + "  ; id = " + id,host);
-            out.writeBytes(prot + " 200 Connection established\nDate: " + df.format(new Date()) + "\nServer: Zako 0.1");
+            out.writeBytes(prot + " 200 Connection established\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako);
             out.flush();
             out.close();
             basicUtils.delID(id);

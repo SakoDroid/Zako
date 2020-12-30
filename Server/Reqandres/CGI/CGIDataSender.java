@@ -11,7 +11,7 @@ public class CGIDataSender extends Sender {
     private static InputStream in;
 
     private static String generateResponse(){
-        return prot + " " + status + "\nDate: " + df.format(new Date()) + "\nServer: Zako 0.1\nConnection: closed\n" ;
+        return prot + " " + status + "\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako + "\nConnection: closed\n" ;
     }
 
     public static void setInputStream(InputStream input){

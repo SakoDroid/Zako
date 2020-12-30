@@ -22,7 +22,7 @@ public class Def implements API{
         if (tempCntc != null) {
             if (tempCntc.equals("CGI") || tempCntc.contains("java")) {
                 fl = new File(Configs.getCGIDir(req.getHost()) + req.Path);
-                String cmd = basicUtils.getExecCmd(ext.replace(".", ""));
+                String cmd = basicUtils.getExecCmd(ext);
                 if (cmd != null && fl.exists()) {
                     Logger.glog("CGI script requested. preparing for executing ...   ; id = " + req.getID(), req.getHost());
                     List<String> cmds = new ArrayList<>();

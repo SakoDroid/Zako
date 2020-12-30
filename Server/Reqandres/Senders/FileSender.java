@@ -11,7 +11,7 @@ public class FileSender extends Sender {
 
 
     private static String generateHeaders(long contentLength){
-        String out = prot + " " + status + "\nDate: " + df.format(new Date()) + "\nServer: Zako 0.1" +
+        String out = prot + " " + status + "\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako +
                 "\nContent-Length: " + contentLength + "\nContent-Type: " + contentType + "\nConnection: close";
         if (cookie != null) out += "\nSet-Cookie: " + cookie;
         out += "\n\n";
