@@ -2,7 +2,7 @@ package Server.Method;
 
 import Server.Reqandres.Request;
 import Server.Reqandres.RequestProcessor;
-import Server.Reqandres.Senders.FileSender;
+import Server.Reqandres.Senders.Sender;
 import Server.Utils.Configs;
 import Server.Utils.Logger;
 import Server.Utils.Perms;
@@ -18,9 +18,8 @@ public class DELETE implements Method{
                 File fl = new File(Configs.getMainDir(req.getHost()) + req.Path);
                 if (fl.exists()) {
                     fl.delete();
-                    FileSender.setProt(req.getProt());
-                    FileSender.setStatus(200);
-                    FileSender.send(null,req.out,req.getIP(),req.getID(),req.getHost());
+                    Sender snd = new Sender(req.getProt(),200);
+                    snd.send(null,req.out,req.getIP(),req.getID(),req.getHost());
                 } else basicUtils.sendCode(404,req);
             }else basicUtils.sendCode(405,req);
         }catch(Exception ex){

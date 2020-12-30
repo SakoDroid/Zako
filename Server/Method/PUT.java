@@ -2,12 +2,11 @@ package Server.Method;
 
 import Server.Reqandres.Request;
 import Server.Reqandres.RequestProcessor;
-import Server.Reqandres.Senders.FileSender;
+import Server.Reqandres.Senders.Sender;
 import Server.Utils.Configs;
 import Server.Utils.Logger;
 import Server.Utils.Perms;
 import Server.Utils.basicUtils;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.RandomAccessFile;
@@ -29,9 +28,8 @@ public class PUT implements Method{
                 fos.flush();
                 fos.close();
                 bf.close();
-                FileSender.setProt(req.getProt());
-                FileSender.setStatus(201);
-                FileSender.send(null,req.out,req.getIP(),req.getID(),req.getHost());
+                Sender snd = new Sender(req.getProt(),201);
+                snd.send(null,req.out,req.getIP(),req.getID(),req.getHost());
             }else basicUtils.sendCode(405,req);
         }catch(Exception ex){
             String t = "";

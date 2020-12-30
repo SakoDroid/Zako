@@ -31,28 +31,25 @@ public class Def implements API{
                     new CGIExecuter(cmds, fl, req.getID(), req.getHost(), reqp.headers, req.getURL(), req.out, reqp.Body, req.getIP());
                 } else {
                     fl = new File(Configs.getMainDir(req.getHost()) + req.Path);
-                    FileSender.setProt(req.getProt());
-                    if (ext.equals(".js")) FileSender.setContentType(FileTypes.getContentType(".js"));
-                    else FileSender.setContentType("text/plain");
-                    FileSender.setStatus(200);
-                    FileSender.sendFile(req.getMethod(), fl, req.out, req.getIP(), req.getID(), req.getHost());
+                    FileSender fs = new FileSender(req.getProt(),200);
+                    if (ext.equals(".js")) fs.setContentType(FileTypes.getContentType(".js"));
+                    else fs.setContentType("text/plain");
+                    fs.sendFile(req.getMethod(), fl, req.out, req.getIP(), req.getID(), req.getHost());
                 }
             } else {
                 fl = new File(Configs.getMainDir(req.getHost()) + req.Path);
                 if (fl.isFile()) {
-                    FileSender.setProt(req.getProt());
-                    FileSender.setContentType(tempCntc);
-                    FileSender.setStatus(200);
-                    FileSender.sendFile(req.getMethod(), fl, req.out, req.getIP(), req.getID(), req.getHost());
+                    FileSender fs = new FileSender(req.getProt(),200);
+                    fs.setContentType(tempCntc);
+                    fs.sendFile(req.getMethod(), fl, req.out, req.getIP(), req.getID(), req.getHost());
                 } else basicUtils.sendCode(404,req);
             }
         } else {
             fl = new File(Configs.getMainDir(req.getHost()) + req.Path);
             if (fl.isFile()) {
-                FileSender.setProt(req.getProt());
-                FileSender.setContentType(FileTypes.getContentType(".bin"));
-                FileSender.setStatus(200);
-                FileSender.sendFile(req.getMethod(), fl, req.out, req.getIP(), req.getID(), req.getHost());
+                FileSender fs = new FileSender(req.getProt(),200);
+                fs.setContentType(FileTypes.getContentType(".bin"));
+                fs.sendFile(req.getMethod(), fl, req.out, req.getIP(), req.getID(), req.getHost());
             } else basicUtils.sendCode(404,req);
         }
     }

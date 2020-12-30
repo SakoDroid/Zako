@@ -8,9 +8,8 @@ import Server.Reqandres.Senders.FileSender;
 public class CapthaSender implements API{
     @Override
     public void init(Request req, RequestProcessor reqp) {
-        FileSender.setProt(req.getProt());
-        FileSender.setContentType("image/png");
-        FileSender.setStatus(200);
-        FileSender.sendFile(req.getMethod(), new Captcha(req.getIP(),req.getHost()).image,req.out,req.getIP(),req.getID(),req.getHost());
+        FileSender fs = new FileSender(req.getProt(),200);
+        fs.setContentType("image/png");
+        fs.sendFile(req.getMethod(), new Captcha(req.getIP(),req.getHost()).image,req.out,req.getIP(),req.getID(),req.getHost());
     }
 }

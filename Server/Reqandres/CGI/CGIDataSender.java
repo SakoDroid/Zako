@@ -8,17 +8,18 @@ import java.util.Date;
 
 public class CGIDataSender extends Sender {
 
-    private static InputStream in;
+    private InputStream in;
 
-    private static String generateResponse(){
+    public CGIDataSender(String prot,int status,InputStream is){
+        super(prot, status);
+        this.in = is;
+    }
+
+    private String generateResponse(){
         return prot + " " + status + "\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako + "\nConnection: closed\n" ;
     }
 
-    public static void setInputStream(InputStream input){
-        in = input;
-    }
-
-    public static void send(DataOutputStream out, String ip, int id, String host){
+    public void send(DataOutputStream out, String ip, int id, String host){
         Logger.glog("Sending CGI output to " + ip + "  ; id = " + id,host);
         try{
             out.writeBytes(generateResponse());

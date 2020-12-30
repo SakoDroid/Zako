@@ -128,9 +128,8 @@ public class Forwarder extends Thread {
     }
 
     private void sendCode(int code){
-        FileSender.setProt("HTTP/1.1");
-        FileSender.setContentType("text/html");
-        FileSender.setStatus(code);
-        FileSender.sendFile(Methods.GET,new File(Configs.getCWD() + "/default_pages/" + code + ".html"),clientOut,ip,0,"NA");
+        FileSender fs = new FileSender("HTTP/1.1",code);
+        fs.setContentType("text/html");
+        fs.sendFile(Methods.GET,new File(Configs.getCWD() + "/default_pages/" + code + ".html"),clientOut,ip,0,"NA");
     }
 }

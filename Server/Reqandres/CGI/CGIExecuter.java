@@ -10,11 +10,11 @@ import java.net.URL;
 
 public class CGIExecuter {
 
-    private File cgiFile;
-    private List<String> commands;
-    private HashMap headers;
-    private URL url;
-    private DataOutputStream out;
+    private final File cgiFile;
+    private final List<String> commands;
+    private final HashMap headers;
+    private final URL url;
+    private final DataOutputStream out;
 
     public CGIExecuter(List<String> cmds,File cgifile,int id,String Host,HashMap hd,URL ur,DataOutputStream osw,String CGIBoody,String ip){
         this.cgiFile = cgifile;
@@ -61,16 +61,13 @@ public class CGIExecuter {
             }
             if (err.isEmpty()){
                 Logger.CGILog("Process created => Extracting result ...  ; id = " + id+ "  ; PID = " + p.pid(),cgiFile.getName(),Host);
-                CGIDataSender.setProt((String)headers.get("Version"));
-                CGIDataSender.setStatus(200);
-                CGIDataSender.setInputStream(p.getInputStream());
-                CGIDataSender.send(out,ip,id,Host);
+                CGIDataSender ds = new CGIDataSender((String)headers.get("Version"),200,p.getInputStream());
+                ds.send(out,ip,id,Host);
                 Logger.CGILog("Process Finished => All done! OK ; id = " + id+ "  ; PID = " + p.pid(),cgiFile.getName(),Host);
             }else{
-                FileSender.setProt((String)headers.get("Version"));
-                FileSender.setStatus(204);
-                FileSender.setContentType("text/plain");
-                FileSender.send(err,out,ip,id,Host);
+                FileSender fs = new FileSender((String)headers.get("Version"),204);
+                fs.setContentType("text/plain");
+                fs.send(err,out,ip,id,Host);
                 Logger.CGIError(err + " ; id = " + id+ "  ; PID = " + p.pid(),cgiFile.getName(),Host);
                 Logger.CGILog("Process Finished => Error. (Check CGI-Logs for error info) ; id = " + id+ "  ; PID = " + p.pid(),cgiFile.getName(),Host);
             }

@@ -96,10 +96,9 @@ public class basicUtils {
     }
 
     public static void sendCode(int code, Request req){
-        FileSender.setProt(req.getProt());
-        FileSender.setContentType("text/html");
-        FileSender.setStatus(code);
-        FileSender.sendFile(Methods.GET,new File(Configs.getCWD() + "/default_pages/" + code + ".html"),req.out,req.getIP(),req.getID(),req.getHost());
+        FileSender fs = new FileSender(req.getProt(),code);
+        fs.setContentType("text/html");
+        fs.sendFile(Methods.GET,new File(Configs.getCWD() + "/default_pages/" + code + ".html"),req.out,req.getIP(),req.getID(),req.getHost());
     }
 
     public static void killPrcs(){

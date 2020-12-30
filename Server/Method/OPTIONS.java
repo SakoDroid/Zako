@@ -2,13 +2,13 @@ package Server.Method;
 
 import Server.Reqandres.Request;
 import Server.Reqandres.RequestProcessor;
-import Server.Reqandres.Senders.FileSender;
+import Server.Reqandres.Senders.Sender;
 
 public class OPTIONS implements Method{
     @Override
     public int run(Request req, RequestProcessor reqp) {
-        FileSender.setProt(req.getProt());
-        FileSender.sendOptionsMethod(req.out,req.getIP(),req.getID(),req.getHost());
+        Sender snd = new Sender(req.getProt(),200);
+        snd.sendOptionsMethod(req.out,req.getIP(),req.getID(),req.getHost());
         return 0;
     }
 }

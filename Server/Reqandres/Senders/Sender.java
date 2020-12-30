@@ -12,13 +12,18 @@ import Server.Utils.basicUtils;
 
 public class Sender {
 
-    protected static SimpleDateFormat df = new SimpleDateFormat("E, dd MM yyyy HH:mm:ss z");
-    protected static String prot;
-    protected static String status;
-    protected static String contentType;
-    protected static String cookie;
+    protected SimpleDateFormat df = new SimpleDateFormat("E, dd MM yyyy HH:mm:ss z");
+    protected String prot;
+    protected String status;
+    protected String contentType;
+    protected String cookie;
 
-    private static String generateResponse(String body){
+    public Sender (String prot, int status){
+        this.prot = prot;
+        this.setStatus(status);
+    }
+
+    private String generateResponse(String body){
         String out = prot + " " + status + "\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako;
         if (body != null) out += "\nContent-Length: " + body.length();
         if (contentType != null) out += "\nContent-Type: " + contentType;
@@ -28,24 +33,24 @@ public class Sender {
         return out;
     }
 
-    public static void setProt(String prt){
+    public void setProt(String prt){
         prot = prt;
     }
 
-    public static void setStatus(int statusCode){
+    public void setStatus(int statusCode){
         status = basicUtils.getStatusCodeComp(statusCode);
     }
 
-    public static void setContentType(String cnt){
+    public void setContentType(String cnt){
         contentType = cnt;
     }
 
-    public static void addCookie(String ck){
+    public void addCookie(String ck){
         if(cookie == null) cookie = ck;
         else cookie += ";" + ck;
     }
 
-    public static void redirect(String location, DataOutputStream out, String ip, int id, String host){
+    public void redirect(String location, DataOutputStream out, String ip, int id, String host){
         Logger.glog("Redirecting " + ip + " to " + location + "  ; id = " + id,host);
         try{
             out.writeBytes(prot + " " + status + "\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako + "\nLocation: " + location + "\n");
@@ -63,7 +68,7 @@ public class Sender {
         }
     }
 
-    public static void sendOptionsMethod(DataOutputStream out,String ip,int id,String host){
+    public void sendOptionsMethod(DataOutputStream out,String ip,int id,String host){
         try{
             Logger.glog("Sending back options method response to " + ip + "  ; id = " + id,host);
             out.writeBytes(prot + " 200 OK\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako + "\nAllow: GET,HEAD,POST,OPTIONS,TRACE,CONNECT,PUT,DELETE\nIPS-Allowed-For-PUT-DELETE: ");
@@ -90,7 +95,7 @@ public class Sender {
         }
     }
 
-    public static void sendConnectMethod(DataOutputStream out,String ip,int id,String host){
+    public void sendConnectMethod(DataOutputStream out,String ip,int id,String host){
         try{
             Logger.glog("Sending back connect method response to " + ip + "  ; id = " + id,host);
             out.writeBytes(prot + " 200 Connection established\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako);
@@ -108,7 +113,7 @@ public class Sender {
         }
     }
 
-    public static void send(String data, DataOutputStream out,String ip,int id,String host){
+    public void send(String data, DataOutputStream out,String ip,int id,String host){
         Logger.glog("Sending data as text/plain to " + ip + "  ; id = " + id,host);
         try{
             out.writeBytes(generateResponse(data));

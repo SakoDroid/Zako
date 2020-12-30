@@ -8,9 +8,8 @@ import Server.Reqandres.Senders.FileSender;
 public class CapthaChecker implements API{
     @Override
     public void init(Request req, RequestProcessor reqp) {
-        FileSender.setProt(req.getProt());
-        FileSender.setStatus(200);
-        FileSender.setContentType("text/plain");
-        FileSender.send(Data.checkAnswer(req.getIP(),reqp.Body),req.out,req.getIP(),req.getID(),req.getHost());
+        FileSender fs = new FileSender(req.getProt(),200);
+        fs.setContentType("text/plain");
+        fs.send(Data.checkAnswer(req.getIP(),reqp.Body),req.out,req.getIP(),req.getID(),req.getHost());
     }
 }

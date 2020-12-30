@@ -8,10 +8,9 @@ import Server.Utils.Methods;
 public class TRACE implements Method{
     @Override
     public int run(Request req, RequestProcessor reqp) {
-        FileSender.setProt(req.getProt());
-        FileSender.setContentType("message/http");
-        FileSender.setStatus(200);
-        FileSender.sendFile(Methods.GET,req.getCacheFile(),req.out,req.getIP(),req.getID(),req.getHost());
+        FileSender fs = new FileSender(req.getProt(),200);
+        fs.setContentType("message/http");
+        fs.sendFile(Methods.GET,req.getCacheFile(),req.out,req.getIP(),req.getID(),req.getHost());
         return 0;
     }
 }

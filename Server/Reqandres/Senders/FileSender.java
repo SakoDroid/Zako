@@ -10,7 +10,11 @@ import java.util.Date;
 public class FileSender extends Sender {
 
 
-    private static String generateHeaders(long contentLength){
+    public FileSender(String prot,int status){
+        super(prot, status);
+    }
+
+    private String generateHeaders(long contentLength){
         String out = prot + " " + status + "\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako +
                 "\nContent-Length: " + contentLength + "\nContent-Type: " + contentType + "\nConnection: close";
         if (cookie != null) out += "\nSet-Cookie: " + cookie;
@@ -18,7 +22,7 @@ public class FileSender extends Sender {
         return out;
     }
 
-    public static void sendFile(Methods method, File file, DataOutputStream out, String ip, int id, String host){
+    public void sendFile(Methods method, File file, DataOutputStream out, String ip, int id, String host){
         Logger.glog("Sending requested file to " + ip + "   ; file name : " + file.getName() + "  ; id = " + id,host);
         try{
             out.writeBytes(generateHeaders(file.length()));
@@ -40,7 +44,7 @@ public class FileSender extends Sender {
         }
     }
 
-    public static void sendFile(Methods method, byte[] file, DataOutputStream out, String ip, int id, String host){
+    public void sendFile(Methods method, byte[] file, DataOutputStream out, String ip, int id, String host){
         Logger.glog("Sending binary file to " + ip + "  ; id = " + id,host);
         try{
             out.writeBytes(generateHeaders(file.length));
