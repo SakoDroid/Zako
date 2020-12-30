@@ -34,7 +34,7 @@ public class FileFixer{
                     Matcher mc = ptn.matcher(name);
                     String ext = "";
                     if (mc.find()) ext = mc.group();
-                    name = name.replace(ext,"") + ex + ext;
+                    name = fl[0].replace(ext,"") + ex + ext;
                     tmp = new File(name);
                 }
                 RandomAccessFile in = new RandomAccessFile(tf,"r");
