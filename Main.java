@@ -31,10 +31,9 @@ public class Main extends Thread{
     }
 
     public static void main (String[] args) {
-        Loader.load();
-        Logger.ilog("Server is starting ...");
+        Loader.loadRs();
         Thread mt = new Main();
         mt.start();
-        if (Configs.autoRs) Runtime.getRuntime().addShutdownHook(new Main());
+        if (Loader.autoRs) Runtime.getRuntime().addShutdownHook(new Main());
     }
 }

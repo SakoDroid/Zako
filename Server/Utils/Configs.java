@@ -22,7 +22,6 @@ public class Configs {
     public static int timeout;
     public static int captchaLength = 5;
     public static int captchaHardness = 5;
-    public static boolean autoRs;
     public static String MainHost;
     private Configs(){}
 
@@ -182,7 +181,6 @@ public class Configs {
             String lbp = "80";
             String wsp = "80";
             String ssl = "0";
-            int ar = 0;
             if (mc.find()) cpln = mc.group().replace("CAPTCHA-LENGTH=","");
             ptn = Pattern.compile("CAPTCHA-HARDNESS=.*");
             mc = ptn.matcher(cfgs);
@@ -205,9 +203,6 @@ public class Configs {
             ptn = Pattern.compile("Sockets-Timeout=.*");
             mc = ptn.matcher(cfgs);
             if (mc.find()) timeout = Integer.parseInt(mc.group().replace("Sockets-Timeout=",""));
-            ptn = Pattern.compile("Auto-Restart=.*");
-            mc = ptn.matcher(cfgs);
-            if (mc.find()) ar = Integer.parseInt(mc.group().replace("Auto-Restart=",""));
             LBPort = Integer.parseInt(lbp);
             WSPort = Integer.parseInt(wsp);
             webServer = Integer.parseInt(wb) == 1;
@@ -215,7 +210,6 @@ public class Configs {
             captchaLength = Integer.parseInt(cpln);
             captchaHardness = Integer.parseInt(cphr);
             SSL = Integer.parseInt(ssl) == 1;
-            autoRs = ar == 1;
         }catch(Exception ex){
             String t = "";
             for (StackTraceElement a : ex.getStackTrace()){
