@@ -2,7 +2,6 @@ package Server.Reqandres.Senders;
 
 import Server.Utils.Configs;
 import Server.Utils.Logger;
-
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.FileReader;
@@ -28,7 +27,8 @@ public class Sender {
         if (body != null) out += "\nContent-Length: " + body.length();
         if (contentType != null) out += "\nContent-Type: " + contentType;
         if (cookie != null) out += "\nSet-Cookie: " + cookie;
-        out += "\nConnection : close";
+        if (Configs.keepAlive) out += "\nConnection: keep-alive";
+        else out += "\nConnection: close";
         if (body != null) out += "\n\n" + body;
         return out;
     }
@@ -53,7 +53,7 @@ public class Sender {
     public void redirect(String location, DataOutputStream out, String ip, int id, String host){
         Logger.glog("Redirecting " + ip + " to " + location + "  ; id = " + id,host);
         try{
-            out.writeBytes(prot + " " + status + "\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako + "\nLocation: " + location + "\n");
+            out.writeBytes(prot + " " + status + "\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako + "\nLocation: " + location + "\nConnection: close\n\n");
             out.flush();
             out.close();
             basicUtils.delID(id);
@@ -71,7 +71,7 @@ public class Sender {
     public void sendOptionsMethod(DataOutputStream out,String ip,int id,String host){
         try{
             Logger.glog("Sending back options method response to " + ip + "  ; id = " + id,host);
-            out.writeBytes(prot + " 200 OK\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako + "\nAllow: GET,HEAD,POST,OPTIONS,TRACE,CONNECT,PUT,DELETE\nIPS-Allowed-For-PUT-DELETE: ");
+            out.writeBytes(prot + " 200 OK\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako + "\nConnection: close\nAllow: GET,HEAD,POST,OPTIONS,TRACE,CONNECT,PUT,DELETE\nIPS-Allowed-For-PUT-DELETE: ");
             BufferedReader bf = new BufferedReader(new FileReader(Configs.getCWD() + "/CFGS/IP_List_PUT_DELETE.cfg"));
             String line;
             String ips = "";

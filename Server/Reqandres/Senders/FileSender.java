@@ -1,9 +1,6 @@
 package Server.Reqandres.Senders;
 
-import Server.Utils.Logger;
-import Server.Utils.Methods;
-import Server.Utils.basicUtils;
-
+import Server.Utils.*;
 import java.io.*;
 import java.util.Date;
 
@@ -16,7 +13,9 @@ public class FileSender extends Sender {
 
     private String generateHeaders(long contentLength){
         String out = prot + " " + status + "\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako +
-                "\nContent-Length: " + contentLength + "\nContent-Type: " + contentType + "\nConnection: close";
+                "\nContent-Length: " + contentLength + "\nContent-Type: " + contentType;
+        if (Configs.keepAlive) out += "\nConnection: keep-alive";
+        else out += "\nConnection: close";
         if (cookie != null) out += "\nSet-Cookie: " + cookie;
         out += "\n\n";
         return out;
@@ -50,7 +49,6 @@ public class FileSender extends Sender {
             out.writeBytes(generateHeaders(file.length));
             if(method != Methods.HEAD) out.write(file);
             out.flush();
-            out.close();
             Logger.glog(ip + "'s request handled successfully!" + "  ; id = " + id,host);
             basicUtils.delID(id);
         }catch(Exception ex){

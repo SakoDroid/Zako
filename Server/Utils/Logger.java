@@ -64,7 +64,7 @@ public class Logger {
     }
 
     public static void ilog(String log){
-        Thread t = new LoggerThread(log,2);
+        if (!log.endsWith("Read timed out") && !log.endsWith("Socket closed")) new LoggerThread(log,2);
     }
 
     public static void CGILog(String log,String filename,String hst){
