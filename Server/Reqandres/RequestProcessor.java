@@ -47,10 +47,7 @@ public class RequestProcessor {
                     rq.getCacheFile().delete();
                     this.stat = 0;
                 }
-            }else {
-                bf.close();
-                rq.getCacheFile().delete();
-            }
+            }else rq.getCacheFile().delete();
         }catch(Exception ex){
             String t = "";
             for (StackTraceElement a : ex.getStackTrace()){
