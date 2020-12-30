@@ -6,9 +6,9 @@ import java.util.regex.*;
 
 public class Configs {
 
-    private static HashMap<String,HashMap<String,String>> Configs = new HashMap<>();
-    private static HashMap<String,Integer> hostsStatus = new HashMap<>();
-    private static HashMap<String,String[]> HostFrAdd = new HashMap<>();
+    private static final HashMap<String,HashMap<String,String>> Configs = new HashMap<>();
+    private static final HashMap<String,Integer> hostsStatus = new HashMap<>();
+    private static final HashMap<String,String[]> HostFrAdd = new HashMap<>();
 
     private static boolean loadBalancer;
     private static boolean webServer;
