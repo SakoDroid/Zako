@@ -2,7 +2,7 @@ import Server.Utils.*;
 import java.io.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import Server.DDOS.Interface;
+import Engines.DDOS.Interface;
 
 public class Loader {
 
