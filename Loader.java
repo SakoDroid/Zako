@@ -33,6 +33,7 @@ public class Loader {
     public static void load(){
         Logger.ilog("Loading basic utilities ...");
         basicUtils.load();
+        FileTypes.load();
         Logger.ilog("Loading configurations ...");
         Server.Utils.Configs.load();
         Logger.ilog("Loading permissions ...");
