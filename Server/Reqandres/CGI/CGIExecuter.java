@@ -16,16 +16,16 @@ public class CGIExecuter {
     private final URL url;
     private final DataOutputStream out;
 
-    public CGIExecuter(List<String> cmds,File cgifile,int id,String Host,HashMap hd,URL ur,DataOutputStream osw,String CGIBoody,String ip){
+    public CGIExecuter(List<String> cmds,File cgifile,int id,String Host,HashMap hd,URL ur,DataOutputStream osw,String CGIBoody,String ip,boolean ka){
         this.cgiFile = cgifile;
         this.commands = cmds;
         this.headers = hd;
         this.url = ur;
         this.out = osw;
-        this.exec(CGIBoody,ip,id,Host);
+        this.exec(CGIBoody,ip,id,Host,ka);
     }
 
-    private void exec(String body,String ip,int id,String Host){
+    private void exec(String body,String ip,int id,String Host,boolean ka){
         try{
             ProcessBuilder pb = new ProcessBuilder(commands);
             Logger.CGILog("Preparing the environment => adding envs. ; id = " + id,cgiFile.getName(),Host);
@@ -62,11 +62,13 @@ public class CGIExecuter {
             if (err.isEmpty()){
                 Logger.CGILog("Process created => Extracting result ...  ; id = " + id+ "  ; PID = " + p.pid(),cgiFile.getName(),Host);
                 CGIDataSender ds = new CGIDataSender((String)headers.get("Version"),200,p.getInputStream());
+                ds.setKeepAlive(ka);
                 ds.send(out,ip,id,Host);
                 Logger.CGILog("Process Finished => All done! OK ; id = " + id+ "  ; PID = " + p.pid(),cgiFile.getName(),Host);
             }else{
                 FileSender fs = new FileSender((String)headers.get("Version"),204);
                 fs.setContentType("text/plain");
+                fs.setKeepAlive(ka);
                 fs.send(err,out,ip,id,Host);
                 Logger.CGIError(err + " ; id = " + id+ "  ; PID = " + p.pid(),cgiFile.getName(),Host);
                 Logger.CGILog("Process Finished => Error. (Check CGI-Logs for error info) ; id = " + id+ "  ; PID = " + p.pid(),cgiFile.getName(),Host);

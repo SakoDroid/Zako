@@ -10,6 +10,7 @@ public class CapthaSender implements API{
     public void init(Request req, RequestProcessor reqp) {
         FileSender fs = new FileSender(req.getProt(),200);
         fs.setContentType("image/png");
+        fs.setKeepAlive(false);
         fs.sendFile(req.getMethod(), new Captcha(req.getIP(),req.getHost()).image,req.out,req.getIP(),req.getID(),req.getHost());
     }
 }

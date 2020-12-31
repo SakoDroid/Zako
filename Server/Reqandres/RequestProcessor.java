@@ -22,6 +22,7 @@ public class RequestProcessor {
     public final HashMap headers = new HashMap();
     public int sit = 0;
     public int stat = 1;
+    public boolean KA;
 
     public RequestProcessor(Request rq){
         this.req = rq;
@@ -30,7 +31,7 @@ public class RequestProcessor {
             if (this.stat != 0){
                 bf = new RandomAccessFile(rq.getCacheFile(), "r");
                 if (bf.length() > 5) {
-                    if (Configs.keepAlive) new HttpHandler(req.getSock());
+                    if (Configs.keepAlive && KA) new HttpHandler(req.getSock());
                     Interface.addReqVol(req.getIP(), bf.length());
                     if (this.sit < 400) {
                         this.stat = Factory.getMt(this.method).run(req, this);
@@ -126,6 +127,12 @@ public class RequestProcessor {
                             headers.replace("URL", u);
                             req.setURL(u);
                             req.Path = u.getPath();
+                            Object cnc = headers.get("Connection");
+                            if (cnc != null){
+                                String con = (String) cnc;
+                                if (con.trim().equals("close")) KA = false;
+                                else KA = true;
+                            }else KA = Configs.keepAlive;
                         }
                         if (this.method == Methods.POST || this.method == Methods.PUT) {
                             if (headers.get("Content-Length") != null) {

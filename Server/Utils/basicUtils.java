@@ -114,6 +114,7 @@ public class basicUtils {
                 String prcs = new String(in.readAllBytes());
                 if (!prcs.isEmpty()){
                     Runtime.getRuntime().exec(new String[]{"fuser","-k",Configs.getLBPort() + "/tcp"});
+                    Logger.ilog("Process on port " + Configs.getLBPort() + " has been killed.");
                 }
             }
             if (Configs.isWSOn()){
@@ -126,6 +127,7 @@ public class basicUtils {
                 String prcs = new String(in.readAllBytes());
                 if (!prcs.isEmpty()){
                     Runtime.getRuntime().exec(new String[]{"fuser","-k",Configs.getWSPort() + "/tcp"});
+                    Logger.ilog("Process on port " + Configs.getWSPort() + " has been killed.");
                 }
             }
             cmds.clear();
@@ -137,6 +139,7 @@ public class basicUtils {
             String prcs = new String(in.readAllBytes());
             if (!prcs.isEmpty()){
                 Runtime.getRuntime().exec(new String[]{"fuser","-k","8560/tcp"});
+                Logger.ilog("Process on port 8560 has been killed.");
             }
         }catch(Exception ex){
             String t = "";

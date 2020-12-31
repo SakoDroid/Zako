@@ -16,6 +16,7 @@ public class Sender {
     protected String status;
     protected String contentType;
     protected String cookie;
+    protected boolean keepAlive = false;
 
     public Sender (String prot, int status){
         this.prot = prot;
@@ -27,14 +28,14 @@ public class Sender {
         if (body != null) out += "\nContent-Length: " + body.length();
         if (contentType != null) out += "\nContent-Type: " + contentType;
         if (cookie != null) out += "\nSet-Cookie: " + cookie;
-        if (Configs.keepAlive) out += "\nConnection: keep-alive";
+        if (keepAlive) out += "\nConnection: keep-alive";
         else out += "\nConnection: close";
         if (body != null) out += "\n\n" + body;
         return out;
     }
 
-    public void setProt(String prt){
-        prot = prt;
+    public void setKeepAlive(boolean ka){
+        this.keepAlive = ka;
     }
 
     public void setStatus(int statusCode){

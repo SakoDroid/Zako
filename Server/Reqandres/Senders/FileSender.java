@@ -14,7 +14,7 @@ public class FileSender extends Sender {
     private String generateHeaders(long contentLength){
         String out = prot + " " + status + "\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako +
                 "\nContent-Length: " + contentLength + "\nContent-Type: " + contentType;
-        if (Configs.keepAlive) out += "\nConnection: keep-alive";
+        if (keepAlive) out += "\nConnection: keep-alive";
         else out += "\nConnection: close";
         if (cookie != null) out += "\nSet-Cookie: " + cookie;
         out += "\n\n";

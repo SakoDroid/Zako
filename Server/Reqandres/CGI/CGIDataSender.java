@@ -16,7 +16,10 @@ public class CGIDataSender extends Sender {
     }
 
     private String generateResponse(){
-        return prot + " " + status + "\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako + "\nConnection: closed\n" ;
+        String out = prot + " " + status + "\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako;
+        if (keepAlive) out += "\nConnection: keep-alive";
+        else out += "\nConnection: close";
+        return out;
     }
 
     public void send(DataOutputStream out, String ip, int id, String host){

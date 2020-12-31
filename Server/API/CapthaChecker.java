@@ -10,6 +10,7 @@ public class CapthaChecker implements API{
     public void init(Request req, RequestProcessor reqp) {
         FileSender fs = new FileSender(req.getProt(),200);
         fs.setContentType("text/plain");
+        fs.setKeepAlive(false);
         fs.send(Data.checkAnswer(req.getIP(),reqp.Body),req.out,req.getIP(),req.getID(),req.getHost());
     }
 }
