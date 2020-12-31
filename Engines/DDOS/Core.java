@@ -1,4 +1,4 @@
-package Server.DDOS;
+package Engines.DDOS;
 
 import Server.Utils.Logger;
 import Server.Utils.Perms;

@@ -2,7 +2,7 @@ package Server;
 
 import Server.Reqandres.*;
 import Server.Utils.*;
-import Server.DDOS.Interface;
+import Engines.DDOS.Interface;
 import javax.net.ssl.SSLSocket;
 import java.net.Socket;
 

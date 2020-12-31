@@ -1,4 +1,4 @@
-package Server.Captcha;
+package Engines.Captcha;
 
 import Server.Utils.Configs;
 import Server.Utils.Logger;

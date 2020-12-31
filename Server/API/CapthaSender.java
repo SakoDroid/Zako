@@ -1,6 +1,6 @@
 package Server.API;
 
-import Server.Captcha.Captcha;
+import Engines.Captcha.Captcha;
 import Server.Reqandres.Request;
 import Server.Reqandres.RequestProcessor;
 import Server.Reqandres.Senders.FileSender;

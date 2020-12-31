@@ -1,6 +1,6 @@
 package Server.Reqandres;
 
-import Server.DDOS.Interface;
+import Engines.DDOS.Interface;
 import Server.HttpHandler;
 import Server.Method.Factory;
 import Server.Utils.*;

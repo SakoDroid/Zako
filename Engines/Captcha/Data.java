@@ -1,4 +1,4 @@
-package Server.Captcha;
+package Engines.Captcha;
 
 import java.util.HashMap;
 import java.util.regex.*;
