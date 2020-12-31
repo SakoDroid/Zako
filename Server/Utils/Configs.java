@@ -24,6 +24,7 @@ public class Configs {
     public static int captchaLength = 5;
     public static int captchaHardness = 5;
     public static String MainHost;
+    public static String MainHostWithPort;
 
     private Configs(){}
 
@@ -68,8 +69,14 @@ public class Configs {
         Configs.get(Host).put("CGI", CGIDir);
         Configs.get(Host).put("Up", TempUploadDir);
         if (cfg.contains("%%MAIN%%")) {
-            if(Host.contains(":")) MainHost = Host.split(":")[0];
-            else MainHost = Host;
+            if(Host.contains(":")){
+                MainHost = Host.split(":")[0];
+                MainHostWithPort = Host;
+            }
+            else{
+                MainHost = Host;
+                MainHostWithPort = Host + ((isSSLOn())? "443":"80");
+            }
             HashMap<String, String> temp = new HashMap<>();
             temp.put("Main", MainDir);
             temp.put("Logs", LogsDir);
@@ -228,9 +235,9 @@ public class Configs {
     }
 
     public static void load(){
+        loadMain();
         loadHosts();
         loadSizes();
-        loadMain();
     }
 
     public static String getDef(String key){
