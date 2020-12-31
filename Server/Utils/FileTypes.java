@@ -1,27 +1,26 @@
 package Server.Utils;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileReader;
+import java.io.File;
 import java.util.HashMap;
-import java.io.ObjectInputStream;
+import org.w3c.dom.*;
+import javax.xml.parsers.*;
 
 public class FileTypes {
 
-    private static HashMap<String,String> cnts;
+    private static final HashMap<String,String> cnts = new HashMap<>();
 
 
     private FileTypes(){}
 
     public static void load(){
-        try(BufferedReader bf = new BufferedReader(new FileReader(Configs.getCWD() + "/CFGS/MIME.cfg"))){
-            cnts = (HashMap<String,String>)new ObjectInputStream(new FileInputStream(Configs.getCWD() + "/Data/content-types.sak")).readObject();
-            String line;
-            while((line = bf.readLine()) != null){
-                if (!line.startsWith("#") && !line.isEmpty()){
-                    String[] tmp = line.split(":",2);
-                    addCT(tmp[0].trim(),tmp[1].trim());
-                }
+        try{
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document doc = db.parse(new File(Configs.getCWD() + "/CFGS/MIME.cfg"));
+            NodeList mms = doc.getElementsByTagName("MIME");
+            for (int i = 0 ; i < mms.getLength() ; i++){
+                Element mm = (Element) mms.item(i);
+                addCT(mm.getElementsByTagName("extension").item(0).getTextContent(),mm.getElementsByTagName("MIME-Type").item(0).getTextContent());
             }
         }catch (Exception ex){
             String t = "";
