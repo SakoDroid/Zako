@@ -6,6 +6,7 @@ import Server.Reqandres.Senders.FileSender;
 import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -98,7 +99,25 @@ public class basicUtils {
     public static void sendCode(int code, Request req){
         FileSender fs = new FileSender(req.getProt(),code);
         fs.setContentType("text/html");
-        fs.sendFile(Methods.GET,new File(Configs.getCWD() + "/default_pages/" + code + ".html"),req.out,req.getIP(),req.getID(),req.getHost());
+        fs.sendFile(Methods.GET,new File(Configs.getCWD() + "/default_pages/" + code + ".html"),req.out,req.getIP(),req.getID(),"NA");
+    }
+
+    public static void redirect(int code,String location, Request req){
+        Logger.glog("Redirecting " + req.getIP() + " to " + location + "  ; id = " + req.getID(),req.getHost());
+        try{
+            req.out.writeBytes("HTTP/1.1 " + getStatusCodeComp(code) + "\nServer: " + basicUtils.Zako + "\nLocation: " + location + "\nConnection: close\n\n");
+            req.out.flush();
+            req.out.close();
+            basicUtils.delID(req.getID());
+            Logger.glog(req.getIP() + "'s request redirected to " + location + "!" + "  ; id = " + req.getID(),"NA");
+        }catch(Exception ex){
+            String t = "";
+            for (StackTraceElement a : ex.getStackTrace()) {
+                t += a.toString() + " ;; ";
+            }
+            t += ex.toString();
+            Logger.ilog(t);
+        }
     }
 
     public static void killPrcs(){

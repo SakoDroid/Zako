@@ -1,4 +1,4 @@
-package Server.Reqandres.CGI;
+package Engines.CGI;
 
 import Server.Reqandres.Senders.Sender;
 import Server.Utils.Logger;

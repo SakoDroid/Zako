@@ -7,8 +7,8 @@ import java.io.*;
 public class SubForwarder extends Thread {
 
     private Socket s;
-    private File temp;
-    private DataOutputStream clientOut;
+    private final File temp;
+    private final DataOutputStream clientOut;
 
     public SubForwarder(String[] address, File tempFile,DataOutputStream out,String ip,String Host){
         this.temp = tempFile;
@@ -16,7 +16,7 @@ public class SubForwarder extends Thread {
         try{
             s = new Socket(address[0], Integer.parseInt(address[1]));
             this.start();
-            Logger.glog("Forwarding request fot " + Host + " from " + ip + " to " + address[0] + ":" + address[1],Host);
+            Logger.glog("Forwarding request for " + Host + " from " + ip + " to " + address[0] + ":" + address[1],Host);
         }catch(Exception ex){
             String t = "";
             for (StackTraceElement a : ex.getStackTrace()){
@@ -33,15 +33,10 @@ public class SubForwarder extends Thread {
             FileInputStream fl = new FileInputStream(temp);
             OutputStream serverOut = s.getOutputStream();
             InputStream serverIn = s.getInputStream();
-            int i;
-            while((i = fl.read()) != -1){
-                serverOut.write(i);
-            }
+            fl.transferTo(serverOut);
             serverOut.flush();
             temp.delete();
-            while((i = serverIn.read()) != -1){
-                clientOut.write(i);
-            }
+            serverIn.transferTo(clientOut);
             clientOut.flush();
             s.close();
         }catch(Exception ex){

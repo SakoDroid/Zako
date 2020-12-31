@@ -51,23 +51,6 @@ public class Sender {
         else cookie += ";" + ck;
     }
 
-    public void redirect(String location, DataOutputStream out, String ip, int id, String host){
-        Logger.glog("Redirecting " + ip + " to " + location + "  ; id = " + id,host);
-        try{
-            out.writeBytes(prot + " " + status + "\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako + "\nLocation: " + location + "\nConnection: close\n\n");
-            out.flush();
-            out.close();
-            basicUtils.delID(id);
-            Logger.glog(ip + "'s request redirected to " + location + "!" + "  ; id = " + id,host);
-        }catch(Exception ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()) {
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
-        }
-    }
 
     public void sendOptionsMethod(DataOutputStream out,String ip,int id,String host){
         try{
