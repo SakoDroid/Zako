@@ -9,6 +9,7 @@ public class Main extends Thread{
     public void run(){
         Logger.ilog("Server is starting ...");
         try {
+            basicUtils.killPrcs();
             Logger.ilog("Loading requirements ...");
             Loader.load();
             new Reporter();
@@ -17,8 +18,10 @@ public class Main extends Thread{
                 if (Configs.isSSLOn()) new HttpsServerMainThread();
                 else new HttpServerMainThread();
             }
-            synchronized (lock){
-                lock.wait();
+            if (Loader.autoRs){
+                synchronized (lock) {
+                    lock.wait();
+                }
             }
         } catch (Exception ex) {
             String t = "";
