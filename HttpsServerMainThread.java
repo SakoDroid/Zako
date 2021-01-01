@@ -31,7 +31,7 @@ public class HttpsServerMainThread{
             public void run(){
                 try{
                     DataOutputStream out = new DataOutputStream(sock.getOutputStream());
-                    out.writeBytes("HTTP/1.1 301 Moved Permanently\nServer: " + basicUtils.Zako + "\nLocation: https://" + Configs.MainHostWithPort + "/\nConnection: close\n\n");
+                    out.writeBytes("HTTP/1.1 426 Upgrade Required\nServer: " + basicUtils.Zako + "\nUpgrade: TLS/1.3, HTTP/1.1\nConnection: Upgrade");
                     out.flush();
                     out.close();
                 }catch(Exception ex){
