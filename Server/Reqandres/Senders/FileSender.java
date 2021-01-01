@@ -6,6 +6,7 @@ import java.util.Date;
 
 public class FileSender extends Sender {
 
+    private String ext;
 
     public FileSender(String prot,int status){
         super(prot, status);
@@ -13,12 +14,19 @@ public class FileSender extends Sender {
 
     private String generateHeaders(long contentLength){
         String out = prot + " " + status + "\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako +
-                "\nContent-Length: " + contentLength + "\nContent-Type: " + contentType;
+                "\nContent-Length: " + contentLength + "\nContent-Type: " + contentType + "\nCache-Control: ";
+        if (ext != null){
+            out += FileTypes.getAge(ext);
+        }else out += "no-store";
         if (keepAlive) out += "\nConnection: keep-alive";
         else out += "\nConnection: close";
         if (cookie != null) out += "\nSet-Cookie: " + cookie;
         out += "\n\n";
         return out;
+    }
+
+    public void setExtension(String ext){
+        this.ext = ext;
     }
 
     public void sendFile(Methods method, File file, DataOutputStream out, String ip, int id, String host){

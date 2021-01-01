@@ -16,6 +16,7 @@ public class Configs {
     private static int WSPort = 80;
     private static boolean SSL = false;
 
+    public static boolean cache;
     public static boolean keepAlive;
     public static long generalSize = Long.MAX_VALUE;
     public static long fileSize = Long.MAX_VALUE;
@@ -191,6 +192,7 @@ public class Configs {
             String wsp = "80";
             String ssl = "0";
             int ka = 0;
+            int ch = 1;
             if (mc.find()) cpln = mc.group().replace("CAPTCHA-LENGTH=","");
             ptn = Pattern.compile("CAPTCHA-HARDNESS=.*");
             mc = ptn.matcher(cfgs);
@@ -216,6 +218,9 @@ public class Configs {
             ptn = Pattern.compile("Keep-Alive=.*");
             mc = ptn.matcher(cfgs);
             if (mc.find()) ka = Integer.parseInt(mc.group().replace("Keep-Alive=",""));
+            ptn = Pattern.compile("Cache-Control=.*");
+            mc = ptn.matcher(cfgs);
+            if (mc.find()) ch = Integer.parseInt(mc.group().replace("Cache-Control=",""));
             LBPort = Integer.parseInt(lbp);
             WSPort = Integer.parseInt(wsp);
             webServer = Integer.parseInt(wb) == 1;
@@ -224,6 +229,7 @@ public class Configs {
             captchaHardness = Integer.parseInt(cphr);
             SSL = Integer.parseInt(ssl) == 1;
             keepAlive = ka == 1;
+            cache = ch == 1;
         }catch(Exception ex){
             String t = "";
             for (StackTraceElement a : ex.getStackTrace()){

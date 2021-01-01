@@ -34,6 +34,7 @@ public class Def implements API{
                     FileSender fs = new FileSender(req.getProt(),200);
                     if (ext.equals(".js")) fs.setContentType(FileTypes.getContentType(".js"));
                     else fs.setContentType("text/plain");
+                    fs.setExtension(ext);
                     fs.setKeepAlive(Configs.keepAlive && reqp.KA);
                     fs.sendFile(req.getMethod(), fl, req.out, req.getIP(), req.getID(), req.getHost());
                 }
@@ -42,6 +43,7 @@ public class Def implements API{
                 if (fl.isFile()) {
                     FileSender fs = new FileSender(req.getProt(),200);
                     fs.setContentType(tempCntc);
+                    fs.setExtension(ext);
                     fs.setKeepAlive(Configs.keepAlive && reqp.KA);
                     fs.sendFile(req.getMethod(), fl, req.out, req.getIP(), req.getID(), req.getHost());
                 } else basicUtils.sendCode(404,req);
@@ -51,6 +53,7 @@ public class Def implements API{
             if (fl.isFile()) {
                 FileSender fs = new FileSender(req.getProt(),200);
                 fs.setContentType(FileTypes.getContentType(".bin"));
+                fs.setExtension(ext);
                 fs.setKeepAlive(Configs.keepAlive && reqp.KA);
                 fs.sendFile(req.getMethod(), fl, req.out, req.getIP(), req.getID(), req.getHost());
             } else basicUtils.sendCode(404,req);

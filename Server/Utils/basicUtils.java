@@ -99,6 +99,7 @@ public class basicUtils {
     public static void sendCode(int code, Request req){
         FileSender fs = new FileSender(req.getProt(),code);
         fs.setContentType("text/html");
+        fs.setExtension(".html");
         fs.sendFile(Methods.GET,new File(Configs.getCWD() + "/default_pages/" + code + ".html"),req.out,req.getIP(),req.getID(),"NA");
     }
 

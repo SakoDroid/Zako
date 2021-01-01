@@ -8,11 +8,11 @@ import javax.xml.parsers.*;
 public class FileTypes {
 
     private static final HashMap<String,String> cnts = new HashMap<>();
-
+    private static final HashMap<String,String> cache = new HashMap<>();
 
     private FileTypes(){}
 
-    public static void load(){
+    private static void loadCnts(){
         try{
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
@@ -32,6 +32,34 @@ public class FileTypes {
         }
     }
 
+    private static void loadCache(){
+        try{
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document d = db.parse(new File(Configs.getCWD() + "/CFGS/Headers.cfg"));
+            Element ch = (Element) d.getElementsByTagName("Cache").item(0);
+            NodeList rules = ch.getElementsByTagName("rule");
+            for (int i = 0 ; i < rules.getLength() ; i++){
+                Element rule = (Element) rules.item(i);
+                String exts = rule.getElementsByTagName("extensions").item(0).getTextContent();
+                String age = rule.getElementsByTagName("value").item(0).getTextContent().trim();
+                for (String ext : exts.split(",")) cache.put(ext.trim(),age);
+            }
+        }catch (Exception ex){
+            String t = "";
+            for (StackTraceElement a : ex.getStackTrace()) {
+                t += a.toString() + " ;; ";
+            }
+            t += ex.toString();
+            Logger.ilog(t);
+        }
+    }
+
+    public static void load(){
+        loadCnts();
+        loadCache();
+    }
+
     private static void addCT(String ext,String ct){
         if (cnts.get(ext) == null){
             cnts.put(ext.trim(),ct.trim());
@@ -42,5 +70,12 @@ public class FileTypes {
 
     public static String getContentType(String ext){
         return cnts.get(ext);
+    }
+
+    public static String getAge(String ext){
+        if (Configs.cache){
+            String value = cache.get(ext);
+            return ((value == null) ? "no-store" : value);
+        }else return "no-store";
     }
 }
