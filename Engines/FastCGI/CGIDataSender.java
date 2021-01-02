@@ -26,8 +26,9 @@ public class CGIDataSender extends Sender {
         Logger.glog("Sending CGI output to " + ip + "  ; id = " + id,host);
         try{
             out.writeBytes(generateResponse());
-            while(in.available() > 0){
-                out.write(in.read());
+            int i;
+            while((i = in.read()) != -1){
+                out.write(i);
             }
             out.flush();
             out.close();
