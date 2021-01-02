@@ -1,41 +1,25 @@
 package LoadBalancer;
 
 import Server.Utils.Logger;
-import java.io.*;
 import java.util.*;
-import java.util.regex.*;
+import org.w3c.dom.*;
+import javax.xml.parsers.*;
 
 public class Configs {
 
     public static List<String[]> servers = new ArrayList<>();
 
-    private static void extractZakoServers(String cfgs){
-        String ips = "";
-        Pattern ptn = Pattern.compile("Zako Servers:[^-]*");
-        Matcher mc = ptn.matcher(cfgs);
-        if (mc.find()) ips = mc.group().replace("Zako Servers:","").trim();
-        for (String line : ips.split("\n")){
-            if (!line.isEmpty()){
-                String[] server = line.split(":");
-                if (server.length > 1) servers.add(server);
-                else servers.add(new String[]{line.trim(),"80"});
-            }
-        }
-    }
-
-
     public static void load(){
-        try(BufferedReader bf = new BufferedReader(new FileReader(Server.Utils.Configs.getCWD() + "/CFGS/Load_Balancer.cfg"))){
-            Logger.ilog("Loading load balancer ...");
-            String cfgs = "";
-            String line;
-            while((line = bf.readLine()) != null){
-                if (!line.startsWith("#")) cfgs += line + "\n";
-            }
-            extractZakoServers(cfgs);
-            if (!servers.isEmpty()){
-                Tracker.start();
-                Logger.ilog("Load balancer is now active!");
+        try{
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document d = db.parse(System.getProperty("user.dir") + "/CFGS/Load_Balancer.cfg");
+            NodeList nl = d.getElementsByTagName("Zako");
+            for (int i = 0 ; i < nl.getLength() ; i++){
+                Element el = (Element) nl.item(i);
+                String host = el.getElementsByTagName("Host").item(0).getTextContent();
+                String port = el.getElementsByTagName("Port").item(0).getTextContent();
+                if (!host.isEmpty()) servers.add(new String[]{host,((port.isEmpty())?"80":port)});
             }
         }catch(Exception ex){
             String t = "";
