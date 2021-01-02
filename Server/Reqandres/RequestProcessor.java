@@ -28,6 +28,7 @@ public class RequestProcessor {
         this.req = rq;
         try{
             this.read();
+            req.setHeaders(this.headers);
             if (this.stat != 0){
                 bf = new RandomAccessFile(rq.getCacheFile(), "r");
                 if (bf.length() > 5) {

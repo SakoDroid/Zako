@@ -5,6 +5,7 @@ import Server.Utils.*;
 import java.io.*;
 import java.net.Socket;
 import java.net.URL;
+import java.util.HashMap;
 
 public class Request {
 
@@ -17,6 +18,7 @@ public class Request {
     private String Prot;
     private URL url;
     private Methods method;
+    private HashMap headers = new HashMap();
     public DataOutputStream out;
     public InputStream is;
     public String Path;
@@ -39,6 +41,14 @@ public class Request {
             t += ex.toString();
             Logger.ilog(t);
         }
+    }
+
+    public void setHeaders(HashMap hd){
+        this.headers = hd;
+    }
+
+    public HashMap getHeaders(){
+        return this.headers;
     }
 
     public void setURL(URL ur){

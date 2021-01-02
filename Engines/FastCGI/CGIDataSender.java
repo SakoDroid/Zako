@@ -1,4 +1,4 @@
-package Engines.CGI;
+package Engines.FastCGI;
 
 import Server.Reqandres.Senders.Sender;
 import Server.Utils.Logger;
