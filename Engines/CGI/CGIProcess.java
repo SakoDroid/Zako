@@ -1,4 +1,4 @@
-package Engines.FastCGI;
+package Engines.CGI;
 
 import Server.Reqandres.Request;
 import Server.Reqandres.Senders.FileSender;

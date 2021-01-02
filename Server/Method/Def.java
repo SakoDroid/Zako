@@ -39,7 +39,8 @@ public class Def implements Method{
                 Logger.glog("request for " + Host + " received from " + req.Path + " .", Host);
                 new SubForwarder(Configs.getForwardAddress(Host), req.getCacheFile(), req.out, req.getIP(), Host);
                 rtn = 0;
-            } else reqp.sit = 500;
+            }else if (status == 2) basicUtils.redirect(307,Configs.getForwardAddress(req.getHost())[0],req);
+            else reqp.sit = 500;
         }catch (Exception ex){
             String t = "";
             for (StackTraceElement a : ex.getStackTrace()) {

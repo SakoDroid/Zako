@@ -118,17 +118,25 @@ public class Configs {
         else HostFrAdd.put(ln[0].trim(),new String[]{add[0],"80"});
     }
 
+    private static void addRd(String line){
+        String[] temp = line.split("=>");
+        hostsStatus.put(temp[0].trim(),2);
+        HostFrAdd.put(temp[0].trim(),new String[]{temp[1]});
+    }
+
     private static void loadHosts(){
         Logger.ilog("Loading subdomains ...");
         try(BufferedReader bf = new BufferedReader(new FileReader(System.getProperty("user.dir") + "/CFGS/Hosts.cfg"))){
             String line;
             while((line = bf.readLine()) != null){
                 if(!line.startsWith("#")){
-                    if(!line.contains("->")){
+                    if(line.contains("->")) addFr(line);
+                    else if (line.contains("=>")) addRd(line);
+                    else{
                         HashMap<String, String> temp = new HashMap();
                         Configs.put(line.trim(), temp);
                         hostsStatus.put(line.trim(),0);
-                    }else addFr(line);
+                    }
                 }
             }
             if (Configs.isEmpty()) {

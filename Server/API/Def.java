@@ -1,6 +1,6 @@
 package Server.API;
 
-import Engines.FastCGI.CGIProcess;
+import Engines.CGI.CGIProcess;
 import Server.Reqandres.Request;
 import Server.Reqandres.RequestProcessor;
 import Server.Reqandres.Senders.FileSender;
