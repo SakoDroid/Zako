@@ -50,19 +50,21 @@ public class FCGIResponse {
                 }
                 case FCGIConstants.FCGI_STDOUT,
                         FCGIConstants.FCGI_STDERR -> {
-                    byte[] body = new byte[header.contentLength];
-                    int read = in.read(body);
-                    if (read == header.contentLength) {
-                        if (header.type == FCGIConstants.FCGI_STDOUT) {
-                            this.status = FCGIConstants.FCGI_REP_OK;
-                            this.content += new String(body);
+                    if (header.contentLength > 0){
+                        byte[] body = new byte[header.contentLength];
+                        int read = in.read(body);
+                        if (read == header.contentLength) {
+                            if (header.type == FCGIConstants.FCGI_STDOUT) {
+                                if (this.status != -1) this.status = FCGIConstants.FCGI_REP_OK;
+                                this.content += new String(body);
+                            } else {
+                                this.status = FCGIConstants.FCGI_REP_ERROR;
+                                this.errorContent += new String(body);
+                            }
                         } else {
-                            this.status = FCGIConstants.FCGI_REP_ERROR;
-                            this.errorContent += new String(body);
+                            temp = 0;
+                            status = FCGIConstants.FCGI_REP_ERROR_CONTENT_LENGTH;
                         }
-                    } else {
-                        temp = 0;
-                        status = FCGIConstants.FCGI_REP_ERROR_CONTENT_LENGTH;
                     }
                 }
             }

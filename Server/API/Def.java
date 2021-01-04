@@ -1,6 +1,6 @@
 package Server.API;
 
-import Engines.CGI.CGIProcess;
+import Engines.CGIClient.CGIProcess;
 import Server.Reqandres.Request;
 import Server.Reqandres.RequestProcessor;
 import Server.Reqandres.Senders.FileSender;
@@ -20,9 +20,7 @@ public class Def implements API{
             String tempCntc = FileTypes.getContentType(ext);
             if (tempCntc != null) {
                 if (tempCntc.equals("CGI")) {
-                    fl = new File(Configs.getCGIDir(req.getHost()) + req.Path);
-                    if (fl.exists()) new CGIProcess(ext,fl,req).exec(reqp.Body, Configs.keepAlive && reqp.KA);
-                    else basicUtils.sendCode(404,req);
+                    new ScriptHandler(req,ext).process(reqp.Body,Configs.keepAlive && reqp.KA);
                 }else {
                     fl = new File(Configs.getMainDir(req.getHost()) + req.Path);
                     sendFile(fl,ext,req,Configs.keepAlive && reqp.KA);

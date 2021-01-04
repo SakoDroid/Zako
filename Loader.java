@@ -34,6 +34,8 @@ public class Loader {
         Logger.ilog("Loading basic utilities ...");
         basicUtils.load();
         FileTypes.load();
+        Logger.ilog("Loading scripts configurations ...");
+        ScriptsConfigs.load();
         Logger.ilog("Loading configurations ...");
         Server.Utils.Configs.load();
         Logger.ilog("Loading permissions ...");

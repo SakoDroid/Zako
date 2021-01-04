@@ -1,26 +1,26 @@
-package Engines.CGI;
+package Engines.CGIClient;
 
+import Engines.CGI;
 import Server.Reqandres.Request;
 import Server.Reqandres.Senders.FileSender;
 import Server.Utils.*;
 import java.io.*;
 import java.util.*;
 
-public class CGIProcess {
+public class CGIProcess extends CGI {
 
-    private final String extension;
-    private File file;
-    private final Request req;
     private boolean executable;
     private List<String> commands;
 
-    public CGIProcess(String ext,File cgifile,Request req){
+    public CGIProcess(String ext,File cgiFile,Request req){
         this.extension = ext;
-        this.file = cgifile;
+        this.file = cgiFile;
         this.req = req;
         this.getCMD();
+        this.getParams();
     }
 
+    @Override
     public void exec(String body,boolean ka){
         if (executable) execCGI(body,ka);
         else sendPlain(ka);
@@ -31,21 +31,7 @@ public class CGIProcess {
             ProcessBuilder pb = new ProcessBuilder(commands);
             Logger.CGILog("Preparing the environment => adding envs. ; id = " + req.getID(),file.getName(),req.getHost());
             Methods mthd = req.getMethod();
-            String query = req.getURL().getQuery();
-            if (query != null) pb.environment().put("QUERY_STRING", query);
-            String ck = (String)req.getHeaders().get("Cookie");
-            if (ck != null) pb.environment().put("HTTP_COOKIE",ck);
-            pb.environment().put("HTTP_USER_AGENT",(String)req.getHeaders().get("User-Agent"));
-            pb.environment().put("PATH_INFO",req.getURL().getPath());
-            pb.environment().put("REQUEST_METHOD",String.valueOf(mthd));
-            pb.environment().put("SCRIPT_FILENAME", Configs.getCGIDir(req.getHost()) + req.getURL().getPath());
-            pb.environment().put("SCRIPT_NAME",file.getName());
-            pb.environment().put("SERVER_SOFTWARE","Zako 0.1");
-            pb.environment().put("REMOTE_ADDR",req.getIP());
-            if (mthd == Methods.POST){
-                pb.environment().put("CONTENT_TYPE",(String)req.getHeaders().get("Content-Type"));
-                pb.environment().put("CONTENT_LENGTH",(String)req.getHeaders().get("Content-Length"));
-            }
+            pb.environment().putAll(this.envs);
             Process p = pb.start();
             Logger.CGILog("Process created => running code ... ; id = " + req.getID() + "  ; PID = " + p.pid(),file.getName(),req.getHost());
             InputStream errin = p.getErrorStream();
