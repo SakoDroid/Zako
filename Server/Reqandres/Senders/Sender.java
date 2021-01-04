@@ -28,8 +28,10 @@ public class Sender {
         if (body != null) out += "\nContent-Length: " + body.length();
         if (contentType != null) out += "\nContent-Type: " + contentType;
         if (cookie != null) out += "\nSet-Cookie: " + cookie;
-        if (keepAlive) out += "\nConnection: keep-alive";
-        else out += "\nConnection: close";
+        if (Double.parseDouble(prot.replace("HTTP/","")) < 2){
+            if (keepAlive) out += "\nConnection: keep-alive";
+            else out += "\nConnection: close";
+        }
         if (body != null) out += "\n\n" + body;
         return out;
     }

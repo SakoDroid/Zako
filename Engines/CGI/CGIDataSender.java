@@ -8,7 +8,7 @@ import java.util.Date;
 
 public class CGIDataSender extends Sender {
 
-    private InputStream in;
+    private final InputStream in;
 
     public CGIDataSender(String prot,int status,InputStream is){
         super(prot, status);
@@ -17,8 +17,10 @@ public class CGIDataSender extends Sender {
 
     private String generateResponse(){
         String out = prot + " " + status + "\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako;
-        if (keepAlive) out += "\nConnection: keep-alive";
-        else out += "\nConnection: close";
+        if (Double.parseDouble(prot.replace("HTTP/","")) < 2){
+            if (keepAlive) out += "\nConnection: keep-alive";
+            else out += "\nConnection: close";
+        }
         return out;
     }
 

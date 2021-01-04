@@ -38,6 +38,7 @@ public class Def implements Method{
                 reqp.bf.close();
                 Logger.glog("request for " + Host + " received from " + req.Path + " .", Host);
                 new SubForwarder(Configs.getForwardAddress(Host), req.getCacheFile(), req.out, req.getIP(), Host);
+                req.getSock().close();
                 rtn = 0;
             }else if (status == 2) basicUtils.redirect(307,Configs.getForwardAddress(req.getHost())[0],req);
             else reqp.sit = 500;

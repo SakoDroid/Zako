@@ -18,8 +18,10 @@ public class FileSender extends Sender {
         if (ext != null){
             out += FileTypes.getAge(ext);
         }else out += "no-store";
-        if (keepAlive) out += "\nConnection: keep-alive";
-        else out += "\nConnection: close";
+        if (Double.parseDouble(prot.replace("HTTP/","")) < 2){
+            if (keepAlive) out += "\nConnection: keep-alive";
+            else out += "\nConnection: close";
+        }
         if (cookie != null) out += "\nSet-Cookie: " + cookie;
         out += "\n\n";
         return out;
