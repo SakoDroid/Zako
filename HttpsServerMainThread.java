@@ -1,4 +1,4 @@
-import Server.HttpHandler;
+import Server.HttpListener;
 import Server.Utils.*;
 import javax.net.ssl.*;
 import java.io.DataOutputStream;
@@ -77,7 +77,7 @@ public class HttpsServerMainThread{
                 SSLServerSocketFactory sslServerSocketfactory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
                 SSLServerSocket sslServerSocket = (SSLServerSocket) sslServerSocketfactory.createServerSocket(Configs.getWSPort());
                 Logger.ilog("Https server thread is now running (jks : " + SSLConfigs.getJKS() + " ,, jks pass : " + SSLConfigs.getPass() + ") ...");
-                while (true) new HttpHandler((SSLSocket) sslServerSocket.accept());
+                while (true) new HttpListener((SSLSocket) sslServerSocket.accept());
             } catch (Exception ex) {
                 String t = "";
                 for (StackTraceElement a : ex.getStackTrace()) {

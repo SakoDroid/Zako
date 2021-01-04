@@ -1,7 +1,7 @@
 package Server.Reqandres;
 
 import Engines.DDOS.Interface;
-import Server.HttpHandler;
+import Server.HttpListener;
 import Server.Method.Factory;
 import Server.Utils.*;
 import java.io.*;
@@ -32,7 +32,7 @@ public class RequestProcessor {
             if (this.stat != 0){
                 bf = new RandomAccessFile(rq.getCacheFile(), "r");
                 if (bf.length() > 5) {
-                    if (Configs.keepAlive && KA) new HttpHandler(req.getSock());
+                    if (Configs.keepAlive && KA) new HttpListener(req.getSock());
                     Interface.addReqVol(req.getIP(), bf.length());
                     if (this.sit < 400) {
                         this.stat = Factory.getMt(this.method).run(req, this);

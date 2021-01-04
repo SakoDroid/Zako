@@ -6,19 +6,19 @@ import Engines.DDOS.Interface;
 import javax.net.ssl.SSLSocket;
 import java.net.Socket;
 
-public class HttpHandler extends Thread{
+public class HttpListener extends Thread{
 
     private Socket sh;
     private SSLSocket ss;
     private Request req;
 
-    public HttpHandler(Socket client){
+    public HttpListener(Socket client){
         this.sh = client;
         this.req = new Request(client);
         this.start();
     }
 
-    public HttpHandler(SSLSocket client){
+    public HttpListener(SSLSocket client){
         this.ss = client;
         this.req = new Request(client);
         this.start();
