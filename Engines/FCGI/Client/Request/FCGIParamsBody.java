@@ -1,4 +1,4 @@
-package Engines.FCGI.Request;
+package Engines.FCGI.Client.Request;
 
 import Server.Utils.Logger;
 import java.util.Map;

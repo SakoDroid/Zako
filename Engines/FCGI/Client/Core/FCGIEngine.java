@@ -1,7 +1,7 @@
-package Engines.FCGI.Core;
+package Engines.FCGI.Client.Core;
 
-import Engines.FCGI.Request.FCGIRequest;
-import Engines.FCGI.Response.FCGIResponse;
+import Engines.FCGI.Client.Request.FCGIRequest;
+import Engines.FCGI.Client.Response.FCGIResponse;
 import Server.Utils.Logger;
 import java.net.Socket;
 import java.io.*;

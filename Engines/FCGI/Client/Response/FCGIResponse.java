@@ -1,6 +1,6 @@
-package Engines.FCGI.Response;
+package Engines.FCGI.Client.Response;
 
-import Engines.FCGI.Utils.FCGIConstants;
+import Engines.FCGI.Client.Utils.FCGIConstants;
 import Server.Utils.Logger;
 import java.io.IOException;
 import java.io.InputStream;

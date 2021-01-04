@@ -1,4 +1,4 @@
-package Engines.FCGI.Response;
+package Engines.FCGI.Client.Response;
 
 import Server.Utils.Logger;
 

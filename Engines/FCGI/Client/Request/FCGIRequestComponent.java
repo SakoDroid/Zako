@@ -1,6 +1,6 @@
-package Engines.FCGI.Request;
+package Engines.FCGI.Client.Request;
 
-import Engines.FCGI.Utils.ComponentNotReadyException;
+import Engines.FCGI.Client.Utils.ComponentNotReadyException;
 import Server.Utils.Logger;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;

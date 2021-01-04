@@ -1,9 +1,9 @@
-package Engines.FCGI;
+package Engines.FCGI.Client;
 
-import Engines.FCGI.Core.FCGIEngine;
-import Engines.FCGI.Request.*;
-import Engines.FCGI.Response.FCGIResponse;
-import Engines.FCGI.Utils.*;
+import Engines.FCGI.Client.Core.FCGIEngine;
+import Engines.FCGI.Client.Request.*;
+import Engines.FCGI.Client.Response.FCGIResponse;
+import Engines.FCGI.Client.Utils.*;
 import java.util.Map;
 
 public class FCGIClient {

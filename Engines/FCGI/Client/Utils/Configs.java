@@ -1,4 +1,4 @@
-package Engines.FCGI.Utils;
+package Engines.FCGI.Client.Utils;
 
 public class Configs {
 
