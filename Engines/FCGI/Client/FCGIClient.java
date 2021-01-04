@@ -17,8 +17,7 @@ public class FCGIClient {
         this.reqID = Utils.getID();
         this.envs = envs;
         this.postBody = postBody;
-        //this.engine = new FCGIEngine(Configs.host,Configs.port,Configs.timeOut);
-        this.engine = new FCGIEngine("127.0.0.1",9000,3000);
+        this.engine = new FCGIEngine(Configs.host,Configs.port,Configs.timeOut);
     }
 
     public void run(){
