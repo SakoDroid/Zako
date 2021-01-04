@@ -23,7 +23,7 @@ public class FCGI extends CGI {
         FCGIResponse response = client.getResponse();
         CGIDataSender ds = new CGIDataSender(req.getProt(),200);
         ds.setKeepAlive(KA);
-        if (response.status != -1 && response.getErrorContent().isEmpty())
+        if (response.status != 1 && response.getErrorContent().isEmpty())
             ds.send(response.getContent(),req.out,req.getIP(),req.getID(),req.getHost());
         else
             ds.send(response.getErrorContent(),req.out,req.getIP(),req.getID(),req.getHost());

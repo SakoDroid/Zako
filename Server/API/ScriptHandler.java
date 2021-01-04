@@ -4,9 +4,7 @@ import Engines.CGI;
 import Engines.CGIClient.CGIProcess;
 import Engines.FCGI.Client.FCGI;
 import Server.Reqandres.Request;
-import Server.Utils.Configs;
-import Server.Utils.ScriptsConfigs;
-import Server.Utils.basicUtils;
+import Server.Utils.*;
 
 import java.io.File;
 
@@ -29,7 +27,4 @@ public class ScriptHandler {
         }
         else basicUtils.sendCode(404,req);
     }
-
-
-
 }
