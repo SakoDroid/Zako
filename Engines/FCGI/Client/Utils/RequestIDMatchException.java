@@ -1,11 +1,11 @@
 package Engines.FCGI.Client.Utils;
 
-public class RequestIDMathException extends Exception{
+public class RequestIDMatchException extends Exception{
 
     private final int reqID1;
     private final int reqID2;
 
-    public RequestIDMathException(int id1, int id2){
+    public RequestIDMatchException(int id1, int id2){
         this.reqID1 = id1;
         this.reqID2 = id2;
     }

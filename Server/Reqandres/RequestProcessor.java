@@ -50,6 +50,7 @@ public class RequestProcessor {
                     this.stat = 0;
                 }
             }else rq.getCacheFile().delete();
+            System.out.println("b : " + Body);
         }catch(Exception ex){
             String t = "";
             for (StackTraceElement a : ex.getStackTrace()){
@@ -219,7 +220,7 @@ public class RequestProcessor {
                         }else if (namemc.find()){
                             bf.readLine();
                             String val = bf.readLine();
-                            if(!val.isEmpty()) this.addToCGIBody(namemc.group() + "=" + bf.readLine());
+                            if(!val.isEmpty()) this.addToCGIBody(namemc.group().replace("name=\"","") + "=" + val);
                         }
                     }
                 }
