@@ -2,8 +2,8 @@ package Engines.FCGI.Client.Utils;
 
 public class Configs {
 
-    public static String host;
-    public static int port;
-    public static int timeOut;
+    public static String host = "localhost";
+    public static int port = 9000;
+    public static int timeOut = 10000;
     public static byte[] padding = null;
 }
