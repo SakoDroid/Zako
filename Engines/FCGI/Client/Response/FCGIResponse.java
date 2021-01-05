@@ -43,7 +43,6 @@ public class FCGIResponse {
         try{
             temp = in.read(headers);
             FCGIResponseHeader header = new FCGIResponseHeader(headers);
-            System.out.println(header.type);
             switch (header.type) {
                 case FCGIConstants.FCGI_END_REQUEST -> {
                     temp = 0;
