@@ -27,4 +27,13 @@ public class FCGIConstants {
     FCGI_REP_ERROR_CONTENT_LENGTH = 2,
     FCGI_REP_ERROR_IOEXCEPTION = 3;
 
+    public static String getStatus(int status){
+        return switch (status){
+            case 0 -> "FCGI_REP_OK";
+            case 1 -> "FCGI_REP_ERROR";
+            case 2 -> "FCGI_REP_ERROR_CONTENT_LENGTH";
+            case 3 -> "FCGI_REP_ERROR_IOEXCEPTION";
+            default -> "UNKNOWN";
+        };
+    }
 }

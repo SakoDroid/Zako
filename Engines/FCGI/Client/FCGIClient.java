@@ -4,16 +4,18 @@ import Engines.FCGI.Client.Core.FCGIEngine;
 import Engines.FCGI.Client.Request.*;
 import Engines.FCGI.Client.Response.FCGIResponse;
 import Engines.FCGI.Client.Utils.*;
+import Server.Utils.Logger;
+
 import java.util.Map;
 
 public class FCGIClient {
 
-    private final int reqID;
+    public final int reqID;
     private final Map<String,String> envs;
     private final String postBody;
     private final FCGIEngine engine;
 
-    public FCGIClient(Map<String,String> envs, String postBody){
+    public FCGIClient(Map<String,String> envs, String postBody,String filename,String host){
         this.reqID = Utils.getID();
         this.envs = envs;
         this.postBody = postBody;
