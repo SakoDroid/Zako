@@ -8,8 +8,8 @@ public class Interface {
     private static boolean status = true;
     private static long time;
 
-    public static void load(int active,long tm){
-        if (active == 1){
+    public static void load(boolean active,long tm){
+        if (active){
             core = new Core();
             time = tm;
             Logger.ilog("DDOS protection is running ...");

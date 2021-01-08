@@ -1,15 +1,18 @@
 import Server.Utils.*;
 import java.io.*;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import Engines.DDOS.Interface;
+import Server.Utils.JSON.JSONBuilder;
+import Server.Utils.JSON.JSONDocument;
 
 public class Loader {
 
     public static boolean autoRs;
 
     public static void loadRs(){
-        try(BufferedReader bf = new BufferedReader(new FileReader(Configs.getCWD() + "/CFGS/Zako.cfg"))){
+        /*try(BufferedReader bf = new BufferedReader(new FileReader(Configs.getCWD() + "/CFGS/Zako.cfg"))){
             String line;
             while((line = bf.readLine()) != null){
                 if (!line.startsWith("#")){
@@ -27,12 +30,18 @@ public class Loader {
             }
             t += ex.toString();
             Logger.ilog(t);
-        }
+        }*/
+        JSONBuilder bld = JSONBuilder.newInstance();
+        JSONDocument doc = bld.parse(new File(Configs.getCWD() + "/CFGS/Zako.cfg"));
+        HashMap data = (HashMap) doc.toJava();
+        autoRs = (Boolean) data.get("Auto Restart");
     }
 
     public static void load(){
         Logger.ilog("Loading basic utilities ...");
         basicUtils.load();
+        Logger.ilog("Loading ssl configurations ...");
+        SSLConfigs.load();
         FileTypes.load();
         Logger.ilog("Loading scripts configurations ...");
         ScriptsConfigs.load();
@@ -43,32 +52,10 @@ public class Loader {
         Logger.ilog("Loading APIs configuration ...");
         APIConfigs.load();
         if (Server.Utils.Configs.isLBOn()) LoadBalancer.Configs.load();
-        try(BufferedReader bf = new BufferedReader(new FileReader(Configs.getCWD() + "/CFGS/Zako.cfg"))){
-            String cfgs = "",line;
-            while((line = bf.readLine()) != null){
-                if (!line.startsWith("#"))cfgs += line + "\n";
-            }
-            Pattern ptn = Pattern.compile("DDOS-Protection=.*");
-            Matcher mc = ptn.matcher(cfgs);
-            int ddos = 1;
-            if (mc.find())ddos = Integer.parseInt(mc.group().replace("DDOS-Protection=","").replace("\"",""));
-            ptn = Pattern.compile("DDOS-Allowable-Time-Between-Requests=.*");
-            mc = ptn.matcher(cfgs);
-            long time = 200;
-            if (mc.find()) time = Long.parseLong(mc.group().replace("DDOS-Allowable-Time-Between-Requests=","").replace("\"",""));
-            Interface.load(ddos,time);
-        }catch(Exception ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()) {
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
-        }
-        if (Configs.isSSLOn()){
-            Logger.ilog("Loading ssl configurations ...");
-            SSLConfigs.load();
-        }
+        JSONBuilder bld = JSONBuilder.newInstance();
+        JSONDocument doc = bld.parse(new File(Configs.getCWD() + "/CFGS/Zako.cfg"));
+        HashMap data = (HashMap) doc.toJava();
+        Interface.load((Boolean) data.get("DDOS Protection"), 200);
         Logger.ilog("ALL OK!");
     }
 }
