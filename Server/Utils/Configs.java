@@ -258,8 +258,8 @@ public class Configs {
         timeout = (Integer) data.get("Sockets-Timeout");
         HashMap cap = (HashMap) data.get("CAPTCHA");
         captcha = (Boolean) cap.get("ON");
-        captchaLength = (Integer) data.get("CAPTCHA length");
-        captchaHardness = (Integer) data.get("CAPTCHA hardness");
+        captchaLength = (Integer) cap.get("CAPTCHA length");
+        captchaHardness = (Integer) cap.get("CAPTCHA hardness");
         HashMap ports = (HashMap) data.get("Ports");
         LBPort = (Integer) ports.get("Load Balancer");
         WSPort = (Integer) ports.get("Web Server");
