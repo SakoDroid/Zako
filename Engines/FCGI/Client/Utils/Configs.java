@@ -12,7 +12,7 @@ public class Configs {
 
     public static void addServer(String ext,Map data){
         String Host = (String) data.get("Host");
-        String port = (String) data.get("Port");
+        String port = String.valueOf(data.get("Port"));
         servers.put(ext.trim(),new String[]{Host.trim(),port.trim()});
     }
 

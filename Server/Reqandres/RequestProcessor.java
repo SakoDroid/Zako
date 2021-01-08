@@ -50,7 +50,6 @@ public class RequestProcessor {
                     this.stat = 0;
                 }
             }else rq.getCacheFile().delete();
-            System.out.println("b : " + Body);
         }catch(Exception ex){
             String t = "";
             for (StackTraceElement a : ex.getStackTrace()){
