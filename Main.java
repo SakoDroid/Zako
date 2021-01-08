@@ -15,7 +15,7 @@ public class Main extends Thread{
             new Reporter();
             if (Configs.isLBOn()) new LoadBalancerMainThread();
             if (Configs.isWSOn()){
-                if (Configs.isSSLOn()) new HttpsServerMainThread();
+                if (SSLConfigs.SSL) new HttpsServerMainThread();
                 else new HttpServerMainThread();
             }
             if (Loader.autoRs){

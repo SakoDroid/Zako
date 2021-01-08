@@ -6,6 +6,7 @@ import java.util.regex.*;
 
 public class SSLConfigs {
 
+    public static boolean SSL;
     private static String jks;
     private static String pss;
 

@@ -1,5 +1,8 @@
 package Server.Utils;
 
+import Server.Utils.JSON.JSONBuilder;
+import Server.Utils.JSON.JSONDocument;
+
 import java.io.*;
 import java.util.HashMap;
 import java.util.regex.*;
@@ -14,8 +17,8 @@ public class Configs {
     private static boolean webServer;
     private static int LBPort = 80;
     private static int WSPort = 80;
-    private static boolean SSL = false;
 
+    public static boolean captcha;
     public static boolean cache;
     public static boolean keepAlive;
     public static long generalSize = Long.MAX_VALUE;
@@ -76,7 +79,7 @@ public class Configs {
             }
             else{
                 MainHost = Host;
-                MainHostWithPort = Host + ((isSSLOn())? "443":"80");
+                MainHostWithPort = Host + ((SSLConfigs.SSL)? "443":"80");
             }
             HashMap<String, String> temp = new HashMap<>();
             temp.put("Main", MainDir);
@@ -184,7 +187,7 @@ public class Configs {
 
     private static void loadMain(){
         Logger.ilog("Loading main configs ...");
-        try(BufferedReader bf = new BufferedReader(new FileReader(getCWD() + "/CFGS/Zako.cfg"))){
+        /*try(BufferedReader bf = new BufferedReader(new FileReader(getCWD() + "/CFGS/Zako.cfg"))){
             String cfgs = "";
             String line;
             while((line = bf.readLine()) != null){
@@ -245,7 +248,22 @@ public class Configs {
             }
             t += ex.toString();
             Logger.ilog(t);
-        }
+        }*/
+        JSONBuilder bld = JSONBuilder.newInstance();
+        JSONDocument doc = bld.parse(new File(getCWD() + "/CFGS/Zako.cfg"));
+        HashMap data = (HashMap) doc.toJava();
+        keepAlive = (Boolean) data.get("Keep Alive");
+        cache = (Boolean) data.get("Cache Control");
+        loadBalancer = (Boolean) data.get("Load Balancer");
+        webServer = (Boolean) data.get("Web Server");
+        timeout = (Integer) data.get("Sockets-Timeout");
+        HashMap cap = (HashMap) data.get("CAPTCHA");
+        captcha = (Boolean) cap.get("ON");
+        captchaLength = (Integer) data.get("CAPTCHA length");
+        captchaHardness = (Integer) data.get("CAPTCHA hardness");
+        HashMap ports = (HashMap) data.get("Ports");
+        LBPort = (Integer) ports.get("Load Balancer");
+        WSPort = (Integer) ports.get("Web Server");
     }
 
     public static void load(){
@@ -324,8 +342,6 @@ public class Configs {
     }
 
     public static boolean isWSOn(){return webServer;}
-
-    public static boolean isSSLOn(){return SSL;}
 
     public static int getLBPort(){return LBPort;}
 
