@@ -1,8 +1,9 @@
 package Server.Utils;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.util.regex.*;
+import Server.Utils.JSON.JSONBuilder;
+import Server.Utils.JSON.JSONDocument;
+import java.io.File;
+import java.util.HashMap;
 
 public class SSLConfigs {
 
@@ -11,26 +12,13 @@ public class SSLConfigs {
     private static String pss;
 
     public static void load(){
-        try(BufferedReader bf = new BufferedReader(new FileReader(Configs.getCWD() + "/CFGS/ssl.cfg"))){
-            String line;
-            String cfgs = "";
-            while((line = bf.readLine()) != null){
-                if (!line.startsWith("#")) cfgs += line + "\n";
-            }
-            Pattern ptn = Pattern.compile("jks-path=.*");
-            Matcher mc = ptn.matcher(cfgs);
-            if (mc.find()) jks = mc.group().replace("jks-path=","").trim();
-            ptn = Pattern.compile("jks-pass=.*");
-            mc = ptn.matcher(cfgs);
-            if (mc.find()) pss = mc.group().replace("jks-pass=","").trim();
-        }catch(Exception ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()){
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
-        }
+        JSONBuilder bld = JSONBuilder.newInstance();
+        JSONDocument doc = bld.parse(new File(Configs.getCWD() + "/CFGS/Zako.cfg"));
+        HashMap data = (HashMap) doc.toJava();
+        HashMap ssl = (HashMap) data.get("SSL");
+        SSL = (Boolean) ssl.get("ON");
+        jks = (String) ssl.get("jks path");
+        pss = (String) ssl.get("jks pass");
     }
 
     public static String getJKS(){
