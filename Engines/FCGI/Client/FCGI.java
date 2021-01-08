@@ -22,7 +22,7 @@ public class FCGI extends CGI {
     @Override
     public void exec(String body, boolean KA){
         envs.put("CONTENT_LENGTH",String.valueOf(body.getBytes().length));
-        FCGIClient client = new FCGIClient(envs,body,file.getName(),req.getHost());
+        FCGIClient client = new FCGIClient(envs,body,extension);
         Logger.CGILog("FCGI client initiated ;;; FCGI request id : " + client.reqID, file.getName(),req.getHost());
         client.run();
         Logger.CGILog("FCGI request sent ;;; FCGI request id : " + client.reqID, file.getName(),req.getHost());

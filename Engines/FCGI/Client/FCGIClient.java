@@ -15,11 +15,12 @@ public class FCGIClient {
     private final String postBody;
     private final FCGIEngine engine;
 
-    public FCGIClient(Map<String,String> envs, String postBody,String filename,String host){
+    public FCGIClient(Map<String,String> envs, String postBody,String ext){
         this.reqID = Utils.getID();
         this.envs = envs;
         this.postBody = postBody;
-        this.engine = new FCGIEngine(Configs.host,Configs.port,Configs.timeOut);
+        String[] server = Configs.getServer(ext);
+        this.engine = new FCGIEngine(server[0],Integer.parseInt(server[1]),Configs.timeOut);
     }
 
     public void run(){
