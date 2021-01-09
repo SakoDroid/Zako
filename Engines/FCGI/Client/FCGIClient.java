@@ -12,10 +12,10 @@ public class FCGIClient {
 
     public final int reqID;
     private final Map<String,String> envs;
-    private final String postBody;
+    private final byte[] postBody;
     private final FCGIEngine engine;
 
-    public FCGIClient(Map<String,String> envs, String postBody,String ext){
+    public FCGIClient(Map<String,String> envs, byte[] postBody,String ext){
         this.reqID = Utils.getID();
         this.envs = envs;
         this.postBody = postBody;
@@ -38,7 +38,7 @@ public class FCGIClient {
         FCGIRequestHeader endParamsH = new FCGIRequestHeader(1,FCGIConstants.FCGI_PARAMS,reqID, endParams.getLength());
         engine.exec(new FCGIRequest(endParamsH,endParams));
 
-        if (postBody != null && postBody.length() > 0){
+        if (postBody != null && postBody.length > 0){
             FCGIPostBody post = FCGIPostBody.getInstance(postBody);
             FCGIRequestHeader postH = new FCGIRequestHeader(1,FCGIConstants.FCGI_STDIN,reqID,post.getLength());
             engine.exec(new FCGIRequest(postH,post));

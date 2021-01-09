@@ -18,8 +18,8 @@ public class FCGIPostBody extends FCGIRequestComponent {
         }
     }
 
-    public static FCGIPostBody getInstance(String body){
-        if (body != null) return new FCGIPostBody(body.getBytes());
+    public static FCGIPostBody getInstance(byte[] body){
+        if (body != null) return new FCGIPostBody(body);
         else return new FCGIPostBody(new byte[]{});
     }
 

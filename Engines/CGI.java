@@ -16,7 +16,7 @@ public abstract class CGI {
     protected Request req;
     protected Map<String,String> envs;
 
-    public abstract void exec(String body,boolean ka);
+    public abstract void exec(byte[] body,boolean ka);
 
     public void getParams(){
         envs = new HashMap<>();

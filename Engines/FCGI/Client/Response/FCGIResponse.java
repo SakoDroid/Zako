@@ -4,11 +4,12 @@ import Engines.FCGI.Client.Utils.FCGIConstants;
 import Server.Utils.Logger;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 public class FCGIResponse {
 
     private FCGIEndRequestBody endRequest;
-    private String content = "";
+    private ArrayList<Byte> content = new ArrayList<>();
     private String errorContent = "";
     private final int reqID;
     public int status;
@@ -22,7 +23,7 @@ public class FCGIResponse {
         return this.endRequest;
     }
 
-    public String getContent(){
+    public ArrayList<Byte> getContent(){
         return this.content;
     }
 
@@ -56,7 +57,7 @@ public class FCGIResponse {
                         if (read == header.contentLength) {
                             if (header.type == FCGIConstants.FCGI_STDOUT) {
                                 if (this.status != -1) this.status = FCGIConstants.FCGI_REP_OK;
-                                this.content += new String(body);
+                                for (byte b : body) content.add(b);
                             } else {
                                 this.status = FCGIConstants.FCGI_REP_ERROR;
                                 this.errorContent += new String(body);

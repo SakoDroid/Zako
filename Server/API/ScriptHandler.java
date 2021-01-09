@@ -18,7 +18,7 @@ public class ScriptHandler {
         this.ext = extension;
     }
 
-    public void process(String body,boolean ka){
+    public void process(byte[] body,boolean ka){
         File fl = new File(Configs.getCGIDir(req.getHost()) + req.Path);
         if (fl.exists()){
             int status = ScriptsConfigs.getHandleMode(ext);

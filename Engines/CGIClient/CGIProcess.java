@@ -21,12 +21,12 @@ public class CGIProcess extends CGI {
     }
 
     @Override
-    public void exec(String body,boolean ka){
+    public void exec(byte[] body,boolean ka){
         if (executable) execCGI(body,ka);
         else sendPlain(ka);
     }
 
-    private void execCGI(String body, boolean ka){
+    private void execCGI(byte[] body, boolean ka){
         try{
             ProcessBuilder pb = new ProcessBuilder(commands);
             Logger.CGILog("Preparing the environment => adding envs. ; id = " + req.getID(),file.getName(),req.getHost());
@@ -36,7 +36,7 @@ public class CGIProcess extends CGI {
             Logger.CGILog("Process created => running code ... ; id = " + req.getID() + "  ; PID = " + p.pid(),file.getName(),req.getHost());
             InputStream errin = p.getErrorStream();
             if (mthd == Methods.POST){
-                OutputStreamWriter osw = new OutputStreamWriter(p.getOutputStream());
+                OutputStream osw = p.getOutputStream();
                 Logger.CGILog("Process created => Injecting post body ... ; id = " + req.getID() + "  ; PID = " + p.pid(),file.getName(),req.getHost());
                 osw.write(body);
                 osw.flush();

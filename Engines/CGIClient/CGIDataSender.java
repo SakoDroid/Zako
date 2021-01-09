@@ -34,7 +34,8 @@ public class CGIDataSender extends Sender {
         Logger.glog("Sending CGI output to " + ip + "  ; id = " + id,host);
         try{
             out.writeBytes(generateResponse());
-            int i;
+            int i = in.read();
+            if (i != 10) out.writeBytes("\n");
             while((i = in.read()) != -1){
                 out.write(i);
             }
@@ -94,4 +95,27 @@ public class CGIDataSender extends Sender {
             Logger.ilog(t);
         }
     }
+    public void sendFCGIData(byte[] data, DataOutputStream out, String ip, int id, String host){
+        String res = new String(data);
+        Pattern ptn = Pattern.compile("Status: .*");
+        Matcher mc = ptn.matcher(res);
+        if(mc.find()) status = mc.group().replace("Status: ","");
+        try{
+            out.writeBytes(generateResponse());
+            if (data[0] != 10) out.writeBytes("\n");
+            out.write(data);
+            out.flush();
+            out.close();
+            basicUtils.delID(id);
+            Logger.glog(ip + "'s request handled successfully!" + "  ; id = " + id,host);
+        }catch(Exception ex){
+            String t = "";
+            for (StackTraceElement a : ex.getStackTrace()) {
+                t += a.toString() + " ;; ";
+            }
+            t += ex.toString();
+            Logger.ilog(t);
+        }
+    }
+
 }

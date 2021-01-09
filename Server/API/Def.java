@@ -6,6 +6,7 @@ import Server.Reqandres.RequestProcessor;
 import Server.Reqandres.Senders.FileSender;
 import Server.Utils.*;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.regex.*;
 
 public class Def implements API{
@@ -20,7 +21,7 @@ public class Def implements API{
             String tempCntc = FileTypes.getContentType(ext);
             if (tempCntc != null) {
                 if (tempCntc.equals("CGI")) {
-                    new ScriptHandler(req,ext).process(reqp.Body,Configs.keepAlive && reqp.KA);
+                    new ScriptHandler(req,ext).process(basicUtils.toByteArray(reqp.Body),Configs.keepAlive && reqp.KA);
                 }else {
                     fl = new File(Configs.getMainDir(req.getHost()) + req.Path);
                     sendFile(fl,ext,req,Configs.keepAlive && reqp.KA);
@@ -31,7 +32,7 @@ public class Def implements API{
             }
         }else{
             fl = new File(Configs.getCGIDir(req.getHost()) + req.Path);
-            if (fl.exists()) new CGIProcess(ext,fl,req).exec(reqp.Body, Configs.keepAlive && reqp.KA);
+            if (fl.exists()) new CGIProcess(ext,fl,req).exec(basicUtils.toByteArray(reqp.Body), Configs.keepAlive && reqp.KA);
             else {
                 fl = new File(Configs.getMainDir(req.getHost()) + req.Path);
                 sendFile(fl,ext,req,Configs.keepAlive && reqp.KA);

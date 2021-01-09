@@ -4,6 +4,7 @@ import Engines.Captcha.Data;
 import Server.Reqandres.Request;
 import Server.Reqandres.RequestProcessor;
 import Server.Reqandres.Senders.FileSender;
+import Server.Utils.basicUtils;
 
 public class CapthaChecker implements API{
     @Override
@@ -11,6 +12,6 @@ public class CapthaChecker implements API{
         FileSender fs = new FileSender(req.getProt(),200);
         fs.setContentType("text/plain");
         fs.setKeepAlive(false);
-        fs.send(Data.checkAnswer(req.getIP(),reqp.Body),req.out,req.getIP(),req.getID(),req.getHost());
+        fs.send(Data.checkAnswer(req.getIP(),new String(basicUtils.toByteArray(reqp.Body))),req.out,req.getIP(),req.getID(),req.getHost());
     }
 }

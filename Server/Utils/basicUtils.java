@@ -91,6 +91,12 @@ public class basicUtils {
         return id;
     }
 
+    public static byte[] toByteArray(ArrayList<Byte> bytes){
+        byte[] temp = new byte[bytes.size()];
+        for (int i = 0 ; i < bytes.size() ; i++) temp[i] = bytes.get(i);
+        return temp;
+    }
+
     public static void delID(int id){
         ids.remove((Integer) id);
     }

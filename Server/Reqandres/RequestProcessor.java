@@ -18,7 +18,7 @@ public class RequestProcessor {
     public RandomAccessFile bf;
     private final Request req;
     public Methods method;
-    public String Body = "";
+    public ArrayList<Byte> Body = new ArrayList();
     public final HashMap headers = new HashMap();
     public int sit = 0;
     public int stat = 1;
@@ -58,6 +58,7 @@ public class RequestProcessor {
             t += ex.toString();
             Logger.ilog(t);
         }
+        System.out.println(Body.size());
     }
 
     private String readLine(InputStream in){
@@ -184,6 +185,7 @@ public class RequestProcessor {
             Matcher mc = ptn.matcher((String)headers.get("Content-Type"));
             String bnd ;
             String line;
+            while(!bf.readLine().isEmpty()){}
             ArrayList<String[]> files = new ArrayList<>();
             if (mc.find()) {
                 bnd = "--" + mc.group().replace("boundary=", "");
@@ -199,7 +201,7 @@ public class RequestProcessor {
                             String fileName = mc.group().replace("filename=","").replace("\"","");
                             if (fileName.isEmpty()) continue;
                             String filead = Configs.getUploadDir((String)this.headers.get("Host")) + "/" + fileName;
-                            if(namemc.find()) this.addToCGIBody(namemc.group().replace("name=","").replace("\"","") + "=" + filead);
+                            if(namemc.find()) this.addToCGIBody((namemc.group().replace("name=","").replace("\"","") + "=" + filead).getBytes());
                             String[] file = new String[3];
                             file[0] = filead;
                             bf.readLine();
@@ -220,14 +222,14 @@ public class RequestProcessor {
                         }else if (namemc.find()){
                             bf.readLine();
                             String val = bf.readLine();
-                            if(!val.isEmpty()) this.addToCGIBody(namemc.group().replace("name=\"","") + "=" + val);
+                            if(!val.isEmpty()) this.addToCGIBody((namemc.group().replace("name=\"","") + "=" + val).getBytes());
                         }
                     }
                 }
             }else {
-                while((line = bf.readLine()) != null){
-                    Body += line;
-                }
+                byte[] temp = new byte[(int)(bf.length() - bf.getFilePointer())];
+                bf.read(temp);
+                this.addToCGIBody(temp);
             }
             bf.close();
             if (!files.isEmpty()) new FileFixer(files,req.getCacheFile());
@@ -241,8 +243,11 @@ public class RequestProcessor {
         }
     }
 
-    private void addToCGIBody(String data){
-        if(Body.isEmpty()) Body += data;
-        else Body += "&" + data;
+    private void addToCGIBody(byte[] data){
+        if(Body.isEmpty()) for (byte b : data) Body.add(b);
+        else{
+            Body.add((byte)'&');
+            for (byte b : data) Body.add(b);
+        }
     }
 }
