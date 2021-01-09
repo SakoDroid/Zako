@@ -24,6 +24,8 @@ public class ScriptsConfigs {
                 Engines.FCGI.Client.Utils.Configs.addServer(ext, (Map) extData.get("FCGI"));
             }
         }
+        HashMap fcgi = (HashMap) data.get("FCGI");
+        Engines.FCGI.Client.Utils.Utils.setEnvs((HashMap<String, String>) fcgi.get("Params"));
     }
 
     public static int getHandleMode(String ext){

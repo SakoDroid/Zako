@@ -1,5 +1,6 @@
 package Engines;
 
+import Engines.FCGI.Client.Utils.Utils;
 import Server.Reqandres.Request;
 import Server.Utils.Configs;
 import Server.Utils.Methods;
@@ -41,5 +42,6 @@ public abstract class CGI {
         envs.put("SERVER_PROTOCOL", req.getProt());
         if (mthd == Methods.POST)
             envs.put("CONTENT_TYPE",(String)req.getHeaders().get("Content-Type"));
+        Utils.fixEnvs(envs);
     }
 }
