@@ -8,18 +8,14 @@ import java.net.Socket;
 
 public class HttpListener extends Thread{
 
-    private Socket sh;
-    private SSLSocket ss;
-    private Request req;
+    private final Request req;
 
     public HttpListener(Socket client){
-        this.sh = client;
         this.req = new Request(client);
         this.start();
     }
 
     public HttpListener(SSLSocket client){
-        this.ss = client;
         this.req = new Request(client);
         this.start();
     }
