@@ -156,98 +156,8 @@ public class Configs {
         }
     }
 
-    private static void loadSizes(){
-        Logger.ilog("Loading Size.cfg ...");
-        try(BufferedReader bf = new BufferedReader(new FileReader(getCWD() + "/CFGS/Size.cfg"))){
-            String line;
-            String cfgs = "";
-            while((line = bf.readLine()) != null){
-                if(!line.startsWith("#")) cfgs += line + "\n";
-            }
-            Pattern ptn = Pattern.compile("post-body=.*");
-            Matcher mc = ptn.matcher(cfgs);
-            String pst = "-";
-            String fl = "-";
-            if (mc.find()) pst = mc.group().replace("post-body=","".replace("\"",""));
-            ptn = Pattern.compile("file-size=.*");
-            mc = ptn.matcher(cfgs);
-            if (mc.find()) fl = mc.group().replace("file-size=","".replace("\"",""));
-            if (!pst.equals("-")) postBodySize = Long.parseLong(pst);
-            if (!fl.equals("-")) fileSize = Long.parseLong(fl);
-        }catch(Exception ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()){
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
-        }
-    }
-
     private static void loadMain(){
         Logger.ilog("Loading main configs ...");
-        /*try(BufferedReader bf = new BufferedReader(new FileReader(getCWD() + "/CFGS/Zako.cfg"))){
-            String cfgs = "";
-            String line;
-            while((line = bf.readLine()) != null){
-                if(!line.startsWith("#")) cfgs += line + "\n";
-            }
-            Pattern ptn = Pattern.compile("CAPTCHA-LENGTH=.*");
-            Matcher mc = ptn.matcher(cfgs);
-            String cpln = "5";
-            String cphr = "5";
-            String ld = "0";
-            String wb = "1";
-            String lbp = "80";
-            String wsp = "80";
-            String ssl = "0";
-            int ka = 0;
-            int ch = 1;
-            if (mc.find()) cpln = mc.group().replace("CAPTCHA-LENGTH=","");
-            ptn = Pattern.compile("CAPTCHA-HARDNESS=.*");
-            mc = ptn.matcher(cfgs);
-            if (mc.find()) cphr = mc.group().replace("CAPTCHA-HARDNESS=","");
-            ptn = Pattern.compile("Load_Balancer=.*");
-            mc = ptn.matcher(cfgs);
-            if (mc.find()) ld = mc.group().replace("Load_Balancer=","");
-            ptn = Pattern.compile("Web_Server=.*");
-            mc = ptn.matcher(cfgs);
-            if (mc.find()) wb = mc.group().replace("Web_Server=","");
-            ptn = Pattern.compile("Load_Balancer_Port=.*");
-            mc = ptn.matcher(cfgs);
-            if (mc.find()) lbp = mc.group().replace("Load_Balancer_Port=","");
-            ptn = Pattern.compile("SSL=.*");
-            mc = ptn.matcher(cfgs);
-            if (mc.find()) ssl = mc.group().replace("SSL=","");
-            ptn = Pattern.compile("Server_Port=.*");
-            mc = ptn.matcher(cfgs);
-            if (mc.find()) wsp = mc.group().replace("Server_Port=","");
-            ptn = Pattern.compile("Sockets-Timeout=.*");
-            mc = ptn.matcher(cfgs);
-            if (mc.find()) timeout = Integer.parseInt(mc.group().replace("Sockets-Timeout=",""));
-            ptn = Pattern.compile("Keep-Alive=.*");
-            mc = ptn.matcher(cfgs);
-            if (mc.find()) ka = Integer.parseInt(mc.group().replace("Keep-Alive=",""));
-            ptn = Pattern.compile("Cache-Control=.*");
-            mc = ptn.matcher(cfgs);
-            if (mc.find()) ch = Integer.parseInt(mc.group().replace("Cache-Control=",""));
-            LBPort = Integer.parseInt(lbp);
-            WSPort = Integer.parseInt(wsp);
-            webServer = Integer.parseInt(wb) == 1;
-            loadBalancer = Integer.parseInt(ld) == 1;
-            captchaLength = Integer.parseInt(cpln);
-            captchaHardness = Integer.parseInt(cphr);
-            SSL = Integer.parseInt(ssl) == 1;
-            keepAlive = ka == 1;
-            cache = ch == 1;
-        }catch(Exception ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()){
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
-        }*/
         JSONBuilder bld = JSONBuilder.newInstance();
         JSONDocument doc = bld.parse(new File(getCWD() + "/CFGS/Zako.cfg"));
         HashMap data = (HashMap) doc.toJava();
@@ -263,12 +173,18 @@ public class Configs {
         HashMap ports = (HashMap) data.get("Ports");
         LBPort = (Integer) ports.get("Load Balancer");
         WSPort = (Integer) ports.get("Web Server");
+        HashMap sizes = (HashMap) data.get("Sizes");
+        if (sizes.get("Post body") != null){
+            postBodySize = (int) sizes.get("Post body");
+        }
+        if (sizes.get("File size") != null){
+            fileSize = (int) sizes.get("File size");
+        }
     }
 
     public static void load(){
         loadMain();
         loadHosts();
-        loadSizes();
     }
 
     public static String getDef(String key){
