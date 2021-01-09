@@ -22,6 +22,7 @@ public class Request {
     public DataOutputStream out;
     public InputStream is;
     public String Path;
+    public String orgPath;
 
     public Request (Socket client){
         this.id = basicUtils.getID();

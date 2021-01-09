@@ -128,6 +128,7 @@ public class RequestProcessor {
                             headers.replace("URL", u);
                             req.setURL(u);
                             req.Path = u.getPath();
+                            req.orgPath = u.getPath();
                             Object cnc = headers.get("Connection");
                             if (cnc != null){
                                 String con = (String) cnc;

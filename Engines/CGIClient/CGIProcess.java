@@ -53,7 +53,7 @@ public class CGIProcess extends CGI {
                 ds.send(req.out,req.getIP(),req.getID(),req.getHost());
                 Logger.CGILog("Process Finished => All done! OK ; id = " + req.getID()+ "  ; PID = " + p.pid(),file.getName(),req.getHost());
             }else{
-                FileSender fs = new FileSender(req.getProt(),204);
+                FileSender fs = new FileSender(req.getProt(),200);
                 fs.setContentType("text/plain");
                 fs.setKeepAlive(ka);
                 fs.send(err,req.out,req.getIP(),req.getID(),req.getHost());

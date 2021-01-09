@@ -25,7 +25,7 @@ public abstract class CGI {
         String ck = (String)req.getHeaders().get("Cookie");
         if (FCGI) envs.put("GATEWAY_INTERFACE", "FastCGI/1.0");
         envs.put("QUERY_STRING", ((query != null) ? query : ""));
-        envs.put("PATH_INFO",req.Path);
+        envs.put("PATH_INFO",req.orgPath);
         envs.put("DOCUMENT_ROOT", Configs.getCGIDir(req.getHost()));
         envs.put("HTTP_COOKIE",((ck != null) ? ck : ""));
         envs.put("HTTP_USER_AGENT",(String)req.getHeaders().get("User-Agent"));
@@ -43,5 +43,6 @@ public abstract class CGI {
         if (mthd == Methods.POST)
             envs.put("CONTENT_TYPE",(String)req.getHeaders().get("Content-Type"));
         Utils.fixEnvs(envs);
+        System.out.println(envs);
     }
 }
