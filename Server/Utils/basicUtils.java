@@ -7,6 +7,7 @@ import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 
 public class basicUtils {
@@ -93,7 +94,9 @@ public class basicUtils {
 
     public static byte[] toByteArray(ArrayList<Byte> bytes){
         byte[] temp = new byte[bytes.size()];
-        for (int i = 0 ; i < bytes.size() ; i++) temp[i] = bytes.get(i);
+        int i = 0;
+        for (Byte b : bytes)
+            temp[i++] = b;
         return temp;
     }
 
