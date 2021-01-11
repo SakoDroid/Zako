@@ -58,7 +58,6 @@ public class RequestProcessor {
             t += ex.toString();
             Logger.ilog(t);
         }
-        System.out.println(Body.size());
     }
 
     private String readLine(InputStream in){
@@ -130,12 +129,13 @@ public class RequestProcessor {
                             req.setURL(u);
                             req.Path = u.getPath();
                             req.orgPath = u.getPath();
+                            Logger.glog(req.getIP() + "'s request is for " + u.getPath() + "; id = " + req.getID(),req.getHost());
                             Object cnc = headers.get("Connection");
                             if (cnc != null){
                                 String con = (String) cnc;
                                 if (con.trim().equals("close")) KA = false;
                                 else KA = true;
-                            }else KA = Configs.keepAlive;
+                            }else KA = false;
                         }
                         if (this.method == Methods.POST || this.method == Methods.PUT) {
                             if (headers.get("Content-Length") != null) {
@@ -227,6 +227,7 @@ public class RequestProcessor {
                     }
                 }
             }else {
+                bf.read();
                 byte[] temp = new byte[(int)(bf.length() - bf.getFilePointer())];
                 bf.read(temp);
                 this.addToCGIBody(temp);

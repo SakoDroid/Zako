@@ -20,6 +20,24 @@ public class CGIProcess extends CGI {
         this.getParams();
     }
 
+    public CGIProcess(String ext,File cgiFile,Request req,String args){
+        this.extension = ext;
+        this.file = cgiFile;
+        this.req = req;
+        this.getCMD();
+        commands.add(args);
+        this.getParams();
+    }
+
+    public CGIProcess(File cgiFile,Request req,List<String> commands){
+        this.extension = "NA";
+        this.file = cgiFile;
+        this.req = req;
+        this.commands = commands;
+        this.getParams();
+        this.executable = true;
+    }
+
     @Override
     public void exec(byte[] body,boolean ka){
         if (executable) execCGI(body,ka);
@@ -34,18 +52,14 @@ public class CGIProcess extends CGI {
             pb.environment().putAll(this.envs);
             Process p = pb.start();
             Logger.CGILog("Process created => running code ... ; id = " + req.getID() + "  ; PID = " + p.pid(),file.getName(),req.getHost());
-            InputStream errin = p.getErrorStream();
             if (mthd == Methods.POST){
                 OutputStream osw = p.getOutputStream();
                 Logger.CGILog("Process created => Injecting post body ... ; id = " + req.getID() + "  ; PID = " + p.pid(),file.getName(),req.getHost());
                 osw.write(body);
                 osw.flush();
+                osw.close();
             }
-            int i;
-            String err = "";
-            while((i = errin.read()) != -1){
-                err += (char)i;
-            }
+            String err = new String(p.getErrorStream().readAllBytes());
             if (err.isEmpty()){
                 Logger.CGILog("Process created => Extracting result ...  ; id = " + req.getID()+ "  ; PID = " + p.pid(),file.getName(), req.getHost());
                 CGIDataSender ds = new CGIDataSender(req.getProt(),200,p.getInputStream());
