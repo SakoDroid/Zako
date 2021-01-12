@@ -175,7 +175,7 @@ public class JSONBuilder {
                     itemObj = item.trim().replace("\"","");
                     break ;
                 case Integer:
-                    itemObj = Integer.parseInt(item.trim());
+                    itemObj = Long.parseLong(item.trim());
                     break ;
                 case Float:
                     itemObj = Float.parseFloat(item.trim());
@@ -235,7 +235,7 @@ public class JSONBuilder {
                     keyObj = key.trim().replace("\"","");
                     break ;
                 case Integer:
-                    keyObj = Integer.parseInt(key.trim());
+                    keyObj = Long.parseLong(key.trim());
                     break ;
                 case Float:
                     keyObj = Float.parseFloat(key.trim());
@@ -255,7 +255,7 @@ public class JSONBuilder {
                     valueObj = value.trim().replace("\"","");
                     break ;
                 case Integer:
-                    valueObj = Integer.parseInt(value.trim());
+                    valueObj = Long.parseLong(value.trim());
                     break ;
                 case Float:
                     valueObj = Float.parseFloat(value.trim());

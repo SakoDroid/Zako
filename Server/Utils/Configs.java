@@ -1,7 +1,6 @@
 package Server.Utils;
 
-import Server.Utils.JSON.JSONBuilder;
-import Server.Utils.JSON.JSONDocument;
+import Server.Utils.JSON.*;
 import java.io.*;
 import java.util.HashMap;
 import java.util.regex.*;
@@ -165,14 +164,14 @@ public class Configs {
         cache = (Boolean) data.get("Cache Control");
         loadBalancer = (Boolean) data.get("Load Balancer");
         webServer = (Boolean) data.get("Web Server");
-        timeout = (Integer) data.get("Sockets-Timeout");
+        timeout = Integer.parseInt(String.valueOf(data.get("Sockets-Timeout")));
         HashMap cap = (HashMap) data.get("CAPTCHA");
         captcha = (Boolean) cap.get("ON");
-        captchaLength = (Integer) cap.get("CAPTCHA length");
-        captchaHardness = (Integer) cap.get("CAPTCHA hardness");
+        captchaLength = Integer.parseInt(String.valueOf(cap.get("CAPTCHA length")));
+        captchaHardness =  Integer.parseInt(String.valueOf(cap.get("CAPTCHA hardness")));
         HashMap ports = (HashMap) data.get("Ports");
-        LBPort = (Integer) ports.get("Load Balancer");
-        WSPort = (Integer) ports.get("Web Server");
+        LBPort = Integer.parseInt(String.valueOf(ports.get("Load Balancer")));
+        WSPort = Integer.parseInt(String.valueOf(ports.get("Web Server")));
         HashMap sizes = (HashMap) data.get("Sizes");
         if (sizes.get("Post body") != null){
             postBodySize = (int) sizes.get("Post body");
