@@ -54,9 +54,9 @@ public class Perms {
             temp = 200;
         }
         else{
-            if (!dir.endsWith("/")) dir += "/";
             try {
                 File fl = new File(dir);
+                fl = new File(fl.getAbsolutePath().replace(fl.getName(),""));
                 if (fl.isDirectory()) {
                     if (dirs.contains(dir)) temp = 200;
                 } else {
