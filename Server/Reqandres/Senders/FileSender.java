@@ -23,6 +23,8 @@ public class FileSender extends Sender {
             else out += "\nConnection: close";
         }
         if (cookie != null) out += "\nSet-Cookie: " + cookie;
+        if (!customHeaders.isEmpty())
+            out += "\n" + customHeaders;
         out += "\n\n";
         return out;
     }

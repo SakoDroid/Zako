@@ -179,6 +179,8 @@ public class Configs {
         if (sizes.get("File size") != null){
             fileSize = (int) sizes.get("File size");
         }
+        HashMap auth = (HashMap) data.get("HTTP AUTH");
+        Server.HttpAuth.Interface.load((Boolean)auth.get("ON"));
     }
 
     public static void load(){

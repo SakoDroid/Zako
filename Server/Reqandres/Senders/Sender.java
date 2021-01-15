@@ -16,6 +16,7 @@ public class Sender {
     protected String status;
     protected String contentType;
     protected String cookie;
+    protected String customHeaders = "";
     protected boolean keepAlive = false;
 
     public Sender (String prot, int status){
@@ -25,14 +26,21 @@ public class Sender {
 
     private String generateResponse(String body){
         String out = prot + " " + status + "\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako;
-        if (body != null) out += "\nContent-Length: " + body.length();
-        if (contentType != null) out += "\nContent-Type: " + contentType;
-        if (cookie != null) out += "\nSet-Cookie: " + cookie;
+        if (body != null)
+            out += "\nContent-Length: " + body.length();
+        if (contentType != null)
+            out += "\nContent-Type: " + contentType;
+        if (cookie != null)
+            out += "\nSet-Cookie: " + cookie;
         if (Double.parseDouble(prot.replace("HTTP/","")) < 2){
             if (keepAlive) out += "\nConnection: keep-alive";
             else out += "\nConnection: close";
         }
-        if (body != null) out += "\n\n" + body;
+        if (!customHeaders.isEmpty())
+            out += "\n" + customHeaders;
+        if (body != null)
+            out += "\n\n" + body;
+        else out += "\n\n";
         return out;
     }
 
@@ -46,6 +54,16 @@ public class Sender {
 
     public void setContentType(String cnt){
         contentType = cnt;
+    }
+
+    public void addHeader(String header){
+        if (customHeaders.isEmpty())
+            customHeaders += header;
+        else {
+            if (customHeaders.endsWith("\n"))
+                customHeaders += header;
+            else customHeaders += "\n" + header;
+        }
     }
 
     public void addCookie(String ck){

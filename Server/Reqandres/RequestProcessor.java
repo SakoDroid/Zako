@@ -26,30 +26,41 @@ public class RequestProcessor {
 
     public RequestProcessor(Request rq){
         this.req = rq;
+        this.read();
+        req.setHeaders(this.headers);
+        if (Server.HttpAuth.Interface.needAuth(req.Path)){
+            this.sit = Server.HttpAuth.Interface.evaluate(this.headers);
+            if (this.sit == 401){
+                this.stat = 0;
+                Server.HttpAuth.Interface.send401(req);
+            }
+        }
+        this.continueProcess();
+    }
+
+    private void continueProcess(){
         try{
-            this.read();
-            req.setHeaders(this.headers);
             if (this.stat != 0){
-                bf = new RandomAccessFile(rq.getCacheFile(), "r");
+                bf = new RandomAccessFile(req.getCacheFile(), "r");
                 if (bf.length() > 5) {
                     if (Configs.keepAlive && KA) new HttpListener(req.getSock());
                     Interface.addReqVol(req.getIP(), bf.length());
                     if (this.sit < 400) {
                         this.stat = Factory.getMt(this.method).run(req, this);
-                    }else{
-                        basicUtils.sendCode(this.sit,req);
+                    } else {
+                        basicUtils.sendCode(this.sit, req);
                         this.stat = 0;
                         req.getCacheFile().delete();
                     }
                     bf.close();
                 } else {
-                    rq.out.flush();
-                    rq.out.close();
+                    req.out.flush();
+                    req.out.close();
                     bf.close();
-                    rq.getCacheFile().delete();
+                    req.getCacheFile().delete();
                     this.stat = 0;
                 }
-            }else rq.getCacheFile().delete();
+            }else req.getCacheFile().delete();
         }catch(Exception ex){
             String t = "";
             for (StackTraceElement a : ex.getStackTrace()){

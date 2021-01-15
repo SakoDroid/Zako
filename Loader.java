@@ -12,25 +12,6 @@ public class Loader {
     public static boolean autoRs;
 
     public static void loadRs(){
-        /*try(BufferedReader bf = new BufferedReader(new FileReader(Configs.getCWD() + "/CFGS/Zako.cfg"))){
-            String line;
-            while((line = bf.readLine()) != null){
-                if (!line.startsWith("#")){
-                    if (line.startsWith("Auto-Restart=")){
-                        line = line.replace("Auto-Restart=","");
-                        break;
-                    }
-                }
-            }
-            autoRs = Integer.parseInt(line) == 1;
-        }catch(Exception ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()) {
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
-        }*/
         JSONBuilder bld = JSONBuilder.newInstance();
         JSONDocument doc = bld.parse(new File(Configs.getCWD() + "/CFGS/Zako.cfg"));
         HashMap data = (HashMap) doc.toJava();
