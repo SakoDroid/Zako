@@ -1,7 +1,6 @@
 package Server.HttpAuth;
 
 import Server.Reqandres.Request;
-
 import java.util.HashMap;
 
 public class Interface {
@@ -23,13 +22,14 @@ public class Interface {
 
     public static int evaluate(HashMap headers){
         int temp;
-        String auth = String.valueOf(headers.get("Authorization"));
+        Object auth = headers.get("Authorization");
         if (auth != null){
-            if (core.checkAuth(auth))
+            if (core.checkAuth(String.valueOf(auth)))
                 temp = 200;
             else
                 temp = 403;
-        }else temp = 401;
+        }else
+            temp = 401;
         return temp;
     }
 

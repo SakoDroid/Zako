@@ -118,7 +118,7 @@ public class Sender {
     }
 
     public void send(String data, DataOutputStream out,String ip,int id,String host){
-        Logger.glog("Sending data as text/plain to " + ip + "  ; id = " + id,host);
+        Logger.glog("Sending response to " + ip + "  ; id = " + id,host);
         try{
             out.writeBytes(generateResponse(data));
             out.flush();
