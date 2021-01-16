@@ -20,14 +20,11 @@ public class Interface {
         else return false;
     }
 
-    public static int evaluate(HashMap headers){
+    public static int evaluate(HashMap headers,String ip){
         int temp;
         Object auth = headers.get("Authorization");
         if (auth != null){
-            if (core.checkAuth(String.valueOf(auth)))
-                temp = 200;
-            else
-                temp = 403;
+            temp = core.checkAuth(String.valueOf(auth),ip);
         }else
             temp = 401;
         return temp;

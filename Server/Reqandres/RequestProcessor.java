@@ -29,7 +29,7 @@ public class RequestProcessor {
         this.read();
         req.setHeaders(this.headers);
         if (Server.HttpAuth.Interface.needAuth(req.getHost() + req.Path)){
-            this.sit = Server.HttpAuth.Interface.evaluate(this.headers);
+            this.sit = Server.HttpAuth.Interface.evaluate(this.headers,req.getIP());
             if (this.sit == 401){
                 this.stat = 0;
                 Server.HttpAuth.Interface.send401(req);
@@ -40,10 +40,11 @@ public class RequestProcessor {
 
     private void continueProcess(){
         try{
+            if (Configs.keepAlive && KA)
+                new HttpListener(req.getSock());
             if (this.stat != 0){
                 bf = new RandomAccessFile(req.getCacheFile(), "r");
                 if (bf.length() > 5) {
-                    if (Configs.keepAlive && KA) new HttpListener(req.getSock());
                     Interface.addReqVol(req.getIP(), bf.length());
                     if (this.sit < 400) {
                         this.stat = Factory.getMt(this.method).run(req, this);
