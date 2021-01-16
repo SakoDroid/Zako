@@ -28,7 +28,7 @@ public class RequestProcessor {
         this.req = rq;
         this.read();
         req.setHeaders(this.headers);
-        if (Server.HttpAuth.Interface.needAuth(req.Path)){
+        if (Server.HttpAuth.Interface.needAuth(req.getHost() + req.Path)){
             this.sit = Server.HttpAuth.Interface.evaluate(this.headers);
             if (this.sit == 401){
                 this.stat = 0;
