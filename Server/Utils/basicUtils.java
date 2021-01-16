@@ -19,7 +19,7 @@ public class basicUtils {
     private static final ArrayList<Integer> ids = new ArrayList<>();
     private static final Random rnd = new Random();
     public static String LocalHostIP = "";
-    public static String Zako = "Zako 0.4";
+    public static String Zako = "Zako 0.5";
 
     private basicUtils(){}
 
