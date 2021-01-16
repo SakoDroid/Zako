@@ -11,9 +11,6 @@ public class Def implements Method{
     public int run(Request req, RequestProcessor reqp){
         int rtn = 1;
         try{
-            if (!basicUtils.LocalHostIP.isEmpty())
-                req.setHost(req.getHost().replace(basicUtils.LocalHostIP, Configs.MainHost));
-            req.setHost(req.getHost().replace("127.0.0.1", "localhost"));
             String Host = req.getHost();
             String Path = req.Path;
             int status = Configs.getHostStatus(Host);

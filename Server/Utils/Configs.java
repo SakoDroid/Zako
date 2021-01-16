@@ -3,13 +3,15 @@ package Server.Utils;
 import Server.Utils.JSON.*;
 import java.io.*;
 import java.util.HashMap;
-import java.util.regex.*;
+import org.w3c.dom.*;
+import javax.xml.parsers.*;
 
 public class Configs {
 
-    private static final HashMap<String,HashMap<String,String>> Configs = new HashMap<>();
+    //Status 0 means handle, 1 means forward, 2 means redirect.
+    private static final HashMap<String,HashMap<String,String>> Dirs = new HashMap<>();
     private static final HashMap<String,Integer> hostsStatus = new HashMap<>();
-    private static final HashMap<String,String[]> HostFrAdd = new HashMap<>();
+    private static final HashMap<String,String[]> targets = new HashMap<>();
 
     private static boolean loadBalancer;
     private static boolean webServer;
@@ -25,133 +27,64 @@ public class Configs {
     public static int timeout;
     public static int captchaLength = 5;
     public static int captchaHardness = 5;
-    public static String MainHost;
-    public static String MainHostWithPort;
 
     private Configs(){}
 
-    private static void parseCfg(String cfg){
-        String Host = "";
-        String MainDir = "";
-        String CGIDir = "";
-        String LogsDir = "";
-        String TempUploadDir = "";
-
-        Pattern ptn = Pattern.compile("Host=.*");
-        Matcher mc = ptn.matcher(cfg);
-        if(mc.find()) Host = mc.group().replace("Host=","");
-        ptn = Pattern.compile("RootDir=.*");
-        mc = ptn.matcher(cfg);
-        if(mc.find()) MainDir = mc.group().replace("RootDir=","");
-        File Main = new File(MainDir);
-        if (!Main.isDirectory()) Main.mkdir();
-        ptn = Pattern.compile("CGIDir=.*");
-        mc = ptn.matcher(cfg);
-        if(mc.find()) CGIDir = mc.group().replace("CGIDir=","");
-        File CGI = new File(CGIDir);
-        if (!CGI.isDirectory()) CGI.mkdir();
-        ptn = Pattern.compile("LogsDir=.*");
-        mc = ptn.matcher(cfg);
-        if(mc.find()) LogsDir = mc.group().replace("LogsDir=","");
-        File Lgs = new File(LogsDir);
-        if (!Lgs.isDirectory()) Lgs.mkdir();
-        ptn = Pattern.compile("TempUploadDir=.*");
-        mc = ptn.matcher(cfg);
-        if(mc.find()) TempUploadDir = mc.group().replace("TempUploadDir=","");
-        File Up = new File(TempUploadDir);
-        if (!Up.isDirectory()) Up.mkdir();
-        if(Configs.get(Host) != null){
-            HashMap<String,String> temp = new HashMap<>();
-            Configs.put(Host,temp);
-        }
-        Perms.addDir(MainDir);
-        Perms.addDir(CGIDir);
-        Configs.get(Host).put("Main", MainDir);
-        Configs.get(Host).put("Logs", LogsDir);
-        Configs.get(Host).put("CGI", CGIDir);
-        Configs.get(Host).put("Up", TempUploadDir);
-        if (cfg.contains("%%MAIN%%")) {
-            if(Host.contains(":")){
-                MainHost = Host.split(":")[0];
-                MainHostWithPort = Host;
-            }
-            else{
-                MainHost = Host;
-                MainHostWithPort = Host + ((SSLConfigs.SSL)? "443":"80");
-            }
-            HashMap<String, String> temp = new HashMap<>();
-            temp.put("Main", MainDir);
-            temp.put("Logs", LogsDir);
-            temp.put("CGI", CGIDir);
-            temp.put("Up", TempUploadDir);
-            Configs.put("Main", temp);
-        }
-    }
-
-    private static void loadDirs(){
-        try(FileReader bf = new FileReader(System.getProperty("user.dir") + "/CFGS/Dirs.cfg")){
-            File tempdir = new File(getCWD() + "/Temp");
-            if (!tempdir.isDirectory()) tempdir.mkdir();
-            String cfg = "";
-            int i;
-            while((i = bf.read()) != -1){
-                cfg += (char)i;
-            }
-            Pattern ptn = Pattern.compile("Host=[^#]+");
-            Matcher mc = ptn.matcher(cfg);
-            while(mc.find()) parseCfg(mc.group());
-        }catch(Exception ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()){
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
-
-        }
-    }
-
-    private static void addFr(String line){
-        String[] ln = line.split("->");
-        hostsStatus.put(ln[0].trim(),1);
-        String[] add = ln[1].trim().split(":");
-        if (add.length > 1) HostFrAdd.put(ln[0].trim(),add);
-        else HostFrAdd.put(ln[0].trim(),new String[]{add[0],"80"});
-    }
-
-    private static void addRd(String line){
-        String[] temp = line.split("=>");
-        hostsStatus.put(temp[0].trim(),2);
-        HostFrAdd.put(temp[0].trim(),new String[]{temp[1]});
-    }
-
     private static void loadHosts(){
-        Logger.ilog("Loading subdomains ...");
-        try(BufferedReader bf = new BufferedReader(new FileReader(System.getProperty("user.dir") + "/CFGS/Hosts.cfg"))){
-            String line;
-            while((line = bf.readLine()) != null){
-                if(!line.startsWith("#")){
-                    if(line.contains("->")) addFr(line);
-                    else if (line.contains("=>")) addRd(line);
-                    else{
-                        HashMap<String, String> temp = new HashMap();
-                        Configs.put(line.trim(), temp);
-                        hostsStatus.put(line.trim(),0);
-                    }
+        try{
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document doc = db.parse(new File(getCWD() + "/CFGS/Hosts.cfg"));
+            NodeList nl = doc.getElementsByTagName("Host");
+            for (int i = 0 ; i < nl.getLength() ; i++){
+                Element host = (Element) nl.item(i);
+                String hostName = host.getElementsByTagName("Name").item(0).getTextContent().trim();
+                if (hostName.isEmpty())
+                    continue;
+                String mode =  host.getElementsByTagName("Mode").item(0).getTextContent().trim();
+                if (mode.equals("Handle")) {
+                    HashMap<String, String> dirs = new HashMap<>();
+                    dirs.put("Root", host.getElementsByTagName("RootDir").item(0).getTextContent().trim());
+                    dirs.put("CGI", host.getElementsByTagName("CGIDir").item(0).getTextContent().trim());
+                    dirs.put("Logs", host.getElementsByTagName("LogsDir").item(0).getTextContent().trim());
+                    dirs.put("Files", host.getElementsByTagName("TempFileUploadDir").item(0).getTextContent().trim());
+                    Dirs.put(hostName, dirs);
+                } else {
+                    hostsStatus.put(hostName,((mode.equals("Forward")) ? 1 : 2));
+                    String target = host.getElementsByTagName("Target").item(0).getTextContent().trim();
+                    String[] address = target.split(":");
+                    targets.put(hostName,((address.length > 1) ? address : new String[]{address[0],"80"}));
                 }
             }
-            if (Configs.isEmpty()) {
-                HashMap<String, String> temp = new HashMap();
-                Configs.put("default", temp);
-            }
-            loadDirs();
         }catch(Exception ex){
             String t = "";
-            for (StackTraceElement a : ex.getStackTrace()){
+            for (StackTraceElement a : ex.getStackTrace()) {
                 t += a.toString() + " ;; ";
             }
             t += ex.toString();
             Logger.ilog(t);
+        }
+        addDefaultSetback();
+        checkDirs();
+    }
+
+    private static void addDefaultSetback(){
+        HashMap<String,String> dirs = new HashMap<>();
+        dirs.put("Root","/var/www/html");
+        dirs.put("CGI","/var/www/cgi-bin");
+        dirs.put("Logs",getCWD() + "/Logs");
+        dirs.put("Files","/var/www/files");
+        Dirs.put("def",dirs);
+    }
+
+    private static void checkDirs(){
+        for (String hostName : Dirs.keySet()){
+            HashMap<String,String> dirs = Dirs.get(hostName);
+            for (String dir : dirs.values()){
+                File fl = new File(dir);
+                if (!fl.isDirectory())
+                    fl.mkdirs();
+            }
         }
     }
 
@@ -189,64 +122,39 @@ public class Configs {
     }
 
     public static String getDef(String key){
-        String def = "";
-        HashMap<String,String> infos = Configs.get("Main");
-        if (infos != null){
-            def = infos.get(key);
-            if (def == null){
-                infos = Configs.get("default");
-                def = infos.get(key);
-            }
-        }else{
-            infos = Configs.get("default");
-            def = infos.get(key);
-        }
-        return def;
+        return Dirs.get("def").get(key);
     }
 
     public static String getMainDir(String host){
-        String MainDir = null;
-        HashMap<String,String> infos = Configs.get(host);
-        if(infos != null){
-            MainDir = infos.get("Main");
-        }
-        return MainDir;
+        HashMap<String,String> dirs = Dirs.get(host);
+        if (dirs != null)
+            return dirs.get("Root");
+        else
+            return getDef("Root");
     }
 
     public static String getLogsDir(String host){
-        String LogsDir = null;
-        HashMap<String,String> infos = Configs.get(host);
-        if(infos != null){
-            LogsDir = infos.get("Logs");
-            if(LogsDir == null){
-                LogsDir = getDef("Logs");
-            }
-        }else LogsDir = getDef("Logs");
-        return LogsDir;
+        HashMap<String,String> dirs = Dirs.get(host);
+        if (dirs != null)
+            return dirs.get("Logs");
+        else
+            return getDef("Logs");
     }
 
     public static String getCGIDir(String host){
-        String CGIDir = null;
-        HashMap<String,String> infos = Configs.get(host);
-        if(infos != null){
-            CGIDir = infos.get("CGI");
-            if(CGIDir == null){
-                CGIDir = getDef("CGI");
-            }
-        }else CGIDir = getDef("CGI");
-        return CGIDir;
+        HashMap<String,String> dirs = Dirs.get(host);
+        if (dirs != null)
+            return dirs.get("CGI");
+        else
+            return getDef("CGI");
     }
 
     public static String getUploadDir(String host){
-        String UpDir = null;
-        HashMap<String,String> infos = Configs.get(host);
-        if(infos != null){
-            UpDir = infos.get("Up");
-            if(UpDir == null){
-                UpDir = getDef("Up");
-            }
-        }else UpDir = getDef("Up");
-        return UpDir;
+        HashMap<String,String> dirs = Dirs.get(host);
+        if (dirs != null)
+            return dirs.get("Files");
+        else
+            return getDef("Files");
     }
 
     public static String getCWD(){
@@ -269,8 +177,7 @@ public class Configs {
     }
 
     public static String[] getForwardAddress(String host){
-        return HostFrAdd.get(host);
+        return targets.get(host);
     }
 
 }
-

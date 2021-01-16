@@ -37,7 +37,7 @@ public abstract class CGI {
         envs.put("REMOTE_PORT", "9985");
         envs.put("SERVER_SOFTWARE",basicUtils.Zako);
         envs.put("SERVER_ADDR", basicUtils.LocalHostIP.trim());
-        envs.put("SERVER_NAME", Configs.MainHost);
+        envs.put("SERVER_NAME", req.getHost());
         envs.put("SERVER_PORT", String.valueOf(Configs.getWSPort()));
         envs.put("SERVER_PROTOCOL", req.getProt());
         if (mthd == Methods.POST)
