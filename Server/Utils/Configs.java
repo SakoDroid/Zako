@@ -43,6 +43,7 @@ public class Configs {
                     continue;
                 String mode =  host.getElementsByTagName("Mode").item(0).getTextContent().trim();
                 if (mode.equals("Handle")) {
+                    hostsStatus.put(hostName,0);
                     HashMap<String, String> dirs = new HashMap<>();
                     dirs.put("Root", host.getElementsByTagName("RootDir").item(0).getTextContent().trim());
                     dirs.put("CGI", host.getElementsByTagName("CGIDir").item(0).getTextContent().trim());
