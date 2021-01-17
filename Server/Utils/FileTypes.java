@@ -82,6 +82,7 @@ public class FileTypes {
     }
 
     public static String getHeaders(String extension){
-        return "";
+        String ret = headers.get(extension);
+        return (ret != null) ? ret : "";
     }
 }
