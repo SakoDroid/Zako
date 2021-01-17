@@ -120,7 +120,6 @@ public class Configs {
     public static void load(){
         loadMain();
         loadHosts();
-        System.out.println(timeout);
     }
 
     public static String getDef(String key){
