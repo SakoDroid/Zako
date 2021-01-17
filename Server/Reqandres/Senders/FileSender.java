@@ -14,15 +14,15 @@ public class FileSender extends Sender {
 
     private String generateHeaders(long contentLength){
         String out = prot + " " + status + "\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako +
-                "\nContent-Length: " + contentLength + "\nContent-Type: " + contentType + "\nCache-Control: ";
-        if (ext != null){
-            out += FileTypes.getAge(ext);
-        }else out += "no-store";
+                "\nContent-Length: " + contentLength + "\nContent-Type: " + contentType;
+        if (ext != null)
+            out += FileTypes.getHeaders(ext);
         if (Double.parseDouble(prot.replace("HTTP/","")) < 2){
             if (keepAlive) out += "\nConnection: keep-alive";
             else out += "\nConnection: close";
         }
-        if (cookie != null) out += "\nSet-Cookie: " + cookie;
+        if (cookie != null)
+            out += "\nSet-Cookie: " + cookie;
         if (!customHeaders.isEmpty())
             out += "\n" + customHeaders;
         out += "\n\n";
@@ -56,7 +56,7 @@ public class FileSender extends Sender {
     }
 
     public void sendFile(Methods method, byte[] file, DataOutputStream out, String ip, int id, String host){
-        Logger.glog("Sending binary file to " + ip + "  ; id = " + id,host);
+        Logger.glog("Sending a file (byte[]) to " + ip + "  ; id = " + id,host);
         try{
             out.writeBytes(generateHeaders(file.length));
             if(method != Methods.HEAD) out.write(file);

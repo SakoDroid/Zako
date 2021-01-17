@@ -8,7 +8,7 @@ import javax.xml.parsers.*;
 public class FileTypes {
 
     private static final HashMap<String,String> cnts = new HashMap<>();
-    private static final HashMap<String,String> cache = new HashMap<>();
+    private static final HashMap<String,String> headers = new HashMap<>();
 
     private FileTypes(){}
 
@@ -37,13 +37,22 @@ public class FileTypes {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
             Document d = db.parse(new File(Configs.getCWD() + "/CFGS/Headers.cfg"));
-            Element ch = (Element) d.getElementsByTagName("Cache").item(0);
-            NodeList rules = ch.getElementsByTagName("rule");
+            NodeList rules = d.getElementsByTagName("rule");
             for (int i = 0 ; i < rules.getLength() ; i++){
                 Element rule = (Element) rules.item(i);
-                String exts = rule.getElementsByTagName("extensions").item(0).getTextContent();
-                String age = rule.getElementsByTagName("value").item(0).getTextContent().trim();
-                for (String ext : exts.split(",")) cache.put(ext.trim(),age);
+                String ex = rule.getAttribute("ext");
+                String[] exs = ex.split(",");
+                StringBuilder header = new StringBuilder();
+                header.append('\n');
+                NodeList child = rule.getChildNodes();
+                for (int j = 0 ; j < child.getLength() ; j++){
+                    Node hd = child.item(j);
+                    if (hd.getNodeName().equals("#text"))
+                        continue;
+                    header.append(hd.getNodeName()).append(": ").append(hd.getTextContent());
+                }
+                for (String ext : exs)
+                    headers.put(ext.trim(),header.toString());
             }
         }catch (Exception ex){
             String t = "";
@@ -72,10 +81,7 @@ public class FileTypes {
         return cnts.get(ext);
     }
 
-    public static String getAge(String ext){
-        if (Configs.cache){
-            String value = cache.get(ext);
-            return ((value == null) ? "no-store" : value);
-        }else return "no-store";
+    public static String getHeaders(String extension){
+        return "";
     }
 }
