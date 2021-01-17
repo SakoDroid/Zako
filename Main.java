@@ -12,6 +12,7 @@ public class Main extends Thread{
             basicUtils.killPrcs();
             Logger.ilog("Loading requirements ...");
             Loader.load();
+            new ConfigsUpdater();
             new Reporter();
             if (Configs.isLBOn()) new LoadBalancerMainThread();
             if (Configs.isWSOn()){
