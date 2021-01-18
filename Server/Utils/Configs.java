@@ -18,6 +18,7 @@ public class Configs {
     private static int LBPort = 80;
     private static int WSPort = 80;
 
+    public static boolean autoUpdate;
     public static boolean captcha;
     public static boolean cache;
     public static boolean keepAlive;
@@ -94,6 +95,7 @@ public class Configs {
         JSONBuilder bld = JSONBuilder.newInstance();
         JSONDocument doc = bld.parse(new File(getCWD() + "/CFGS/Zako.cfg"));
         HashMap data = (HashMap) doc.toJava();
+        autoUpdate = (Boolean) data.get("CFG Update");
         keepAlive = (Boolean) data.get("Keep Alive");
         cache = (Boolean) data.get("Cache Control");
         loadBalancer = (Boolean) data.get("Load Balancer");
