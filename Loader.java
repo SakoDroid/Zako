@@ -24,6 +24,8 @@ public class Loader {
         Logger.ilog("Loading ssl configurations ...");
         SSLConfigs.load();
         FileTypes.load();
+        Logger.ilog("Loading CAPTCHA configurations ...");
+        CaptchaConfigs.load();
         Logger.ilog("Loading scripts configurations ...");
         ScriptsConfigs.load();
         Logger.ilog("Loading configurations ...");

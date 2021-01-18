@@ -19,15 +19,12 @@ public class Configs {
     private static int WSPort = 80;
 
     public static boolean autoUpdate;
-    public static boolean captcha;
     public static boolean cache;
     public static boolean keepAlive;
     public static long generalSize = Long.MAX_VALUE;
     public static long fileSize = Long.MAX_VALUE;
     public static long postBodySize = Long.MAX_VALUE;
     public static int timeout;
-    public static int captchaLength = 5;
-    public static int captchaHardness = 5;
 
     private Configs(){}
 
@@ -101,10 +98,6 @@ public class Configs {
         loadBalancer = (Boolean) data.get("Load Balancer");
         webServer = (Boolean) data.get("Web Server");
         timeout = Integer.parseInt(String.valueOf(data.get("Sockets-Timeout")));
-        HashMap cap = (HashMap) data.get("CAPTCHA");
-        captcha = (Boolean) cap.get("ON");
-        captchaLength = Integer.parseInt(String.valueOf(cap.get("CAPTCHA length")));
-        captchaHardness =  Integer.parseInt(String.valueOf(cap.get("CAPTCHA hardness")));
         HashMap ports = (HashMap) data.get("Ports");
         LBPort = Integer.parseInt(String.valueOf(ports.get("Load Balancer")));
         WSPort = Integer.parseInt(String.valueOf(ports.get("Web Server")));

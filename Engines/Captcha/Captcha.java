@@ -1,6 +1,6 @@
 package Engines.Captcha;
 
-import Server.Utils.Configs;
+import Server.Utils.CaptchaConfigs;
 import Server.Utils.Logger;
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -19,7 +19,7 @@ public class Captcha {
 
     public Captcha(String ip,String host){
         Logger.glog("generating captcha for " + ip,host);
-        String ans = getRandomString(Configs.captchaLength);
+        String ans = getRandomString(CaptchaConfigs.length);
         image = getPicture(ans);
         Data.addRecord(ip,ans);
     }
@@ -34,7 +34,7 @@ public class Captcha {
 
     private byte[] getPicture(String cap){
         int mode = rnd.nextInt(3);
-        int hr = Configs.captchaHardness;
+        int hr = CaptchaConfigs.hardness;
         int startind = 20;
         BufferedImage img = new BufferedImage(140,80,BufferedImage.TYPE_INT_RGB);
         Graphics2D g = img.createGraphics();
