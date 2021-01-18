@@ -25,28 +25,33 @@ public class Core {
     }
 
     private void load(){
-        try(BufferedReader bf = new BufferedReader(new FileReader(System.getProperty("user.dir") + "/CFGS/passwd"))){
+        loadPasswd();
+        HashMap data = (HashMap) JSONBuilder
+                .newInstance()
+                .parse(new File(System.getProperty("user.dir") + "/CFGS/Zako.cfg"))
+                .toJava();
+        HashMap authCfg = (HashMap) data.get("HTTP AUTH");
+        String mech = String.valueOf(authCfg.get("Auth mechanism"));
+        this.realm = String.valueOf(authCfg.get("Auth realm"));
+        if (mech.contains(" ")){
+            Mechanism = Mechanisms.Digest;
+            alg = mech.split(" ",2)[1];
+        }else
+            Mechanism = Mechanisms.Basic;
+        apis = (ArrayList<String>) authCfg.get("Dirs");
+        new PasswdUpdater();
+    }
+
+    private void loadPasswd(){
+        try(BufferedReader bf = new BufferedReader(new FileReader(System.getProperty("user.dir") + "/CFGS/passwd"))) {
             String line;
-            while((line = bf.readLine()) != null){
-                if (!line.startsWith("#") && !line.isEmpty()){
+            while ((line = bf.readLine()) != null) {
+                if (!line.startsWith("#") && !line.isEmpty()) {
                     String[] entry = line.split(":");
                     if (entry.length > 1)
-                        passwd.put(entry[0],entry[1]);
+                        passwd.put(entry[0], entry[1]);
                 }
             }
-            HashMap data = (HashMap) JSONBuilder
-                    .newInstance()
-                    .parse(new File(System.getProperty("user.dir") + "/CFGS/Zako.cfg"))
-                    .toJava();
-            HashMap authCfg = (HashMap) data.get("HTTP AUTH");
-            String mech = String.valueOf(authCfg.get("Auth mechanism"));
-            this.realm = String.valueOf(authCfg.get("Auth realm"));
-            if (mech.contains(" ")){
-                Mechanism = Mechanisms.Digest;
-                alg = mech.split(" ",2)[1];
-            }else
-                Mechanism = Mechanisms.Basic;
-            apis = (ArrayList<String>) authCfg.get("Dirs");
         }catch (Exception ex){
             String t = "";
             for (StackTraceElement a : ex.getStackTrace()) {
@@ -212,6 +217,25 @@ public class Core {
 
         public int getSituation(){
             return this.situation;
+        }
+    }
+
+    private class PasswdUpdater extends Thread{
+
+        private final Object lock = new Object();
+
+        public PasswdUpdater(){
+            this.start();
+        }
+
+        @Override
+        public void run(){
+            synchronized (lock){
+                try{
+                    lock.wait(100);
+                    loadPasswd();
+                }catch (Exception ignored){}
+            }
         }
     }
 }

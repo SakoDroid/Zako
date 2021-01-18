@@ -9,8 +9,10 @@ public class Interface {
     private static boolean ON = true;
 
     public static void load (boolean status){
-        if (status)
-            core = new Core();
+        if (status){
+            if (core == null)
+                core = new Core();
+        }
         ON = status;
     }
 
