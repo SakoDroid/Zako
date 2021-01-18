@@ -75,8 +75,8 @@ public class Sender {
     public void sendOptionsMethod(DataOutputStream out,String ip,int id,String host){
         try{
             Logger.glog("Sending back options method response to " + ip + "  ; id = " + id,host);
-            out.writeBytes(prot + " 200 OK\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako + "\nConnection: close\nAllow: GET,HEAD,POST,OPTIONS,TRACE,CONNECT,PUT,DELETE\nIPS-Allowed-For-PUT-DELETE: ");
-            BufferedReader bf = new BufferedReader(new FileReader(Configs.getCWD() + "/CFGS/IP_List_PUT_DELETE.cfg"));
+            out.writeBytes(prot + " 200 OK\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako + "\nConnection: close\nAllow: GET,HEAD,POST,OPTIONS,TRACE,CONNECT,PUT,DELETE\nx-IPS-Allowed-For-PUT-DELETE: ");
+            BufferedReader bf = new BufferedReader(new FileReader(Configs.getCWD() + "/CFGS/ILPD"));
             String line;
             String ips = "";
             while ((line = bf.readLine()) != null){

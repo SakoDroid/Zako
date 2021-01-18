@@ -59,7 +59,8 @@ public class FileSender extends Sender {
         Logger.glog("Sending a file (byte[]) to " + ip + "  ; id = " + id,host);
         try{
             out.writeBytes(generateHeaders(file.length));
-            if(method != Methods.HEAD) out.write(file);
+            if(method != Methods.HEAD)
+                out.write(file);
             out.flush();
             Logger.glog(ip + "'s request handled successfully!" + "  ; id = " + id,host);
             basicUtils.delID(id);

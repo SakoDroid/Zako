@@ -6,7 +6,7 @@ import java.util.HashSet;
 public class Perms {
 
     private final static HashSet<String> dirs = new HashSet<>();
-    private final static HashSet<String> ipblacklist = new HashSet<>();
+    private final static HashSet<String> ipBlackList = new HashSet<>();
     private final static HashSet<String> ipsAuthorizedForPUTAndDelete = new HashSet<>();
 
     public static void load(){
@@ -22,13 +22,13 @@ public class Perms {
             }
             bf.close();
             Logger.ilog("Loading ip black list ...");
-            bf = new BufferedReader(new FileReader(Configs.getCWD() + "/CFGS/IP-Blacklist.cfg"));
+            bf = new BufferedReader(new FileReader(Configs.getCWD() + "/CFGS/IP-Blacklist"));
             while((line = bf.readLine()) != null){
-                if (!line.startsWith("#") && !line.isEmpty()) ipblacklist.add(line);
+                if (!line.startsWith("#") && !line.isEmpty()) ipBlackList.add(line);
             }
             bf.close();
             Logger.ilog("Loading authorized ips for PUT and DELETE method ...");
-            bf = new BufferedReader(new FileReader(Configs.getCWD() + "/CFGS/IP_List_PUT_DELETE.cfg"));
+            bf = new BufferedReader(new FileReader(Configs.getCWD() + "/CFGS/ILPD"));
             while((line = bf.readLine()) != null){
                 if (!line.startsWith("#") && !line.isEmpty()) ipsAuthorizedForPUTAndDelete.add(line);
             }
@@ -82,12 +82,12 @@ public class Perms {
     }
 
     public static boolean isIPAllowed(String ip){
-        return !ipblacklist.contains(ip);
+        return !ipBlackList.contains(ip);
     }
 
-    public static void addIPToBlackList(String ip){
-        ipblacklist.add(ip);
-        try(FileWriter fw = new FileWriter(Configs.getCWD() + "/CFGS/IP-Blacklist.cfg",true)){
+    public static synchronized void addIPToBlackList(String ip){
+        ipBlackList.add(ip);
+        try(FileWriter fw = new FileWriter(Configs.getCWD() + "/CFGS/IP-Blacklist",true)){
             fw.write("\n" + ip);
             fw.flush();
         }catch(Exception ex){

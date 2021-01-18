@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width initial-scale=1.0"/>
+    <title>Zako</title>
+    <style id="style">
+        .zako{
+            padding-bottom: 0;
+            margin-bottom: 0;
+            border-bottom: 0;
+            text-align: center;
+            color: #581b1b;
+            font-family: 'Rasa SemiBold',monospace;
+            font-size: 150px
+        }
+        .inCode{
+            padding-top: 0;
+            margin-top: 0;
+            border-top: 0;
+            text-align: center;
+            color: #1d6567;
+            font-family: 'Rasa SemiBold',monospace;
+            font-size: 48px;
+        }
+        button{
+            width: 200px;
+            padding: 15px;
+            font-size: 20px;
+            color: white;
+            background-color: darkred;
+            border-style: solid;
+            border-color: #581b1b;
+            border-radius: 30px;
+            border-width: 3px;
+        }
+        ol{
+            font-size: 14px;
+            font-family: "Fira Code Retina",monospace;
+            list-style-type: disc;
+        }
+        .info_div{
+            text-align: justify;
+            padding: 15px;
+            border-style: dashed;
+            border-width: 3px;
+            width: 750px;
+            margin: auto;
+            font-family: "DejaVu Sans",fantasy;
+            font-size: 16px;
+            line-height: 1.8;
+        }
+        .info_div a{
+            text-decoration: none;
+            color: inherit;
+        }
+        .info_div a:hover{
+            color: dimgrey;
+        }
+        .hd{
+            padding: 10px;
+            text-align: center;
+            color: white;font-size:20px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="header" style="margin: auto;top: 170px;position: relative;opacity: 0">
+        <p class="zako">ZAKO</p>
+        <p id="trust" class="inCode">In <span style="color:rgba(1,0,96,0.84)">CODE</span> we trust</p>
+    </div>
+    <script type="text/javascript">
+        setTimeout(()=>{
+            const header = document.getElementById("header");
+            let op = 0;
+            const int = setInterval(()=>{
+                op += 0.1;
+                if (op < 1)
+                    header.style.opacity = op;
+                else{
+                    clearInterval(int);
+                    setTimeout(()=>{
+                        const trust = document.getElementById("trust");
+                        let op = 1;
+                        const int1 = setInterval(()=>{
+                            op -= 0.1;
+                            if (op > 0)
+                                trust.style.opacity = op;
+                            else{
+                                clearInterval(int1);
+                            }
+                        },35);
+                        let pos = header.style.top.replace("px","");
+                        const int2 = setInterval(()=>{
+                            pos -= 4;
+                            if (pos > -100)
+                                header.style.top = pos + "px";
+                            else{
+                                clearInterval(int2);
+                                addButtons();
+                            }
+                        },15);
+                    },150);
+                }
+            },35);
+        },200);
+
+        function addButtons(){
+            let op = 0;
+            const div = document.createElement("div");
+            const b1 = document.createElement("button");
+            const b2 = document.createElement("button");
+            div.id = "buttons";
+            b1.addEventListener("click",showAbout);
+            b2.addEventListener("click",showManual);
+            b1.innerHTML = "About Zako";
+            b2.innerHTML = "How to use Zako";
+            div.append(b1,"    ",b2);
+            div.style.width = "fit-content";
+            div.style.margin = "auto";
+            div.style.opacity = String(op);
+            document.body.appendChild(div);
+            const int = setInterval(()=>{
+                op += 0.1;
+                if (op < 1)
+                    div.style.opacity = op;
+                else
+                    clearInterval(int);
+            },30);
+        }
+
+        function showAbout(){
+            const text = "<div style='background-color: lightblue;' class='hd'>About Zako</div>" +
+                "</br>Zako is a static web server that comes with great features such as : " +
+                "<ol><li>DDOS protection engine</li><li>Built in captcha generator</li><li>Custom headers for each file or extension</li>" +
+                "<li>IP blocking</li><li>And much more ...</li></ol>" +
+                "Cool features right !?</br></br>" +
+                "The project of Zako started in october 2020, mainly focusing on reliability, speed and " +
+                "never before seen features. We try our best to create something that you enjoy working with and gives you confident!</br>" +
+                "Zako offers you speed, flexibility, strength and cool features to play with! Also Zako takes any criticism and productive offers." +
+                " You can send your beautiful thoughts to us by <a target='_blank' href='http://xako.ir'>our website</a>!</br>" +
+                "</br><div style='background-color: lightblue;' class='hd'>How is Zako made</div></br>" +
+                "Zako has been written with love in pure java (java core, version 14 and above) and every single library that has been used in this project has been written " +
+                "by ourselves, so basically no external libraries has been used in this project. For example, Fast CGI (client) for Zako has been developed " +
+                "by our team!</br>" +
+                "Zako project is currently open source and you can see the codes in github. (also cool, right!?)</br>" +
+                "Since Zako is open source, you can clone the code and modify it so you can use it for your own purposes, but keep in mind that" +
+                " Zako is registered under <a target='_blank' href='https://choosealicense.com/licenses/apache-2.0/#'>apache2 license</a>." +
+                "<button style='margin-top:25px;background-color: #581b1b;color: wheat;width: inherit;border-style: unset;border-radius: 10px' onclick='showManual()'>Learn how to use Zako</button>";
+            const headerDiv = document.getElementById("header");
+            headerDiv.removeAttribute("style");
+            headerDiv.className = "info_div";
+            headerDiv.style.backgroundColor = "aliceblue";
+            headerDiv.style.borderColor = "#1d6567";
+            const btns = document.getElementById("buttons");
+            if (btns != null)
+                btns.remove();
+            headerDiv.innerHTML = text;
+        }
+
+        function showManual(){
+            const text = "<div style='background-color: #581b1b' class='hd'>How to use Zako</div></br>Hi! First of all, thank you for choosing Zako. We are honored that you chose Zako to server your website." +
+                " You can learn more about Zako by clicking the button at the end of this page. </br>" +
+                "This page which you are seeing right now is located at <u>/var/www/html</u> and you can replace this page by replacing index.html file. This " +
+                "page is basically default setback for the server, which means if Host header of a client's request is not defined in the Hosts.cfg " +
+                "this page is sent back. Now let's dive right into configurations : </br>" +
+                "There are 7 configuration files (.cfg) : " +
+                "<ol><li>API.cfg</li><li>Headers.cfg</li><li>Hosts.cfg</li><li>Load_Balancer.cfg</li><li>MIME.cfg</li><li>Statics.cfg</li><li>Zako.cfg</li></ol>" +
+                "And there are 3 other files which contain some information : " +
+                "<ol><li>IP-Blacklist</li><li>ILPD</li><li>passwd</li></ol></br>" +
+                "Now that you know the configuration files, let's talk about them. keep in mind that these files are located at <u>/etc/zako</u></br><ol style='list-style-type: decimal'>" +
+                "<li><b style='font-size: 15px'>Zako.cfg :</b></br>This file contains most of the configurations of the server such as ports, sockets timeout, SSL/TLS, scripts, Http authentication " +
+                "and ... . Zako.cfg contains comment for each configuration so we won't talk about it anymore.</li>" +
+                "</br><li><b style='font-size: 15px'>Load_Balancer.cfg :</b></br>This file contains servers which will be used by the Zako load balancer. You can enable load balancer in Zako.cfg</li>" +
+                "</br><li><b style='font-size: 15px'>MIME.cfg :</b></br>This files contains MIME types which server uses for Content-Type header. " +
+                "This file is based on extensions and can be modified.</li>" +
+                "</br><li><b style='font-size: 15px'>Hosts.cfg :</b></br>This file contains every host name that will be served by Zako. Host name is included in every Http request as " +
+                "Host header. This file uses xml format and tags are defined as below : <br/>" +
+                "<b style='font-size: 14px'>Name :</b> the name of the host. For example : example.com, example.com:3000</br>" +
+                "<b style='font-size: 14px'>Mode :</b> this tag indicates how server should react to this host name. This tag can have three values : " +
+                "<ol style='font-size: 13px'><li><b style='font-size: 14px'>Handle</b> : </br>Indicates that server should handle this host itself. If this option is chosen, then directories should be " +
+                "defined for this host and target tag should be left empty. (in case of Handle, server will ignore target tag anyway)</li>" +
+                "<li><b style='font-size: 14px'>Forward :</b></br>Indicates that server should forward requests for this host name to the address that has been written in target tag. Server" +
+                " will act as a proxy in this case.</li><li><b style='font-size: 14px'>Redirect :</b></br>Indicates that server should redirect requests for this host name to" +
+                " the address specified in target tag. (Directory tags are ignored in Forward and Redirect mode)</li></ol></br>" +
+                "<b style='font-size: 14px'>Target :</b> This tag contains the address that server forwards or redirects requests for this host name.</br>" +
+                "<b style='font-size: 14px'>...Dir :</b> Tags that end with 'Dir' are directories that server will use for this host name. If directories do not " +
+                "exist, server will create them automatically.</br>" +
+                "</br><li><b style='font-size: 15px'>Statics.cfg :</b></br>This file contains directories that available for client to access them. If a directory is not mentioned in this file," +
+                " server will reject all requests for this directory with 403.Root directories and CGI directories of hosts in Hosts.cfg are automatically " +
+                "added to green list and there is no need for them to be mentioned in Statics.cfg .</li>" +
+                "</br><li><b style='font-size: 15px'>API.cfg :</b></br> API.cfg contains configurations for forwarding a request to a specified path or assigning it to a file." +
+                "</br>For example we can forward request for example.com/blah to localhost:3000 by writing 'example.com/blah -> localhost:3000' in API.cfg .</li>" +
+                "</br><li><b style='font-size: 15px'>Headers.cfg :</b></br> You can add custom headers based on extensions in this file. Server will add these custom headers to the default headers." +
+                "This file uses xml format as below :</br>" +
+                "<blockquote>&lt;Headers&gt;</br>" +
+                "&lt;rule ext=\".jpg , .png , .jpeg\"&gt;</br>" +
+                "&lt;Cache-Control&gt;max-age=60&lt;/Cache-Control&gt;</br>" +
+                "&lt;/rule&gt;</br>" +
+                "&lt;/Headers&gt;</blockquote></br>For every new custom header, you should add a new rule tag which has an attribute called 'ext' that contains" +
+                " all the extensions that this rule will apply to. You can add as many extension as you want by separating them with ',' . Then you can add " +
+                "custom headers by adding a new child to rule element. The child tag name should be the header name.</li>" +
+                "</ol></br>You did it! That was all you needed to know for configuring Zako to server your website(s). Oh and there is three more files which are basically files" +
+                " that contain some information for server to use. These files are located at <u>/etc/zako/sec</u> and they are :" +
+                "<ol style='list-style-type: decimal'><li><b style='font-size: 15px'>IP-Blacklist :</b> As you can tell by the name, this file contains ips that " +
+                "are banned from this website. The requests from these ips will be rejected with 403.</br></li>" +
+                "</br><li><b style='font-size: 15px'>ILPD :</b></br> ILPD stands for IPs for PUT and DELETE methods. Only ips that are mentioned in this file are allowed to use " +
+                "PUT and DELETE methods on this website. PUT and DELETE requests from other ips are rejected with 405.</li>" +
+                "</br><li><b style='font-size: 15px'>passwd :</b></br> This file contains user names and password that will be used for HTTP authentication. User names and their " +
+                "passwords are saved as key value pairs (username:pass). Example : Michael:12345</li></ol>" +
+                "Hoooray! It's done and now you should be able to config Zako properly. If you have any question you can visit " +
+                "<a target='_blank' href='http://xako.ir'>our website</a>, we will be happy to see you there ;) .</br><p>Thanks again for choosing Zako! Good luck.</p>" +
+                "<button style='margin-top:25px;background-color: lightblue;color: darkblue;width: inherit;border-style: unset;border-radius: 10px' onclick='showAbout()'>Learn more about Zako</button>";
+            const headerDiv = document.getElementById("header");
+            headerDiv.removeAttribute("style");
+            headerDiv.className = "info_div";
+            headerDiv.style.backgroundColor = "white";
+            headerDiv.style.borderColor = "#581b1b";
+            const btns = document.getElementById("buttons");
+            if (btns != null)
+                btns.remove();
+            headerDiv.innerHTML = text;
+        }
+    </script>
+</body>
+</html>
