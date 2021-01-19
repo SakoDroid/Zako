@@ -67,7 +67,7 @@
 </head>
 <body>
     <div id="header" style="margin: auto;top: 170px;position: relative;opacity: 0">
-        <p class="zako">ZAKO</p>
+        <p class="zako"><span id="Zspan" style="opacity: 0">Z</span>AKO</p>
         <p id="trust" class="inCode">In <span style="color:rgba(1,0,96,0.84)">CODE</span> we trust</p>
     </div>
     <script type="text/javascript">
@@ -82,15 +82,20 @@
                     clearInterval(int);
                     setTimeout(()=>{
                         const trust = document.getElementById("trust");
-                        let op = 1;
+                        const Z = document.getElementById("Zspan");
+                        let opz = 0;
+                        let opt = 1;
                         const int1 = setInterval(()=>{
-                            op -= 0.1;
-                            if (op > 0)
-                                trust.style.opacity = op;
+                            opz += 0.1
+                            opt -= 0.1;
+                            if (opt > 0){
+                                trust.style.opacity = opt;
+                                Z.style.opacity = opz;
+                            }
                             else{
                                 clearInterval(int1);
                             }
-                        },35);
+                        },85);
                         let pos = header.style.top.replace("px","");
                         const int2 = setInterval(()=>{
                             pos -= 4;
