@@ -43,16 +43,23 @@ public class Configs {
                 if (mode.equals("Handle")) {
                     hostsStatus.put(hostName,0);
                     HashMap<String, String> dirs = new HashMap<>();
-                    dirs.put("Root", host.getElementsByTagName("RootDir").item(0).getTextContent().trim());
-                    dirs.put("CGI", host.getElementsByTagName("CGIDir").item(0).getTextContent().trim());
+                    String root = host.getElementsByTagName("RootDir").item(0).getTextContent().trim();
+                    String cgi = host.getElementsByTagName("CGIDir").item(0).getTextContent().trim();
+                    dirs.put("Root", root);
+                    dirs.put("CGI", cgi);
                     dirs.put("Logs", host.getElementsByTagName("LogsDir").item(0).getTextContent().trim());
                     dirs.put("Files", host.getElementsByTagName("TempFileUploadDir").item(0).getTextContent().trim());
+                    Perms.addDir(root);
+                    Perms.addDir(cgi);
                     Dirs.put(hostName, dirs);
-                } else {
-                    hostsStatus.put(hostName,((mode.equals("Forward")) ? 1 : 2));
+                } else if (mode.equals("Forward")){
+                    hostsStatus.put(hostName,1);
                     String target = host.getElementsByTagName("Target").item(0).getTextContent().trim();
                     String[] address = target.split(":");
                     targets.put(hostName,((address.length > 1) ? address : new String[]{address[0],"80"}));
+                }else if (mode.equals("Redirect")){
+                    hostsStatus.put(hostName,2);
+                    targets.put(hostName,new String[]{host.getElementsByTagName("Target").item(0).getTextContent().trim()});
                 }
             }
         }catch(Exception ex){
@@ -169,7 +176,7 @@ public class Configs {
 
     public static int getHostStatus(String host){
         if (hostsStatus.get(host) != null) return hostsStatus.get(host);
-        else return 2;
+        else return 3;
     }
 
     public static String[] getForwardAddress(String host){

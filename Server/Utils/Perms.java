@@ -50,13 +50,12 @@ public class Perms {
 
     public static int isDirPerm(String dir){
         int temp = 403;
-        if (dir.endsWith("/getcp") || dir.endsWith("/chkcp")){
+        if (dir.endsWith(CaptchaConfigs.CGA) || dir.endsWith(CaptchaConfigs.CPA)){
             temp = 200;
         }
         else{
             try {
                 File fl = new File(dir);
-                fl = new File(fl.getAbsolutePath().replace(fl.getName(),""));
                 if (fl.isDirectory()) {
                     if (dirs.contains(dir)) temp = 200;
                 } else {

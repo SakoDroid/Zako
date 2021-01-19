@@ -6,12 +6,15 @@ import java.io.*;
 
 public class SubForwarder{
 
-    public SubForwarder(String[] address, File tempFile,DataOutputStream out,String ip,String Host){
+    private final Socket client;
+
+    public SubForwarder(String[] address, String read,Request req){
+        this.client = req.getSock();
         try{
             Socket s = new Socket(address[0], Integer.parseInt(address[1]));
-            new Piper(tempFile,s.getOutputStream(),s);
-            new Piper(s.getInputStream(),out,s);
-            Logger.glog("Forwarding request for " + Host + " from " + ip + " to " + address[0] + ":" + address[1],Host);
+            new Piper(read,req.is,s.getOutputStream(),s);
+            new Piper(s.getInputStream(),req.out,s);
+            Logger.glog("Forwarding request for " + req.getHost() + " from " + req.getIP() + " to " + address[0] + ":" + address[1],req.getHost());
         }catch(Exception ex){
             String t = "";
             for (StackTraceElement a : ex.getStackTrace()){
@@ -24,15 +27,16 @@ public class SubForwarder{
 
     private class Piper extends Thread {
 
-        private File fl;
+        private String readReq;
         private final OutputStream out;
-        private InputStream in;
+        private final InputStream in;
         private final Socket connection;
 
-        public Piper (File cachedFile, OutputStream os, Socket s){
-            this.fl = cachedFile;
+        public Piper (String str,InputStream is, OutputStream os, Socket s){
+            this.readReq = str;
             this.out = os;
             this.connection = s;
+            this.in = is;
             this.start();
         }
 
@@ -46,12 +50,11 @@ public class SubForwarder{
         @Override
         public void run(){
             try{
-                if (fl != null){
-                    FileInputStream fis = new FileInputStream(fl);
-                    fis.transferTo(out);
-                }else
+                if (readReq != null)
+                    out.write(readReq.getBytes());
+                do
                     in.transferTo(out);
-                out.flush();
+                while (!connection.isClosed() && !client.isClosed());
             }catch(Exception ex){
                 try {
                     connection.close();
