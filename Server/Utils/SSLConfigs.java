@@ -13,7 +13,7 @@ public class SSLConfigs {
 
     public static void load(){
         JSONBuilder bld = JSONBuilder.newInstance();
-        JSONDocument doc = bld.parse(new File(Configs.getCWD() + "/CFGS/Zako.cfg"));
+        JSONDocument doc = bld.parse(new File("/etc/zako/Zako.cfg"));
         HashMap data = (HashMap) doc.toJava();
         HashMap ssl = (HashMap) data.get("SSL");
         SSL = (Boolean) ssl.get("ON");

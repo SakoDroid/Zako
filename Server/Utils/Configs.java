@@ -32,7 +32,7 @@ public class Configs {
         try{
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
-            Document doc = db.parse(new File(getCWD() + "/CFGS/Hosts.cfg"));
+            Document doc = db.parse(new File("/etc/zako/Hosts.cfg"));
             NodeList nl = doc.getElementsByTagName("Host");
             for (int i = 0 ; i < nl.getLength() ; i++){
                 Element host = (Element) nl.item(i);
@@ -90,7 +90,7 @@ public class Configs {
     private static void loadMain(){
         Logger.ilog("Loading main configs ...");
         JSONBuilder bld = JSONBuilder.newInstance();
-        JSONDocument doc = bld.parse(new File(getCWD() + "/CFGS/Zako.cfg"));
+        JSONDocument doc = bld.parse(new File("/etc/zako/Zako.cfg"));
         HashMap data = (HashMap) doc.toJava();
         autoUpdate = (Boolean) data.get("CFG Update");
         keepAlive = (Boolean) data.get("Keep Alive");

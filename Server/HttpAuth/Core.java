@@ -28,7 +28,7 @@ public class Core {
         loadPasswd();
         HashMap data = (HashMap) JSONBuilder
                 .newInstance()
-                .parse(new File(System.getProperty("user.dir") + "/CFGS/Zako.cfg"))
+                .parse(new File("/etc/zako/Zako.cfg"))
                 .toJava();
         HashMap authCfg = (HashMap) data.get("HTTP AUTH");
         String mech = String.valueOf(authCfg.get("Auth mechanism"));
@@ -43,7 +43,7 @@ public class Core {
     }
 
     private void loadPasswd(){
-        try(BufferedReader bf = new BufferedReader(new FileReader(System.getProperty("user.dir") + "/CFGS/passwd"))) {
+        try(BufferedReader bf = new BufferedReader(new FileReader("/etc/zako/sec/passwd"))) {
             String line;
             while ((line = bf.readLine()) != null) {
                 if (!line.startsWith("#") && !line.isEmpty()) {

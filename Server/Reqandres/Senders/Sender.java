@@ -76,7 +76,7 @@ public class Sender {
         try{
             Logger.glog("Sending back options method response to " + ip + "  ; id = " + id,host);
             out.writeBytes(prot + " 200 OK\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako + "\nConnection: close\nAllow: GET,HEAD,POST,OPTIONS,TRACE,CONNECT,PUT,DELETE\nx-IPS-Allowed-For-PUT-DELETE: ");
-            BufferedReader bf = new BufferedReader(new FileReader(Configs.getCWD() + "/CFGS/ILPD"));
+            BufferedReader bf = new BufferedReader(new FileReader("/etc/zako/sec/ILPD"));
             String line;
             String ips = "";
             while ((line = bf.readLine()) != null){

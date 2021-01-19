@@ -14,7 +14,7 @@ public class CaptchaConfigs {
 
     public static void load(){
         JSONBuilder bld = JSONBuilder.newInstance();
-        JSONDocument doc = bld.parse(new File(Configs.getCWD() + "/CFGS/Zako.cfg"));
+        JSONDocument doc = bld.parse(new File("/etc/zako/Zako.cfg"));
         HashMap data = (HashMap) doc.toJava();
         HashMap cap = (HashMap) data.get("CAPTCHA");
         ON = (Boolean) cap.get("ON");

@@ -12,7 +12,7 @@ public class Perms {
     public static void load(){
         try{
             Logger.ilog("Loading static directories ...");
-            BufferedReader bf = new BufferedReader(new FileReader(Configs.getCWD() + "/CFGS/Statics.cfg"));
+            BufferedReader bf = new BufferedReader(new FileReader("/etc/zako/Statics.cfg"));
             String line;
             while((line = bf.readLine()) != null){
                 if (!line.startsWith("#") && !line.isEmpty()){
@@ -22,13 +22,13 @@ public class Perms {
             }
             bf.close();
             Logger.ilog("Loading ip black list ...");
-            bf = new BufferedReader(new FileReader(Configs.getCWD() + "/CFGS/IP-Blacklist"));
+            bf = new BufferedReader(new FileReader("/etc/zako/sec/IP-Blacklist"));
             while((line = bf.readLine()) != null){
                 if (!line.startsWith("#") && !line.isEmpty()) ipBlackList.add(line);
             }
             bf.close();
             Logger.ilog("Loading authorized ips for PUT and DELETE method ...");
-            bf = new BufferedReader(new FileReader(Configs.getCWD() + "/CFGS/ILPD"));
+            bf = new BufferedReader(new FileReader("/etc/zako/sec/ILPD"));
             while((line = bf.readLine()) != null){
                 if (!line.startsWith("#") && !line.isEmpty()) ipsAuthorizedForPUTAndDelete.add(line);
             }
@@ -87,7 +87,7 @@ public class Perms {
 
     public static synchronized void addIPToBlackList(String ip){
         ipBlackList.add(ip);
-        try(FileWriter fw = new FileWriter(Configs.getCWD() + "/CFGS/IP-Blacklist",true)){
+        try(FileWriter fw = new FileWriter("/etc/zako/sec/IP-Blacklist",true)){
             fw.write("\n" + ip);
             fw.flush();
         }catch(Exception ex){

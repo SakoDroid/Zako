@@ -16,7 +16,7 @@ public class FileTypes {
         try{
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
-            Document doc = db.parse(new File(Configs.getCWD() + "/CFGS/MIME.cfg"));
+            Document doc = db.parse(new File("/etc/zako/MIME.cfg"));
             NodeList mms = doc.getElementsByTagName("MIME");
             for (int i = 0 ; i < mms.getLength() ; i++){
                 Element mm = (Element) mms.item(i);
@@ -36,7 +36,7 @@ public class FileTypes {
         try{
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
-            Document d = db.parse(new File(Configs.getCWD() + "/CFGS/Headers.cfg"));
+            Document d = db.parse(new File("/etc/zako/Headers.cfg"));
             NodeList rules = d.getElementsByTagName("rule");
             for (int i = 0 ; i < rules.getLength() ; i++){
                 Element rule = (Element) rules.item(i);

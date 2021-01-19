@@ -15,7 +15,7 @@ public class APIConfigs {
     }
 
     public static void load(){
-        try(BufferedReader bf = new BufferedReader(new FileReader(Configs.getCWD() + "/CFGS/API.cfg"))){
+        try(BufferedReader bf = new BufferedReader(new FileReader("/etc/zako/API.cfg"))){
             String line;
             while((line = bf.readLine()) != null){
                 if (!line.startsWith("#")) addAPI(line);
