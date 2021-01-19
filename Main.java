@@ -15,7 +15,10 @@ public class Main extends Thread{
             if (Configs.autoUpdate)
                 new ConfigsUpdater();
             new Reporter();
-            if (Configs.isLBOn()) new LoadBalancerMainThread();
+            if (Configs.isLBOn()){
+                LoadBalancer.Configs.load();
+                new LoadBalancerMainThread();
+            }
             if (Configs.isWSOn()){
                 if (SSLConfigs.SSL) new HttpsServerMainThread();
                 else new HttpServerMainThread();

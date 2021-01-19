@@ -42,12 +42,8 @@ public class Forwarder extends Thread {
             if (Perms.isIPAllowed(ip)){
                 if (Interface.checkIP(ip)) {
                     Logger.glog(ip + " request received. Forwarding to " + serverip,"not available");
-                    read(client.getInputStream(),new DataOutputStream(server.getOutputStream()));
-                    InputStream serverIn = server.getInputStream();
-                    serverIn.transferTo(clientOut);
-                    clientOut.flush();
-                    client.close();
-                    server.close();
+                    new Piper(client.getInputStream(),server.getOutputStream(),client,server);
+                    new Piper(server.getInputStream(),clientOut,client,server);
                 } else {
                     Logger.glog(client.getRemoteSocketAddress().toString() + " request rejected due to DDOS protection.", "not available");
                     clientOut.write(HTMLGen.genTooManyRequests(ip).getBytes());
@@ -70,56 +66,6 @@ public class Forwarder extends Thread {
             if (ex.toString().contains("Timeout")) this.sendCode(504);
             else this.sendCode(502);
         }
-    }
-
-    private void read(InputStream in,DataOutputStream out){
-        try{
-            int len = 0;
-            String line = this.readLine(in);
-            out.writeBytes(line + "\r\n");
-            while ((line = this.readLine(in)) != null) {
-                if (!line.isEmpty()) {
-                    out.writeBytes((line + "\n\r"));
-                    if (line.contains("Content-Length")){
-                        len = Integer.parseInt(line.split(":",2)[1].trim());
-                    }
-                }else break;
-            }
-            out.writeBytes("\n\r");
-            if (len != 0){
-                out.write(in.readNBytes(len+1));
-            }
-            out.flush();
-        }catch(Exception ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()) {
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
-        }
-    }
-
-    private String readLine(InputStream in){
-        StringBuilder sb = new StringBuilder();
-        int i;
-        try{
-            i = in.read();
-            if (i == -1) return null;
-            while (i != 13){
-                if (i != 10 ) sb.append((char)i);
-                i = in.read();
-                if (i == -1) break;
-            }
-        }catch(Exception ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()) {
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
-        }
-        return sb.toString();
     }
 
     private void sendCode(int code){

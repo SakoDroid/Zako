@@ -34,7 +34,6 @@ public class Loader {
         Perms.load();
         Logger.ilog("Loading APIs configuration ...");
         APIConfigs.load();
-        if (Server.Utils.Configs.isLBOn()) LoadBalancer.Configs.load();
         JSONBuilder bld = JSONBuilder.newInstance();
         JSONDocument doc = bld.parse(new File(Configs.getCWD() + "/CFGS/Zako.cfg"));
         HashMap data = (HashMap) doc.toJava();

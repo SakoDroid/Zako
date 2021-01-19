@@ -8,7 +8,7 @@ class Tracker {
 
     public static String[] firstServer ;
 
-    static class track extends Thread{
+    private static class track extends Thread{
 
         private String[] bestServer;
         private long curen = 0;

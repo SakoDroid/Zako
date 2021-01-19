@@ -21,6 +21,7 @@ public class Configs {
                 String port = el.getElementsByTagName("Port").item(0).getTextContent();
                 if (!host.isEmpty()) servers.add(new String[]{host,((port.isEmpty())?"80":port)});
             }
+            Tracker.start();
         }catch(Exception ex){
             String t = "";
             for (StackTraceElement a : ex.getStackTrace()){
