@@ -50,7 +50,8 @@ public class RequestProcessor {
                 } else {
                     req.out.flush();
                     req.out.close();
-                    bf.close();
+                    if (bf != null)
+                        bf.close();
                     req.getCacheFile().delete();
                     this.stat = 0;
                 }
@@ -97,49 +98,61 @@ public class RequestProcessor {
                 Matcher pathMatcher = pathPattern.matcher(line);
                 if (pathMatcher.find())
                     path = URLDecoder.decode(pathMatcher.group().trim(), StandardCharsets.UTF_8);
-                req.Path =path;
+                req.Path = path;
+                req.setProt("HTTP/1.1");
                 StringBuilder sb = new StringBuilder();
                 sb.append(line);
-                while(!(line = this.readLine(reader)).startsWith("Host"))
-                    sb.append("\r\n").append(line);
+                boolean hostFound = false;
+                while(true){
+                    line = this.readLine(reader);
+                    if (line != null){
+                        if (!line.startsWith("Host"))
+                            sb.append("\r\n").append(line);
+                        else{
+                            hostFound = true;
+                            break;
+                        }
+                    }else
+                         break;
+                }
                 sb.append("\r\n").append(line).append("\r\n");
-                String hostName = line.split(":",2)[1].trim();
-                int status = Configs.getHostStatus(hostName);
-                if (status == 0){
-                    String[] api = APIConfigs.getAPIAddress(hostName + path);
-                    if (api == null) {
+                if (hostFound){
+                    String hostName = line.split(":", 2)[1].trim();
+                    int status = Configs.getHostStatus(hostName);
+                    if (status == 0) {
+                        String[] api = APIConfigs.getAPIAddress(hostName + path);
+                        if (api == null) {
+                            req.setHost(hostName);
+                            this.readRequest(sb.toString());
+                            bf = new RandomAccessFile(req.getCacheFile(), "r");
+                            if (this.method == Methods.POST && this.sit == 200) {
+                                this.parseBody();
+                            } else bf.close();
+                        } else {
+                            if (api.length > 1) {
+                                Logger.glog("request for API " + hostName + path + " received from " + req.getIP() + " .", hostName);
+                                new SubForwarder(api, sb.substring(0, sb.length() - 2), req);
+                                this.stat = 0;
+                            } else {
+                                req.setHost(hostName);
+                                req.Path = api[0];
+                                this.readRequest(sb.toString());
+                            }
+                        }
+                    } else if (status == 1) {
+                        Logger.glog("request for " + hostName + " received from " + req.getIP() + " .", hostName);
+                        new SubForwarder(Configs.getForwardAddress(hostName), sb.substring(0, sb.length() - 2), req);
+                        req.getSock().close();
+                        this.stat = 0;
+                    } else if (status == 2) {
+                        basicUtils.redirect(307, Configs.getForwardAddress(hostName)[0], req);
+                        this.stat = 0;
+                    } else {
                         req.setHost(hostName);
                         this.readRequest(sb.toString());
-                        bf = new RandomAccessFile(req.getCacheFile(), "r");
-                        if (this.method == Methods.POST && this.sit == 200) {
-                            this.parseBody();
-                        } else bf.close();
-                    } else {
-                        if (api.length > 1) {
-                            Logger.glog("request for API " + hostName + path + " received from " + req.getIP() + " .", hostName);
-                            new SubForwarder(api,sb.substring(0,sb.length()-2),req);
-                            this.stat = 0;
-                        } else{
-                            req.setHost(hostName);
-                            req.Path = api[0];
-                            this.readRequest(sb.toString());
-                        }
                     }
-                }
-                else if (status == 1){
-                    Logger.glog("request for " + hostName + " received from " + req.getIP() + " .", hostName);
-                    new SubForwarder(Configs.getForwardAddress(hostName),sb.substring(0,sb.length()-2),req);
-                    req.getSock().close();
-                    this.stat = 0;
-                }
-                else if (status == 2){
-                    basicUtils.redirect(307,Configs.getForwardAddress(hostName)[0],req);
-                    this.stat = 0;
-                }
-                else{
-                    req.setHost(hostName);
-                    this.readRequest(sb.toString());
-                }
+                } else
+                    this.sit = 400;
             }else{
                 req.out.flush();
                 this.stat = 0;
