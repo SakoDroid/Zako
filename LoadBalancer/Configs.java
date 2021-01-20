@@ -13,7 +13,7 @@ public class Configs {
         try{
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
-            Document d = db.parse("/etc/zako/Load_Balancer.cfg");
+            Document d = db.parse("/etc/zako-web/Load_Balancer.cfg");
             NodeList nl = d.getElementsByTagName("Zako");
             for (int i = 0 ; i < nl.getLength() ; i++){
                 Element el = (Element) nl.item(i);

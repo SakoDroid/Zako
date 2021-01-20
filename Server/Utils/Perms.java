@@ -12,13 +12,13 @@ public class Perms {
         try{
             String line;
             Logger.ilog("Loading ip black list ...");
-            BufferedReader bf = new BufferedReader(new FileReader("/etc/zako/sec/IP-Blacklist"));
+            BufferedReader bf = new BufferedReader(new FileReader("/etc/zako-web/sec/IP-Blacklist"));
             while((line = bf.readLine()) != null){
                 if (!line.startsWith("#") && !line.isEmpty()) ipBlackList.add(line);
             }
             bf.close();
             Logger.ilog("Loading authorized ips for PUT and DELETE method ...");
-            bf = new BufferedReader(new FileReader("/etc/zako/sec/ILPD"));
+            bf = new BufferedReader(new FileReader("/etc/zako-web/sec/ILPD"));
             while((line = bf.readLine()) != null){
                 if (!line.startsWith("#") && !line.isEmpty()) ipsAuthorizedForPUTAndDelete.add(line);
             }
@@ -43,7 +43,7 @@ public class Perms {
 
     public static synchronized void addIPToBlackList(String ip){
         ipBlackList.add(ip);
-        try(FileWriter fw = new FileWriter("/etc/zako/sec/IP-Blacklist",true)){
+        try(FileWriter fw = new FileWriter("/etc/zako-web/sec/IP-Blacklist",true)){
             fw.write("\n" + ip);
             fw.flush();
         }catch(Exception ex){

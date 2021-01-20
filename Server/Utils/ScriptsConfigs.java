@@ -11,7 +11,7 @@ public class ScriptsConfigs {
 
     public static void load(){
         JSONBuilder bld = JSONBuilder.newInstance();
-        JSONDocument doc = bld.parse(new File("/etc/zako/Zako.cfg"));
+        JSONDocument doc = bld.parse(new File("/etc/zako-web/Zako.cfg"));
         HashMap data = (HashMap) doc.toJava();
         HashMap scripts = (HashMap) data.get("Scripts");
         for (Object obj : scripts.keySet()){

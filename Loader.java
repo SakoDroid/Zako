@@ -13,7 +13,7 @@ public class Loader {
 
     public static void loadRs(){
         JSONBuilder bld = JSONBuilder.newInstance();
-        JSONDocument doc = bld.parse(new File("/etc/zako/Zako.cfg"));
+        JSONDocument doc = bld.parse(new File("/etc/zako-web/Zako.cfg"));
         HashMap data = (HashMap) doc.toJava();
         autoRs = (Boolean) data.get("Auto Restart");
     }
@@ -35,7 +35,7 @@ public class Loader {
         Logger.ilog("Loading APIs configuration ...");
         APIConfigs.load();
         JSONBuilder bld = JSONBuilder.newInstance();
-        JSONDocument doc = bld.parse(new File("/etc/zako/Zako.cfg"));
+        JSONDocument doc = bld.parse(new File("/etc/zako-web/Zako.cfg"));
         HashMap data = (HashMap) doc.toJava();
         Interface.load((Boolean) data.get("DDOS Protection"), 200);
         Logger.ilog("ALL OK!");

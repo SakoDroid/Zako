@@ -2,7 +2,6 @@ package Server.Utils;
 
 import Server.Reqandres.Request.Request;
 import Server.Reqandres.Senders.FileSender;
-
 import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
@@ -18,7 +17,7 @@ public class basicUtils {
     private static final ArrayList<Integer> ids = new ArrayList<>();
     private static final Random rnd = new Random();
     public static String LocalHostIP = "";
-    public static String Zako = "Zako 0.7";
+    public static String Zako = "Zako 0.8";
 
     private basicUtils(){}
 

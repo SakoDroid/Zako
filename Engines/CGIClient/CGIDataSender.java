@@ -40,7 +40,6 @@ public class CGIDataSender extends Sender {
                 out.write(i);
             }
             out.flush();
-            out.close();
             basicUtils.delID(id);
             Logger.glog(ip + "'s request handled successfully!" + "  ; id = " + id,host);
         }catch(Exception ex){
@@ -63,7 +62,6 @@ public class CGIDataSender extends Sender {
             if (data.startsWith("\n")) out.writeBytes(data);
             else out.writeBytes("\n" + data);
             out.flush();
-            out.close();
             basicUtils.delID(id);
             Logger.glog(ip + "'s request handled successfully!" + "  ; id = " + id,host);
         }catch(Exception ex){
@@ -85,7 +83,6 @@ public class CGIDataSender extends Sender {
             if (data[0] != 10) out.writeBytes("\n");
             out.write(data);
             out.flush();
-            out.close();
             basicUtils.delID(id);
             Logger.glog(ip + "'s request handled successfully!" + "  ; id = " + id,host);
         }catch(Exception ex){

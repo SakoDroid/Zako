@@ -88,8 +88,6 @@ public class RequestProcessor {
     private void processRequest(){
         try{
             String line = this.readLine(req.is);
-            System.out.println(req.getSock().getRemoteSocketAddress());
-            System.out.println("line : " + line);
             if (line != null && line.length() > 5){
                 String path = "";
                 Pattern pathPattern = Pattern.compile(" /[^ ]*");
