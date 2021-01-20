@@ -194,7 +194,8 @@
                 "exist, server will create them automatically. Pay attention to the fact that entire RootDir and CGIDir will be visible to the client, so avoid putting" +
                 " files that should be hidden from client in those directories.</br>" +
                 "</br><li><b style='font-size: 15px'>API.cfg :</b></br> API.cfg contains configurations for forwarding a request to a specified path or assigning it to a file." +
-                "</br>For example we can forward request for example.com/blah to localhost:3000 by writing 'example.com/blah -> localhost:3000' in API.cfg .</li>" +
+                "This file is based on regex so the syntax is : <blockquote>regex -> address or file</blockquote>" +
+                "For example we can forward request for example.com/blah to localhost:3000 by writing <blockquote>example.com/blah -> localhost:3000</blockquote> in API.cfg .</li>" +
                 "</br><li><b style='font-size: 15px'>Headers.cfg :</b></br> You can add custom headers based on extensions in this file. Server will add these custom headers to the default headers." +
                 "This file uses xml format as below :</br>" +
                 "<blockquote>&lt;Headers&gt;</br>" +

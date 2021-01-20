@@ -16,36 +16,46 @@ public class Def implements API{
         String ext = "";
         if (mc.find()) ext = mc.group();
         File fl;
-        if (!ext.equals(".js")){
-            String tempCntc = FileTypes.getContentType(ext);
-            if (tempCntc != null) {
-                if (tempCntc.equals("CGI")) {
-                    new ScriptHandler(req,ext).process(basicUtils.toByteArray(reqp.Body),Configs.keepAlive && reqp.KA);
-                }else {
+        if (!ext.isEmpty()){
+            if (!ext.equals(".js")) {
+                String tempCntc = FileTypes.getContentType(ext);
+                if (tempCntc != null) {
+                    if (tempCntc.equals("CGI")) {
+                        new ScriptHandler(req, ext).process(basicUtils.toByteArray(reqp.Body),reqp.KA);
+                    } else {
+                        fl = new File(Configs.getMainDir(req.getHost()) + req.Path);
+                        sendFile(fl, ext, req, reqp.KA);
+                    }
+                } else {
                     fl = new File(Configs.getMainDir(req.getHost()) + req.Path);
-                    sendFile(fl,ext,req,Configs.keepAlive && reqp.KA);
+                    sendFile(fl, ".bin", req, reqp.KA);
                 }
-            }else {
-                fl = new File(Configs.getMainDir(req.getHost()) + req.Path);
-                sendFile(fl,".bin",req,Configs.keepAlive && reqp.KA);
+            } else {
+                fl = new File(Configs.getCGIDir(req.getHost()) + req.Path);
+                if (fl.exists())
+                    new CGIProcess(ext, fl, req).exec(basicUtils.toByteArray(reqp.Body), reqp.KA);
+                else {
+                    fl = new File(Configs.getMainDir(req.getHost()) + req.Path);
+                    sendFile(fl, ext, req, reqp.KA);
+                }
             }
-        }else{
-            fl = new File(Configs.getCGIDir(req.getHost()) + req.Path);
-            if (fl.exists()) new CGIProcess(ext,fl,req).exec(basicUtils.toByteArray(reqp.Body), Configs.keepAlive && reqp.KA);
-            else {
-                fl = new File(Configs.getMainDir(req.getHost()) + req.Path);
-                sendFile(fl,ext,req,Configs.keepAlive && reqp.KA);
-            }
+        }else {
+            fl = new File(Configs.getMainDir(req.getHost()) + req.Path);
+            if (fl.isFile())
+                this.sendFile(fl,ext,req, reqp.KA);
+            else
+                basicUtils.sendCode(404,req);
         }
     }
 
     private void sendFile(File fl,String ext,Request req,boolean ka){
-        if (fl.exists()) {
+        if (fl.isFile()) {
             FileSender fs = new FileSender(req.getProt(), 200);
             fs.setContentType(FileTypes.getContentType(ext));
             fs.setExtension(ext);
             fs.setKeepAlive(ka);
             fs.sendFile(req.getMethod(), fl, req.out, req.getIP(), req.getID(), req.getHost());
-        } else basicUtils.sendCode(404, req);
+        } else
+            basicUtils.sendCode(404, req);
     }
 }

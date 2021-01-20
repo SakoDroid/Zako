@@ -2,6 +2,7 @@ package Server.Utils;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.regex.*;
 
 public class APIConfigs {
 
@@ -11,7 +12,25 @@ public class APIConfigs {
 
     private static void addAPI(String line){
         String[] api = line.split("->");
-        apis.put(api[0].trim(),api[1].trim().split(":"));
+        String path = api[1].trim();
+        Pattern ptn = Pattern.compile(":\\d+");
+        Matcher mc = ptn.matcher(path);
+        if (mc.find())
+            apis.put(api[0].trim(),cleanURL(path).split(":"));
+        else{
+            File fl = new File(path);
+            if (fl.exists())
+                apis.put(api[0].trim(),new String[]{path});
+            else
+                apis.put(api[0].trim(),new String[]{cleanURL(path),"80"});
+        }
+    }
+
+    private static String cleanURL(String uncleaned){
+        return uncleaned.toLowerCase()
+                .replace("http://","")
+                .replace("https://","")
+                .trim();
     }
 
     public static void load(){
@@ -31,6 +50,13 @@ public class APIConfigs {
     }
 
     public static String[] getAPIAddress(String fullPath){
-        return apis.get(fullPath);
+        for (String api : apis.keySet()){
+            Pattern ptn = Pattern.compile(api.trim());
+            Matcher mc = ptn.matcher(fullPath.trim());
+            if (mc.find()){
+                return apis.get(api);
+            }
+        }
+        return null;
     }
 }
