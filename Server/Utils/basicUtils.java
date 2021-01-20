@@ -1,6 +1,6 @@
 package Server.Utils;
 
-import Server.Reqandres.Request;
+import Server.Reqandres.Request.Request;
 import Server.Reqandres.Senders.FileSender;
 
 import java.io.*;

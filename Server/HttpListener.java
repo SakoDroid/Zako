@@ -1,6 +1,8 @@
 package Server;
 
 import Server.Reqandres.*;
+import Server.Reqandres.Request.Request;
+import Server.Reqandres.Request.RequestProcessor;
 import Server.Utils.*;
 import Engines.DDOS.Interface;
 import javax.net.ssl.SSLSocket;

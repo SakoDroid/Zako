@@ -1,7 +1,7 @@
 package Server.API;
 
-import Server.Reqandres.Request;
-import Server.Reqandres.RequestProcessor;
+import Server.Reqandres.Request.Request;
+import Server.Reqandres.Request.RequestProcessor;
 
 public interface API {
 

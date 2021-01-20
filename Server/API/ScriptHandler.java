@@ -3,7 +3,7 @@ package Server.API;
 import Engines.CGI;
 import Engines.CGIClient.CGIProcess;
 import Engines.FCGI.Client.FCGI;
-import Server.Reqandres.Request;
+import Server.Reqandres.Request.Request;
 import Server.Utils.*;
 
 import java.io.File;

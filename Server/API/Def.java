@@ -1,12 +1,11 @@
 package Server.API;
 
 import Engines.CGIClient.CGIProcess;
-import Server.Reqandres.Request;
-import Server.Reqandres.RequestProcessor;
+import Server.Reqandres.Request.Request;
+import Server.Reqandres.Request.RequestProcessor;
 import Server.Reqandres.Senders.FileSender;
 import Server.Utils.*;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.regex.*;
 
 public class Def implements API{

@@ -1,8 +1,9 @@
-package Server.Reqandres;
+package Server.Reqandres.Request;
 
 import Engines.DDOS.Interface;
 import Server.HttpListener;
 import Server.Method.Factory;
+import Server.Reqandres.SubForwarder;
 import Server.Utils.*;
 import java.io.*;
 import java.net.URL;
@@ -36,8 +37,8 @@ public class RequestProcessor {
             if (Configs.keepAlive && KA)
                 new HttpListener(req.getSock());
             if (this.stat != 0){
-                if (bf.length() > 5) {
-                    Interface.addReqVol(req.getIP(), bf.length());
+                if (req.getCacheFile().length() > 5) {
+                    Interface.addReqVol(req.getIP(), req.getCacheFile().length());
                     if (this.sit < 400) {
                         this.stat = Factory.getMt(this.method).run(req, this);
                     } else {
@@ -113,7 +114,6 @@ public class RequestProcessor {
                         if (this.method == Methods.POST && this.sit == 200) {
                             this.parseBody();
                         } else bf.close();
-
                     } else {
                         if (api.length > 1) {
                             Logger.glog("request for API " + hostName + path + " received from " + req.getIP() + " .", hostName);
@@ -186,7 +186,7 @@ public class RequestProcessor {
                 };
                 req.setMethod(this.method);
                 if (this.method != Methods.UNKNOWN) {
-                    req.setProt(p[2]);
+                    req.setProt(p[2].trim());
                     headers.put("Method", this.method);
                     headers.put("URL", p[1]);
                     headers.put("Version", p[2]);

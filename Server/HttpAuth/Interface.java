@@ -1,6 +1,6 @@
 package Server.HttpAuth;
 
-import Server.Reqandres.Request;
+import Server.Reqandres.Request.Request;
 import java.util.HashMap;
 
 public class Interface {

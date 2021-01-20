@@ -1,7 +1,6 @@
-package Server.Reqandres;
+package Server.Reqandres.Request;
 
 import Server.Utils.*;
-
 import java.io.*;
 import java.net.Socket;
 import java.net.URL;
@@ -42,6 +41,10 @@ public class Request {
             t += ex.toString();
             Logger.ilog(t);
         }
+    }
+
+    public void addHeader(String key, Object value){
+        headers.put(key,value);
     }
 
     public void setHeaders(HashMap hd){

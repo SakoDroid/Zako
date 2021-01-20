@@ -4,7 +4,7 @@ import Engines.CGI;
 import Engines.CGIClient.CGIDataSender;
 import Engines.FCGI.Client.Response.FCGIResponse;
 import Engines.FCGI.Client.Utils.FCGIConstants;
-import Server.Reqandres.Request;
+import Server.Reqandres.Request.Request;
 import Server.Utils.Logger;
 import Server.Utils.basicUtils;
 

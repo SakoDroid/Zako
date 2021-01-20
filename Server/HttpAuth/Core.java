@@ -1,6 +1,6 @@
 package Server.HttpAuth;
 
-import Server.Reqandres.Request;
+import Server.Reqandres.Request.Request;
 import Server.Reqandres.Senders.Sender;
 import Server.Utils.JSON.JSONBuilder;
 import Server.Utils.Logger;

@@ -1,7 +1,7 @@
 package Engines.CGIClient;
 
 import Engines.CGI;
-import Server.Reqandres.Request;
+import Server.Reqandres.Request.Request;
 import Server.Reqandres.Senders.FileSender;
 import Server.Utils.*;
 import java.io.*;

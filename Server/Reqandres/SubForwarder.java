@@ -1,5 +1,6 @@
 package Server.Reqandres;
 
+import Server.Reqandres.Request.Request;
 import Server.Utils.Logger;
 import java.net.Socket;
 import java.io.*;
@@ -8,7 +9,7 @@ public class SubForwarder{
 
     private final Socket client;
 
-    public SubForwarder(String[] address, String read,Request req){
+    public SubForwarder(String[] address, String read, Request req){
         this.client = req.getSock();
         try{
             Socket s = new Socket(address[0], Integer.parseInt(address[1]));
