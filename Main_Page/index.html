@@ -95,7 +95,7 @@
                             else{
                                 clearInterval(int1);
                             }
-                        },85);
+                        },100);
                         let pos = header.style.top.replace("px","");
                         const int2 = setInterval(()=>{
                             pos -= 4;
@@ -170,11 +170,11 @@
                 "This page which you are seeing right now is located at <u>/var/www/html</u> and you can replace this page by replacing index.html file. This " +
                 "page is basically default setback for the server, which means if Host header of a client's request is not defined in the Hosts.cfg " +
                 "this page is sent back. Now let's dive right into configurations : </br>" +
-                "There are 7 configuration files (.cfg) : " +
-                "<ol><li>API.cfg</li><li>Headers.cfg</li><li>Hosts.cfg</li><li>Load_Balancer.cfg</li><li>MIME.cfg</li><li>Statics.cfg</li><li>Zako.cfg</li></ol>" +
+                "There are 6 configuration files (.cfg) : " +
+                "<ol><li>API.cfg</li><li>Headers.cfg</li><li>Hosts.cfg</li><li>Load_Balancer.cfg</li><li>MIME.cfg</li><li>Zako.cfg</li></ol>" +
                 "And there are 3 other files which contain some information : " +
                 "<ol><li>IP-Blacklist</li><li>ILPD</li><li>passwd</li></ol></br>" +
-                "Now that you know the configuration files, let's talk about them. keep in mind that these files are located at <u>/etc/zako</u></br><ol style='list-style-type: decimal'>" +
+                "Now that you know the configuration files, let's talk about them. keep in mind that these files are located at <u>/etc/zako-web</u></br><ol style='list-style-type: decimal'>" +
                 "<li><b style='font-size: 15px'>Zako.cfg :</b></br>This file contains most of the configurations of the server such as ports, sockets timeout, SSL/TLS, scripts, Http authentication " +
                 "and ... . Zako.cfg contains comment for each configuration so we won't talk about it anymore.</li>" +
                 "</br><li><b style='font-size: 15px'>Load_Balancer.cfg :</b></br>This file contains servers which will be used by the Zako load balancer. You can enable load balancer in Zako.cfg</li>" +
@@ -205,7 +205,7 @@
                 " all the extensions that this rule will apply to. You can add as many extension as you want by separating them with ',' . Then you can add " +
                 "custom headers by adding a new child to rule element. The child tag name should be the header name.</li>" +
                 "</ol></br>You did it! That was all you needed to know for configuring Zako to server your website(s). Oh and there is three more files which are basically files" +
-                " that contain some information for server to use. These files are located at <u>/etc/zako/sec</u> and they are :" +
+                " that contain some information for server to use. These files are located at <u>/etc/zako-web/sec</u> and they are :" +
                 "<ol style='list-style-type: decimal'><li><b style='font-size: 15px'>IP-Blacklist :</b> As you can tell by the name, this file contains ips that " +
                 "are banned from this website. The requests from these ips will be rejected with 403.</br></li>" +
                 "</br><li><b style='font-size: 15px'>ILPD :</b></br> ILPD stands for IPs for PUT and DELETE methods. Only ips that are mentioned in this file are allowed to use " +
