@@ -17,7 +17,10 @@ public class Response {
     private void handleRes(){
         try{
             Logger.glog("Preparing response to " + request.getIP() + "  ; id = " + request.getID(), request.getHost());
-            Server.API.Factory.getAPI(request.Path).init(request, reqes);
+            if (reqes.sit < 300)
+                Server.API.Factory.getAPI(request.Path).init(request, reqes);
+            else
+                basicUtils.sendCode(reqes.sit,request);
         }catch (Exception ex) {
             String t = "";
             for (StackTraceElement a : ex.getStackTrace()) {

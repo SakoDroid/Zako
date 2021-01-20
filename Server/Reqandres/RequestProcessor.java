@@ -28,13 +28,6 @@ public class RequestProcessor {
         this.req = rq;
         this.processRequest();
         req.setHeaders(this.headers);
-        if (Server.HttpAuth.Interface.needAuth(req.getHost() + req.Path)){
-            this.sit = Server.HttpAuth.Interface.evaluate(this.headers,req.getIP());
-            if (this.sit == 401){
-                this.stat = 0;
-                Server.HttpAuth.Interface.send401(req);
-            }
-        }
         this.continueProcess();
     }
 
@@ -102,7 +95,8 @@ public class RequestProcessor {
                 Pattern pathPattern = Pattern.compile(" /[^ ]*");
                 Matcher pathMatcher = pathPattern.matcher(line);
                 if (pathMatcher.find())
-                    path = pathMatcher.group().trim();
+                    path = URLDecoder.decode(pathMatcher.group().trim(), StandardCharsets.UTF_8);
+                req.Path =path;
                 StringBuilder sb = new StringBuilder();
                 sb.append(line);
                 while(!(line = this.readLine(reader)).startsWith("Host"))
@@ -110,23 +104,26 @@ public class RequestProcessor {
                 sb.append("\r\n").append(line).append("\r\n");
                 String hostName = line.split(":",2)[1].trim();
                 int status = Configs.getHostStatus(hostName);
-                System.out.println(status);
                 if (status == 0){
                     String[] api = APIConfigs.getAPIAddress(hostName + path);
                     if (api == null) {
+                        req.setHost(hostName);
                         this.readRequest(sb.toString());
                         bf = new RandomAccessFile(req.getCacheFile(), "r");
-                        this.sit = Perms.isDirPerm(Configs.getMainDir(hostName) + path);
                         if (this.method == Methods.POST && this.sit == 200) {
                             this.parseBody();
-                        }else bf.close();
+                        } else bf.close();
+
                     } else {
                         if (api.length > 1) {
                             Logger.glog("request for API " + hostName + path + " received from " + req.getIP() + " .", hostName);
                             new SubForwarder(api,sb.substring(0,sb.length()-2),req);
                             this.stat = 0;
-                        } else
+                        } else{
+                            req.setHost(hostName);
                             req.Path = api[0];
+                            this.readRequest(sb.toString());
+                        }
                     }
                 }
                 else if (status == 1){
@@ -139,8 +136,10 @@ public class RequestProcessor {
                     basicUtils.redirect(307,Configs.getForwardAddress(hostName)[0],req);
                     this.stat = 0;
                 }
-                else
+                else{
+                    req.setHost(hostName);
                     this.readRequest(sb.toString());
+                }
             }else{
                 req.out.flush();
                 this.stat = 0;
@@ -152,6 +151,16 @@ public class RequestProcessor {
             }
             t += ex.toString();
             Logger.ilog(t);
+        }
+    }
+
+    private void authenticate(){
+        if (Server.HttpAuth.Interface.needAuth(req.getHost() + req.Path)){
+            this.sit = Server.HttpAuth.Interface.evaluate(this.headers,req.getIP());
+            if (this.sit == 401){
+                this.stat = 0;
+                Server.HttpAuth.Interface.send401(req);
+            }
         }
     }
 
@@ -181,7 +190,10 @@ public class RequestProcessor {
                     headers.put("Method", this.method);
                     headers.put("URL", p[1]);
                     headers.put("Version", p[2]);
-                    for (int i = 1 ; i < currentRead.length ; i++){
+                    req.orgPath = URLDecoder.decode(p[1],StandardCharsets.UTF_8);
+                    if (req.Path == null)
+                        req.Path = req.orgPath;
+                    for (int i = 1; i < currentRead.length; i++) {
                         String[] tmp = currentRead[i].split(":", 2);
                         if (tmp.length != 1) headers.put(tmp[0].trim(), tmp[1].trim());
                     }
@@ -194,41 +206,39 @@ public class RequestProcessor {
                         } else break;
                     }
                     fw.write((line + "\r\n").getBytes());
-                    if (this.method != Methods.CONNECT && this.method != Methods.OPTIONS) {
-                        String prt = (String) headers.get("Version");
-                        String url = prt.split("/")[0] + "://" + headers.get("Host") + URLDecoder.decode((String) headers.get("URL"), StandardCharsets.UTF_8);
-                        URL u = new URL(url);
-                        String Host = u.getHost().replace("www.", "").replace("ww2.", "");
-                        if (u.getPort() != -1) Host += ":" + u.getPort();
-                        req.setHost(Host);
-                        headers.replace("URL", u);
-                        req.setURL(u);
-                        if (req.Path == null)
-                            req.Path = u.getPath();
-                        req.orgPath = u.getPath();
-                        Logger.glog(req.getIP() + "'s request is for " + u.getPath() + "; id = " + req.getID(),req.getHost());
-                        Object cnc = headers.get("Connection");
-                        if (cnc != null){
-                            String con = (String) cnc;
-                            KA = !con.trim().equals("close");
-                        }else KA = false;
-                    }
-                    if (this.method == Methods.POST || this.method == Methods.PUT) {
-                        if (headers.get("Content-Length") != null) {
-                            int length = Integer.parseInt((String) headers.get("Content-Length"));
-                            if (length < Configs.postBodySize) {
-                                try {
-                                    fw.write(reader.readNBytes(length + 1));
-                                } catch (Exception ex) {
-                                    String t = "";
-                                    for (StackTraceElement a : ex.getStackTrace()) {
-                                        t += a.toString() + " ;; ";
+                    this.authenticate();
+                    if (this.sit == 200) {
+                        if (this.method != Methods.CONNECT && this.method != Methods.OPTIONS) {
+                            String prt = (String) headers.get("Version");
+                            String url = prt.split("/")[0] + "://" + req.getHost() + req.Path;
+                            URL u = new URL(url);
+                            headers.replace("URL", u);
+                            req.setURL(u);
+                            Logger.glog(req.getIP() + "'s request is for " + u.getPath() + "; id = " + req.getID(), req.getHost());
+                            Object cnc = headers.get("Connection");
+                            if (cnc != null) {
+                                String con = (String) cnc;
+                                KA = !con.trim().equals("close");
+                            } else KA = false;
+                        }
+                        if (this.method == Methods.POST || this.method == Methods.PUT) {
+                            if (headers.get("Content-Length") != null) {
+                                int length = Integer.parseInt((String) headers.get("Content-Length"));
+                                if (length < Configs.postBodySize) {
+                                    try {
+                                        //Reads the body
+                                        fw.write(reader.readNBytes(length + 1));
+                                    } catch (Exception ex) {
+                                        String t = "";
+                                        for (StackTraceElement a : ex.getStackTrace()) {
+                                            t += a.toString() + " ;; ";
+                                        }
+                                        t += ex.toString();
+                                        Logger.ilog(t);
                                     }
-                                    t += ex.toString();
-                                    Logger.ilog(t);
-                                }
-                            } else this.sit = 413;
-                        } else this.sit = 411;
+                                } else this.sit = 413;
+                            } else this.sit = 411;
+                        }
                     }
                 } else this.sit = 400;
             } else this.sit = 400;

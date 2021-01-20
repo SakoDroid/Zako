@@ -191,10 +191,8 @@
                 " the address specified in target tag. (Directory tags are ignored in Forward and Redirect mode)</li></ol></br>" +
                 "<b style='font-size: 14px'>Target :</b> This tag contains the address that server forwards or redirects requests for this host name.</br>" +
                 "<b style='font-size: 14px'>...Dir :</b> Tags that end with 'Dir' are directories that server will use for this host name. If directories do not " +
-                "exist, server will create them automatically.</br>" +
-                "</br><li><b style='font-size: 15px'>Statics.cfg :</b></br>This file contains directories that available for client to access them. If a directory is not mentioned in this file," +
-                " server will reject all requests for this directory with 403.Root directories and CGI directories of hosts in Hosts.cfg are automatically " +
-                "added to green list and there is no need for them to be mentioned in Statics.cfg .</li>" +
+                "exist, server will create them automatically. Pay attention to the fact that entire RootDir and CGIDir will be visible to the client, so avoid putting" +
+                " files that should be hidden from client in those directories.</br>" +
                 "</br><li><b style='font-size: 15px'>API.cfg :</b></br> API.cfg contains configurations for forwarding a request to a specified path or assigning it to a file." +
                 "</br>For example we can forward request for example.com/blah to localhost:3000 by writing 'example.com/blah -> localhost:3000' in API.cfg .</li>" +
                 "</br><li><b style='font-size: 15px'>Headers.cfg :</b></br> You can add custom headers based on extensions in this file. Server will add these custom headers to the default headers." +

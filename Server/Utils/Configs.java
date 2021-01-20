@@ -37,29 +37,44 @@ public class Configs {
             for (int i = 0 ; i < nl.getLength() ; i++){
                 Element host = (Element) nl.item(i);
                 String hostName = host.getElementsByTagName("Name").item(0).getTextContent().trim();
+                String hostName2 = "";
                 if (hostName.isEmpty())
                     continue;
+                if (!hostName.startsWith("www"))
+                    hostName2 = "www." + hostName;
                 String mode =  host.getElementsByTagName("Mode").item(0).getTextContent().trim();
-                if (mode.equals("Handle")) {
-                    hostsStatus.put(hostName,0);
-                    HashMap<String, String> dirs = new HashMap<>();
-                    String root = host.getElementsByTagName("RootDir").item(0).getTextContent().trim();
-                    String cgi = host.getElementsByTagName("CGIDir").item(0).getTextContent().trim();
-                    dirs.put("Root", root);
-                    dirs.put("CGI", cgi);
-                    dirs.put("Logs", host.getElementsByTagName("LogsDir").item(0).getTextContent().trim());
-                    dirs.put("Files", host.getElementsByTagName("TempFileUploadDir").item(0).getTextContent().trim());
-                    Perms.addDir(root);
-                    Perms.addDir(cgi);
-                    Dirs.put(hostName, dirs);
-                } else if (mode.equals("Forward")){
-                    hostsStatus.put(hostName,1);
-                    String target = host.getElementsByTagName("Target").item(0).getTextContent().trim();
-                    String[] address = target.split(":");
-                    targets.put(hostName,((address.length > 1) ? address : new String[]{address[0],"80"}));
-                }else if (mode.equals("Redirect")){
-                    hostsStatus.put(hostName,2);
-                    targets.put(hostName,new String[]{host.getElementsByTagName("Target").item(0).getTextContent().trim()});
+                switch (mode) {
+                    case "Handle" -> {
+                        hostsStatus.put(hostName, 0);
+                        HashMap<String, String> dirs = new HashMap<>();
+                        dirs.put("Root", host.getElementsByTagName("RootDir").item(0).getTextContent().trim());
+                        dirs.put("CGI", host.getElementsByTagName("CGIDir").item(0).getTextContent().trim());
+                        dirs.put("Logs", host.getElementsByTagName("LogsDir").item(0).getTextContent().trim());
+                        dirs.put("Files", host.getElementsByTagName("TempFileUploadDir").item(0).getTextContent().trim());
+                        Dirs.put(hostName, dirs);
+                        if (!hostName2.isEmpty()){
+                            hostsStatus.put(hostName2,0);
+                            Dirs.put(hostName2,dirs);
+                        }
+                    }
+                    case "Forward" -> {
+                        hostsStatus.put(hostName, 1);
+                        String target = host.getElementsByTagName("Target").item(0).getTextContent().trim();
+                        String[] address = target.split(":");
+                        targets.put(hostName, ((address.length > 1) ? address : new String[]{address[0], "80"}));
+                        if (!hostName2.isEmpty()){
+                            hostsStatus.put(hostName2,1);
+                            targets.put(hostName2, ((address.length > 1) ? address : new String[]{address[0], "80"}));
+                        }
+                    }
+                    case "Redirect" -> {
+                        hostsStatus.put(hostName, 2);
+                        targets.put(hostName, new String[]{host.getElementsByTagName("Target").item(0).getTextContent().trim()});
+                        if (!hostName2.isEmpty()){
+                            hostsStatus.put(hostName2,2);
+                            targets.put(hostName2, new String[]{host.getElementsByTagName("Target").item(0).getTextContent().trim()});
+                        }
+                    }
                 }
             }
         }catch(Exception ex){
