@@ -36,6 +36,7 @@ public class CGIDataSender extends Sender {
             out.writeBytes(generateResponse());
             int i = in.read();
             if (i != 10) out.writeBytes("\n");
+            out.write(i);
             while((i = in.read()) != -1){
                 out.write(i);
             }

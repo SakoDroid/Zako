@@ -18,7 +18,7 @@ public class RequestProcessor {
     private final Request req;
     public Methods method;
     public ArrayList<Byte> Body = new ArrayList();
-    public int sit = 0;
+    public int sit = 200;
     public int stat = 1;
     public boolean KA = false;
 
@@ -244,7 +244,7 @@ public class RequestProcessor {
                 fw.write((line + "\r\n").getBytes());
                 this.determineKeepAlive();
                 this.authenticate();
-                if (this.sit == 200) {
+                if (this.sit < 300) {
                     this.fixTheHeaders();
                     if (this.method == Methods.POST || this.method == Methods.PUT) {
                         if (req.getHeaders().get("Content-Length") != null) {

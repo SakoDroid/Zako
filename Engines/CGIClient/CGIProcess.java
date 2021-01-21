@@ -9,7 +9,6 @@ import java.util.*;
 
 public class CGIProcess extends CGI {
 
-    private boolean executable;
     private List<String> commands;
 
     public CGIProcess(String ext,File cgiFile,Request req){
@@ -35,13 +34,11 @@ public class CGIProcess extends CGI {
         this.req = req;
         this.commands = commands;
         this.getParams();
-        this.executable = true;
     }
 
     @Override
     public void exec(byte[] body,boolean ka){
-        if (executable) execCGI(body,ka);
-        else sendPlain(ka);
+        execCGI(body,ka);
     }
 
     private void execCGI(byte[] body, boolean ka){
@@ -84,22 +81,10 @@ public class CGIProcess extends CGI {
         }
     }
 
-    private void sendPlain(boolean ka){
-        file = new File(Configs.getMainDir(req.getHost()) + req.Path);
-        FileSender fs = new FileSender(req.getProt(),200);
-        fs.setContentType("text/plain");
-        fs.setExtension(extension);
-        fs.setKeepAlive(ka);
-        fs.sendFile(req.getMethod(), file, req.out, req.getIP(), req.getID(), req.getHost());
-    }
-
     private void getCMD(){
-        String cmd = basicUtils.getExecCmd(extension);
-        if (cmd != null){
-            executable = true;
-            commands = new ArrayList<>();
-            commands.add(cmd);
-            commands.add(file.getAbsolutePath());
-        } else executable = false;
+        commands = new ArrayList<>();
+        if (extension.equals("php"))
+            commands.add("php");
+        commands.add(file.getAbsolutePath());
     }
 }
