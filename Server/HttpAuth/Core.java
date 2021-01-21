@@ -38,7 +38,7 @@ public class Core {
             alg = mech.split(" ",2)[1];
         }else
             Mechanism = Mechanisms.Basic;
-        apis = (ArrayList<String>) authCfg.get("Dirs");
+        apis = (ArrayList<String>) authCfg.get("Need");
         new PasswdUpdater();
     }
 
@@ -63,7 +63,15 @@ public class Core {
     }
 
     public boolean apiContains(String api){
-        return apis.contains(api);
+        Pattern ptn;
+        Matcher mc;
+        for (String s : apis){
+            ptn = Pattern.compile(s);
+            mc = ptn.matcher(api);
+            if (mc.find())
+                return true;
+        }
+        return false;
     }
 
     public int checkAuth(String authorization,String ip){
@@ -207,7 +215,7 @@ public class Core {
             String decoded = new String(Base64.getDecoder().decode(nonce));
             String[] items = decoded.split(" ");
             if (ip.equals(items[1]))
-                 if (Long.parseLong(items[0]) - new Date().getTime() < 10000)
+                 if (new Date().getTime() - Long.parseLong(items[0]) < 10000)
                      return 0;
                  else
                      return 1;
