@@ -2,10 +2,7 @@ package Server.Utils;
 
 import Server.Reqandres.Request.Request;
 import Server.Reqandres.Senders.FileSender;
-
-import java.awt.image.AreaAveragingScaleFilter;
 import java.io.*;
-import java.lang.reflect.Array;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,7 +18,7 @@ public class basicUtils {
     private static HashMap<String,String> execCmds;
     private static final ArrayList<Integer> ids = new ArrayList<>();
     private static final Random rnd = new Random();
-    public static String LocalHostIP = "", Zako = "Zako 0.8";
+    public static String LocalHostIP = "", Zako = "Zako 1.0.0";
 
     private basicUtils(){}
 
