@@ -2,11 +2,16 @@ package Server.Utils;
 
 import Server.Reqandres.Request.Request;
 import Server.Reqandres.Senders.FileSender;
+
+import java.awt.image.AreaAveragingScaleFilter;
 import java.io.*;
+import java.lang.reflect.Array;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class basicUtils {
 
@@ -127,44 +132,45 @@ public class basicUtils {
     }
 
     public static void killPrcs(){
-        ArrayList<String> cmds = new ArrayList<>();
+        ArrayList<String> commands;
+        String platform = System.getProperty("os.name");
         try{
             if (Configs.isLBOn()){
-                cmds.clear();
-                cmds.add("fuser");
-                cmds.add(Configs.getLBPort() + "/tcp");
-                ProcessBuilder pb = new ProcessBuilder(cmds);
+                commands = getCheckCmd(Configs.getLBPort());
+                ProcessBuilder pb = new ProcessBuilder(commands);
                 Process p = pb.start();
                 InputStream in = p.getInputStream();
                 String prcs = new String(in.readAllBytes());
                 if (!prcs.isEmpty()){
-                    Runtime.getRuntime().exec(new String[]{"fuser","-k",Configs.getLBPort() + "/tcp"});
-                    Logger.ilog("Process on port " + Configs.getLBPort() + " has been killed.");
+                    if (platform.equalsIgnoreCase("linux"))
+                        killLinux(Configs.getLBPort());
+                    else if (platform.equalsIgnoreCase("windows"))
+                        killWindows(prcs);
                 }
             }
             if (Configs.isWSOn()){
-                cmds.clear();
-                cmds.add("fuser");
-                cmds.add(Configs.getWSPort() + "/tcp");
-                ProcessBuilder pb = new ProcessBuilder(cmds);
+                commands = getCheckCmd(Configs.getWSPort());
+                ProcessBuilder pb = new ProcessBuilder(commands);
                 Process p = pb.start();
                 InputStream in = p.getInputStream();
                 String prcs = new String(in.readAllBytes());
                 if (!prcs.isEmpty()){
-                    Runtime.getRuntime().exec(new String[]{"fuser","-k",Configs.getWSPort() + "/tcp"});
-                    Logger.ilog("Process on port " + Configs.getWSPort() + " has been killed.");
+                    if (platform.equalsIgnoreCase("linux"))
+                        killLinux(Configs.getWSPort());
+                    else if (platform.equalsIgnoreCase("windows"))
+                        killWindows(prcs);
                 }
             }
-            cmds.clear();
-            cmds.add("fuser");
-            cmds.add("8560/tcp");
-            ProcessBuilder pb = new ProcessBuilder(cmds);
+            commands = getCheckCmd(8560);
+            ProcessBuilder pb = new ProcessBuilder(commands);
             Process p = pb.start();
             InputStream in = p.getInputStream();
             String prcs = new String(in.readAllBytes());
             if (!prcs.isEmpty()){
-                Runtime.getRuntime().exec(new String[]{"fuser","-k","8560/tcp"});
-                Logger.ilog("Process on port 8560 has been killed.");
+                if (platform.equalsIgnoreCase("linux"))
+                    killLinux(8560);
+                else if (platform.equalsIgnoreCase("windows"))
+                    killWindows(prcs);
             }
         }catch(Exception ex){
             String t = "";
@@ -174,5 +180,70 @@ public class basicUtils {
             t += ex.toString();
             Logger.ilog(t);
         }
+    }
+
+    private static void killLinux(int port){
+        try{
+            Runtime.getRuntime().exec((String[]) getKillCmdUbuntu(port).toArray());
+            Logger.ilog("Process on port " + port + " has been killed.");
+        }catch(Exception ex){
+            String t = "";
+            for (StackTraceElement a : ex.getStackTrace()){
+                t += a.toString() + " ;; ";
+            }
+            t += ex.toString();
+            Logger.ilog(t);
+        }
+    }
+
+    private static void killWindows(String result){
+        try{
+            Pattern ptn = Pattern.compile(" \\d+[^.]");
+            Matcher mc = ptn.matcher(result);
+            if (mc.find()) {
+                Runtime.getRuntime().exec((String[]) getKillCmdWin(mc.group()).toArray());
+                Logger.ilog("Process (PID:) " + result + " has been killed.");
+            }
+        }catch(Exception ex){
+            String t = "";
+            for (StackTraceElement a : ex.getStackTrace()){
+                t += a.toString() + " ;; ";
+            }
+            t += ex.toString();
+            Logger.ilog(t);
+        }
+    }
+
+    private static ArrayList<String> getCheckCmd(int port){
+        ArrayList<String> cmd = new ArrayList<>();
+        String platform = System.getProperty("os.name");
+        if (platform.equalsIgnoreCase("linux")){
+            cmd.add("fuser");
+            cmd.add(port + "/tcp");
+        }
+        else if (platform.equalsIgnoreCase("windows")){
+            cmd.add("netstat");
+            cmd.add("-ano");
+            cmd.add("|");
+            cmd.add("findstr :" + port);
+        }
+        return cmd;
+    }
+
+    private static ArrayList<String> getKillCmdUbuntu(int port){
+        ArrayList<String> cmd = new ArrayList<>();
+        cmd.add("fuser");
+        cmd.add("-k");
+        cmd.add(port + "/tcp");
+        return cmd;
+    }
+
+    private static ArrayList<String> getKillCmdWin(String PID){
+        ArrayList<String> cmd = new ArrayList<>();
+        cmd.add("taskkill");
+        cmd.add("/PID");
+        cmd.add(PID);
+        cmd.add("/F");
+        return cmd;
     }
 }
