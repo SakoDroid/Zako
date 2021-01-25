@@ -6,7 +6,7 @@ import java.util.regex.*;
 
 public class APIConfigs {
 
-    private static final HashMap<String,String[]> apis = new HashMap<>();
+    private static final HashMap<Pattern,String[]> apis = new HashMap<>();
 
     private APIConfigs(){}
 
@@ -16,13 +16,16 @@ public class APIConfigs {
         Pattern ptn = Pattern.compile(":\\d+");
         Matcher mc = ptn.matcher(path);
         if (mc.find())
-            apis.put(api[0].trim(),cleanURL(path).split(":"));
+            apis.put(Pattern.compile(api[0].trim())
+                    ,cleanURL(path).split(":"));
         else{
             File fl = new File(path);
             if (fl.exists())
-                apis.put(api[0].trim(),new String[]{path});
+                apis.put(Pattern.compile(api[0].trim())
+                        ,new String[]{path});
             else
-                apis.put(api[0].trim(),new String[]{cleanURL(path),"80"});
+                apis.put(Pattern.compile(api[0].trim())
+                        ,new String[]{cleanURL(path),"80"});
         }
     }
 
@@ -50,11 +53,10 @@ public class APIConfigs {
     }
 
     public static String[] getAPIAddress(String fullPath){
-        for (String api : apis.keySet()){
-            Pattern ptn = Pattern.compile(api.trim());
+        for (Pattern ptn : apis.keySet()){
             Matcher mc = ptn.matcher(fullPath.trim());
             if (mc.find()){
-                return apis.get(api);
+                return apis.get(ptn);
             }
         }
         return null;

@@ -32,7 +32,7 @@ public class FileTypes {
         }
     }
 
-    private static void loadCache(){
+    private static void loadHeaders(){
         try{
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
@@ -66,7 +66,7 @@ public class FileTypes {
 
     public static void load(){
         loadCnts();
-        loadCache();
+        loadHeaders();
     }
 
     private static void addCT(String ext,String ct){

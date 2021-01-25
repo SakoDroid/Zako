@@ -85,17 +85,18 @@ public class Configs {
             t += ex.toString();
             Logger.ilog(t);
         }
-        if (Dirs.isEmpty())
-            addDefaultSetback();
+        addDefaultSetback(Dirs.isEmpty());
         checkDirs();
     }
 
-    private static void addDefaultSetback(){
+    private static void addDefaultSetback(boolean hostsAdded){
         HashMap<String,String> dirs = new HashMap<>();
-        dirs.put("Root","/var/www/html");
-        dirs.put("CGI","/var/www/cgi-bin");
+        if (hostsAdded){
+            dirs.put("Root", "/var/www/html");
+            dirs.put("CGI", "/var/www/cgi-bin");
+            dirs.put("Files", "/var/www/files");
+        }
         dirs.put("Logs",getCWD() + "/Logs");
-        dirs.put("Files","/var/www/files");
         Dirs.put("def",dirs);
     }
 
