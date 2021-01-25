@@ -12,7 +12,7 @@ import java.util.regex.*;
 
 public class Core {
 
-    private ArrayList<String> apis;
+    private final ArrayList<Pattern> apis = new ArrayList<>();
     private final HashMap<String,String> passwd = new HashMap<>();
     private final HashMap<String,String> opaques = new HashMap<>();
     private final HashSet<String> stales = new HashSet<>();
@@ -38,7 +38,9 @@ public class Core {
             alg = mech.split(" ",2)[1];
         }else
             Mechanism = Mechanisms.Basic;
-        apis = (ArrayList<String>) authCfg.get("Need");
+        ArrayList<String> needs = (ArrayList<String>) authCfg.get("Need");
+        for (String s : needs)
+            apis.add(Pattern.compile(s));
         new PasswdUpdater();
     }
 
@@ -63,10 +65,8 @@ public class Core {
     }
 
     public boolean apiContains(String api){
-        Pattern ptn;
         Matcher mc;
-        for (String s : apis){
-            ptn = Pattern.compile(s);
+        for (Pattern ptn : apis){
             mc = ptn.matcher(api);
             if (mc.find())
                 return true;

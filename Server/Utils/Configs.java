@@ -85,7 +85,8 @@ public class Configs {
             t += ex.toString();
             Logger.ilog(t);
         }
-        addDefaultSetback();
+        if (Dirs.isEmpty())
+            addDefaultSetback();
         checkDirs();
     }
 
