@@ -115,7 +115,8 @@ public class RequestProcessor {
                     }
                     sb.append("\r\n").append(line).append("\r\n");
                     if (hostFound) {
-                        String hostName = line.split(":", 2)[1].trim();
+                        String hostName = line.split(":", 2)[1].trim()
+                                .replace("www.","");
                         int status = Configs.getHostStatus(hostName);
                         if (status == 0) {
                             String[] api = APIConfigs.getAPIAddress(hostName + path);

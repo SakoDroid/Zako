@@ -3,6 +3,7 @@ package Server.Reqandres;
 import Server.Reqandres.Request.Request;
 import Server.Reqandres.Request.RequestProcessor;
 import Server.Utils.*;
+import Server.Utils.ViewCounter.View;
 
 public class Response {
 
@@ -19,6 +20,7 @@ public class Response {
     private void handleRes(){
         try{
             Logger.glog("Preparing response to " + request.getIP() + "  ; id = " + request.getID(), request.getHost());
+            new View(request.getHost(),request.getIP());
             if (reqes.sit < 300)
                 Server.API.Factory.getAPI(request.Path).init(request, reqes);
             else

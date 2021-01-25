@@ -64,7 +64,10 @@ public class JSONDocument {
                 sb.append(this.objectToString(obj))
                 .append(",\n");
             }
-            return sb.substring(0,sb.length()-2) + "\n]";
+            if (sb.length() > 3)
+                return sb.substring(0,sb.length()-2) + "\n]";
+            else
+                return sb.toString() + "\n}";
         }
 
         //Parses a Map into String.
@@ -77,7 +80,10 @@ public class JSONDocument {
                 .append(this.objectToString(map.get(key)))
                 .append(",\n");
             }
-            return sb.substring(0,sb.length()-2) + "\n}";
+            if (sb.length() > 3)
+                return sb.substring(0,sb.length()-2) + "\n}";
+            else
+                return sb.toString() + "\n}";
         }
 
         //Evaluates an object and turns it into String.
