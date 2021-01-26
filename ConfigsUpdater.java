@@ -13,8 +13,15 @@ public class ConfigsUpdater extends Thread{
 
     @Override
     public void run(){
+        File fl = null;
+        if (System.getProperty("os.name")
+                .toLowerCase().contains("windows"))
+            fl = new File(System.getProperty("user.dir") + "/Configs/Zako.cfg");
+        else if (System.getProperty("os.name")
+                .toLowerCase().contains("linux"))
+            fl = new File("/etc/zako-web/Zako.cfg");
         HashMap data = (HashMap) JSONBuilder.newInstance()
-                .parse(new File("/etc/zako-web/Zako.cfg"))
+                .parse(fl)
                 .toJava();
         long time = (Long) data.get("CFG Update period");
         while (true){

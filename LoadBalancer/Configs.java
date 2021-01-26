@@ -1,6 +1,8 @@
 package LoadBalancer;
 
 import Server.Utils.Logger;
+
+import java.io.File;
 import java.util.*;
 import org.w3c.dom.*;
 import javax.xml.parsers.*;
@@ -11,6 +13,13 @@ public class Configs {
 
     public static void load(){
         try{
+            File fl = null;
+            if (System.getProperty("os.name")
+                    .toLowerCase().contains("windows"))
+                fl = new File(System.getProperty("user.dir") + "/Configs/Load_Balancer.cfg");
+            else if (System.getProperty("os.name")
+                    .toLowerCase().contains("linux"))
+                fl = new File("/etc/zako-web/Load_Balancer.cfg");
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
             Document d = db.parse("/etc/zako-web/Load_Balancer.cfg");
