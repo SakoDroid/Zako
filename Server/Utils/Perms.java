@@ -10,15 +10,29 @@ public class Perms {
 
     public static void load(){
         try{
+            File fl = null;
+            if (System.getProperty("os.name")
+                    .toLowerCase().contains("windows"))
+                fl = new File(System.getProperty("user.dir") + "/Configs/sec/IP-Blacklist");
+            else if (System.getProperty("os.name")
+                    .toLowerCase().contains("linux"))
+                fl = new File("/etc/zako-web/sec/IP-Blacklist");
             String line;
             Logger.ilog("Loading ip black list ...");
-            BufferedReader bf = new BufferedReader(new FileReader("/etc/zako-web/sec/IP-Blacklist"));
+            assert fl != null;
+            BufferedReader bf = new BufferedReader(new FileReader(fl));
             while((line = bf.readLine()) != null){
                 if (!line.startsWith("#") && !line.isEmpty()) ipBlackList.add(line);
             }
             bf.close();
             Logger.ilog("Loading authorized ips for PUT and DELETE method ...");
-            bf = new BufferedReader(new FileReader("/etc/zako-web/sec/ILPD"));
+            if (System.getProperty("os.name")
+                    .toLowerCase().contains("windows"))
+                fl = new File(System.getProperty("user.dir") + "/Configs/sec/ILPD");
+            else if (System.getProperty("os.name")
+                    .toLowerCase().contains("linux"))
+                fl = new File("/etc/zako-web/sec/ILPD");
+            bf = new BufferedReader(new FileReader(fl));
             while((line = bf.readLine()) != null){
                 if (!line.startsWith("#") && !line.isEmpty()) ipsAuthorizedForPUTAndDelete.add(line);
             }
@@ -43,7 +57,14 @@ public class Perms {
 
     public static synchronized void addIPToBlackList(String ip){
         ipBlackList.add(ip);
-        try(FileWriter fw = new FileWriter("/etc/zako-web/sec/IP-Blacklist",true)){
+        File fl = null;
+        if (System.getProperty("os.name")
+                .toLowerCase().contains("windows"))
+            fl = new File(System.getProperty("user.dir") + "/Configs/sec/IP-Blacklist");
+        else if (System.getProperty("os.name")
+                .toLowerCase().contains("linux"))
+            fl = new File("/etc/zako-web/sec/IP-Blacklist");
+        try(FileWriter fw = new FileWriter(fl,true)){
             fw.write("\n" + ip);
             fw.flush();
         }catch(Exception ex){

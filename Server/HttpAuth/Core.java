@@ -26,9 +26,16 @@ public class Core {
 
     private void load(){
         loadPasswd();
+        File fl = null;
+        if (System.getProperty("os.name")
+                .toLowerCase().contains("windows"))
+            fl = new File(System.getProperty("user.dir") + "/Configs/Zako.cfg");
+        else if (System.getProperty("os.name")
+                .toLowerCase().contains("linux"))
+            fl = new File("/etc/zako-web/Zako.cfg");
         HashMap data = (HashMap) JSONBuilder
                 .newInstance()
-                .parse(new File("/etc/zako-web/Zako.cfg"))
+                .parse(fl)
                 .toJava();
         HashMap authCfg = (HashMap) data.get("HTTP AUTH");
         String mech = String.valueOf(authCfg.get("Auth mechanism"));
@@ -45,16 +52,26 @@ public class Core {
     }
 
     private void loadPasswd(){
-        try(BufferedReader bf = new BufferedReader(new FileReader("/etc/zako-web/sec/passwd"))) {
-            String line;
-            while ((line = bf.readLine()) != null) {
-                if (!line.startsWith("#") && !line.isEmpty()) {
-                    String[] entry = line.split(":");
-                    if (entry.length > 1)
-                        passwd.put(entry[0], entry[1]);
+        File fl = null;
+        if (System.getProperty("os.name")
+                .toLowerCase().contains("windows"))
+            fl = new File(System.getProperty("user.dir") + "/Configs/sec/passwd");
+        else if (System.getProperty("os.name")
+                .toLowerCase().contains("linux"))
+            fl = new File("/etc/zako-web/sec/passwd");
+        try {
+            assert fl != null;
+            try(BufferedReader bf = new BufferedReader(new FileReader(fl))) {
+                String line;
+                while ((line = bf.readLine()) != null) {
+                    if (!line.startsWith("#") && !line.isEmpty()) {
+                        String[] entry = line.split(":");
+                        if (entry.length > 1)
+                            passwd.put(entry[0], entry[1]);
+                    }
                 }
             }
-        }catch (Exception ex){
+        } catch (Exception ex){
             String t = "";
             for (StackTraceElement a : ex.getStackTrace()) {
                 t += a.toString() + " ;; ";

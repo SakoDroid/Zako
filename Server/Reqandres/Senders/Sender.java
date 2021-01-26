@@ -4,6 +4,7 @@ import Server.Utils.Configs;
 import Server.Utils.Logger;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.FileReader;
 import java.util.Date;
 import java.text.SimpleDateFormat;
@@ -76,7 +77,15 @@ public class Sender {
         try{
             Logger.glog("Sending back options method response to " + ip + "  ; id = " + id,host);
             out.writeBytes(prot + " 200 OK\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako + "\nConnection: close\nAllow: GET,HEAD,POST,OPTIONS,TRACE,CONNECT,PUT,DELETE\nx-IPS-Allowed-For-PUT-DELETE: ");
-            BufferedReader bf = new BufferedReader(new FileReader("/etc/zako-web/sec/ILPD"));
+            File fl = null;
+            if (System.getProperty("os.name")
+                    .toLowerCase().contains("windows"))
+                fl = new File(System.getProperty("user.dir") + "/Configs/sec/ILPD");
+            else if (System.getProperty("os.name")
+                    .toLowerCase().contains("linux"))
+                fl = new File("/etc/zako-web/sec/ILPD");
+            assert fl != null;
+            BufferedReader bf = new BufferedReader(new FileReader(fl));
             String line;
             String ips = "";
             while ((line = bf.readLine()) != null){

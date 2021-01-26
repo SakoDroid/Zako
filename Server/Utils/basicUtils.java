@@ -139,9 +139,9 @@ public class basicUtils {
                 InputStream in = p.getInputStream();
                 String prcs = new String(in.readAllBytes());
                 if (!prcs.isEmpty()){
-                    if (platform.equalsIgnoreCase("linux"))
+                    if (platform.toLowerCase().contains("linux"))
                         killLinux(Configs.getLBPort());
-                    else if (platform.equalsIgnoreCase("windows"))
+                    else if (platform.toLowerCase().contains("windows"))
                         killWindows(prcs);
                 }
             }
@@ -152,9 +152,9 @@ public class basicUtils {
                 InputStream in = p.getInputStream();
                 String prcs = new String(in.readAllBytes());
                 if (!prcs.isEmpty()){
-                    if (platform.equalsIgnoreCase("linux"))
+                    if (platform.toLowerCase().contains("linux"))
                         killLinux(Configs.getWSPort());
-                    else if (platform.equalsIgnoreCase("windows"))
+                    else if (platform.toLowerCase().contains("windows"))
                         killWindows(prcs);
                 }
             }
@@ -164,9 +164,9 @@ public class basicUtils {
             InputStream in = p.getInputStream();
             String prcs = new String(in.readAllBytes());
             if (!prcs.isEmpty()){
-                if (platform.equalsIgnoreCase("linux"))
+                if (platform.toLowerCase().contains("linux"))
                     killLinux(8560);
-                else if (platform.equalsIgnoreCase("windows"))
+                else if (platform.toLowerCase().contains("windows"))
                     killWindows(prcs);
             }
         }catch(Exception ex){
@@ -214,11 +214,11 @@ public class basicUtils {
     private static ArrayList<String> getCheckCmd(int port){
         ArrayList<String> cmd = new ArrayList<>();
         String platform = System.getProperty("os.name");
-        if (platform.equalsIgnoreCase("linux")){
+        if (platform.toLowerCase().contains("linux")){
             cmd.add("fuser");
             cmd.add(port + "/tcp");
         }
-        else if (platform.equalsIgnoreCase("windows")){
+        else if (platform.toLowerCase().contains("windows")){
             cmd.add("netstat");
             cmd.add("-ano");
             cmd.add("|");

@@ -32,9 +32,16 @@ public class Configs {
 
     private static void loadHosts(){
         try{
+            File fl = null;
+            if (System.getProperty("os.name")
+                    .toLowerCase().contains("windows"))
+                fl = new File(System.getProperty("user.dir") + "/Configs/Hosts.cfg");
+            else if (System.getProperty("os.name")
+                    .toLowerCase().contains("linux"))
+                fl = new File("/etc/zako-web/Hosts.cfg");
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
-            Document doc = db.parse(new File("/etc/zako-web/Hosts.cfg"));
+            Document doc = db.parse(fl);
             NodeList nl = doc.getElementsByTagName("Host");
             for (int i = 0 ; i < nl.getLength() ; i++){
                 Element host = (Element) nl.item(i);
@@ -103,8 +110,15 @@ public class Configs {
 
     private static void loadMain(){
         Logger.ilog("Loading main configs ...");
+        File fl = null;
+        if (System.getProperty("os.name")
+                .toLowerCase().contains("windows"))
+            fl = new File(System.getProperty("user.dir") + "/Configs/Zako.cfg");
+        else if (System.getProperty("os.name")
+                .toLowerCase().contains("linux"))
+            fl = new File("/etc/zako-web/Zako.cfg");
         JSONBuilder bld = JSONBuilder.newInstance();
-        JSONDocument doc = bld.parse(new File("/etc/zako-web/Zako.cfg"));
+        JSONDocument doc = bld.parse(fl);
         HashMap data = (HashMap) doc.toJava();
         ViewCounter = (Boolean) data.get("View counter");
         ViewCounterUpdate = (Long) data.get("View update frequency");

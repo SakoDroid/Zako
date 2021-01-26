@@ -13,8 +13,15 @@ public class CaptchaConfigs {
     public static String CPA;
 
     public static void load(){
+        File fl = null;
+        if (System.getProperty("os.name")
+                .toLowerCase().contains("windows"))
+            fl = new File(System.getProperty("user.dir") + "/Configs/Zako.cfg");
+        else if (System.getProperty("os.name")
+                .toLowerCase().contains("linux"))
+            fl = new File("/etc/zako-web/Zako.cfg");
         JSONBuilder bld = JSONBuilder.newInstance();
-        JSONDocument doc = bld.parse(new File("/etc/zako-web/Zako.cfg"));
+        JSONDocument doc = bld.parse(fl);
         HashMap data = (HashMap) doc.toJava();
         HashMap cap = (HashMap) data.get("CAPTCHA");
         ON = (Boolean) cap.get("ON");

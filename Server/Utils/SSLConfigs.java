@@ -12,8 +12,15 @@ public class SSLConfigs {
     private static String pss;
 
     public static void load(){
+        File fl = null;
+        if (System.getProperty("os.name")
+                .toLowerCase().contains("windows"))
+            fl = new File(System.getProperty("user.dir") + "/Configs/Zako.cfg");
+        else if (System.getProperty("os.name")
+                .toLowerCase().contains("linux"))
+            fl = new File("/etc/zako-web/Zako.cfg");
         JSONBuilder bld = JSONBuilder.newInstance();
-        JSONDocument doc = bld.parse(new File("/etc/zako-web/Zako.cfg"));
+        JSONDocument doc = bld.parse(fl);
         HashMap data = (HashMap) doc.toJava();
         HashMap ssl = (HashMap) data.get("SSL");
         SSL = (Boolean) ssl.get("ON");

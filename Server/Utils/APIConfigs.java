@@ -37,7 +37,14 @@ public class APIConfigs {
     }
 
     public static void load(){
-        try(BufferedReader bf = new BufferedReader(new FileReader("/etc/zako-web/API.cfg"))){
+        File fl = null;
+        if (System.getProperty("os.name")
+                .toLowerCase().contains("windows"))
+            fl = new File(System.getProperty("user.dir") + "/Configs/API.cfg");
+        else if (System.getProperty("os.name")
+                .toLowerCase().contains("linux"))
+            fl = new File("/etc/zako-web/API.cfg");
+        try(BufferedReader bf = new BufferedReader(new FileReader(fl))){
             String line;
             while((line = bf.readLine()) != null){
                 if (!line.startsWith("#")) addAPI(line);

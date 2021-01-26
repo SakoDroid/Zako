@@ -14,9 +14,16 @@ public class FileTypes {
 
     private static void loadCnts(){
         try{
+            File fl = null;
+            if (System.getProperty("os.name")
+                    .toLowerCase().contains("windows"))
+                fl = new File(System.getProperty("user.dir") + "/Configs/MIME.cfg");
+            else if (System.getProperty("os.name")
+                    .toLowerCase().contains("linux"))
+                fl = new File("/etc/zako-web/MIME.cfg");
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
-            Document doc = db.parse(new File("/etc/zako-web/MIME.cfg"));
+            Document doc = db.parse(fl);
             NodeList mms = doc.getElementsByTagName("MIME");
             for (int i = 0 ; i < mms.getLength() ; i++){
                 Element mm = (Element) mms.item(i);
@@ -34,9 +41,16 @@ public class FileTypes {
 
     private static void loadHeaders(){
         try{
+            File fl = null;
+            if (System.getProperty("os.name")
+                    .toLowerCase().contains("windows"))
+                fl = new File(System.getProperty("user.dir") + "/Configs/Headers.cfg");
+            else if (System.getProperty("os.name")
+                    .toLowerCase().contains("linux"))
+                fl = new File("/etc/zako-web/Headers.cfg");
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
-            Document d = db.parse(new File("/etc/zako-web/Headers.cfg"));
+            Document d = db.parse(fl);
             NodeList rules = d.getElementsByTagName("rule");
             for (int i = 0 ; i < rules.getLength() ; i++){
                 Element rule = (Element) rules.item(i);
