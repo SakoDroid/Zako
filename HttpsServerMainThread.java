@@ -35,12 +35,7 @@ public class HttpsServerMainThread{
                     out.flush();
                     out.close();
                 }catch(Exception ex){
-                    String t = "";
-                    for (StackTraceElement a : ex.getStackTrace()) {
-                        t += a.toString() + " ;; ";
-                    }
-                    t += ex.toString();
-                    Logger.ilog(t);
+                    Logger.logException(ex);
                 }
             }
 
@@ -53,12 +48,7 @@ public class HttpsServerMainThread{
                 Logger.ilog("Http thread is running on port 80 for redirection ...");
                 while (true) new Redirect(ss.accept());
             }catch (Exception ex) {
-                String t = "";
-                for (StackTraceElement a : ex.getStackTrace()) {
-                    t += a.toString() + " ;; ";
-                }
-                t += ex.toString();
-                Logger.ilog(t);
+                Logger.logException(ex);
             }
         }
     }
@@ -79,12 +69,7 @@ public class HttpsServerMainThread{
                 Logger.ilog("Https server thread is now running (jks : " + SSLConfigs.getJKS() + " ,, jks pass : " + SSLConfigs.getPass() + ") ...");
                 while (true) new HttpListener((SSLSocket) sslServerSocket.accept());
             } catch (Exception ex) {
-                String t = "";
-                for (StackTraceElement a : ex.getStackTrace()) {
-                    t += a.toString() + " ;; ";
-                }
-                t += ex.toString();
-                Logger.ilog(t);
+                Logger.logException(ex);
             }
             Logger.ilog("Server is shutting down ...");
         }

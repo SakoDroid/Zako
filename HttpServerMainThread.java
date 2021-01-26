@@ -16,12 +16,7 @@ public class HttpServerMainThread extends Thread{
             Logger.ilog("Http server thread is now running on port " + Configs.getWSPort() + " ...");
             while(true) new HttpListener(server.accept());
         }catch (Exception ex) {
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()){
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
+            Logger.logException(ex);
         }
 
         Logger.ilog("Server is shutting down ...");

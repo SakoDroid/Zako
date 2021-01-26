@@ -49,12 +49,7 @@ public class FileFixer{
                 out.close();
                 in.close();
             } catch (Exception ex) {
-                String t = "";
-                for (StackTraceElement a : ex.getStackTrace()) {
-                    t += a.toString() + " ;; ";
-                }
-                t += ex.toString();
-                Logger.ilog(t);
+                Logger.logException(ex);
             }
         }
     }

@@ -46,12 +46,7 @@ public class FileSender extends Sender {
             Logger.glog(ip + "'s request handled successfully!" + "  ; id = " + id,host);
             basicUtils.delID(id);
         }catch(Exception ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()) {
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
+            Logger.logException(ex);
         }
     }
 
@@ -65,12 +60,7 @@ public class FileSender extends Sender {
             Logger.glog(ip + "'s request handled successfully!" + "  ; id = " + id,host);
             basicUtils.delID(id);
         }catch(Exception ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()) {
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
+            Logger.logException(ex);
         }
     }
 }

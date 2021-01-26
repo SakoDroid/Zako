@@ -38,12 +38,7 @@ public class Perms {
             }
             bf.close();
         }catch(Exception ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()){
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
+            Logger.logException(ex);
         }
     }
 
@@ -68,12 +63,7 @@ public class Perms {
             fw.write("\n" + ip);
             fw.flush();
         }catch(Exception ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()){
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
+            Logger.logException(ex);
         }
     }
 }

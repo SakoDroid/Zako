@@ -19,12 +19,7 @@ public class FCGIEngine {
             this.out = this.sock.getOutputStream();
             this.in = this.sock.getInputStream();
         }catch (Exception ex) {
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()) {
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
+            Logger.logException(ex);
         }
     }
 
@@ -42,12 +37,7 @@ public class FCGIEngine {
         try{
             this.sock.close();
         }catch (Exception ex) {
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()) {
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
+            Logger.logException(ex);
         }
     }
 }

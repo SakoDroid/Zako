@@ -14,12 +14,7 @@ public class FCGIEndRequestBody {
         try{
             in.read(body);
         }catch (Exception ex) {
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()) {
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
+            Logger.logException(ex);
         }
         this.appStatus = (body[0] << 24) + (body[1] << 16) + (body[2] << 8) + body[3];
         this.protocolStatus = body[4];

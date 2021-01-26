@@ -99,12 +99,7 @@ public class Sender {
             basicUtils.delID(id);
             Logger.glog(ip + "'s request handled successfully!" + "  ; id = " + id,host);
         }catch (Exception ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()) {
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
+            Logger.logException(ex);
         }
     }
 
@@ -117,12 +112,7 @@ public class Sender {
             basicUtils.delID(id);
             Logger.glog(ip + "'s request handled successfully!" + "  ; id = " + id,host);
         }catch (Exception ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()) {
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
+            Logger.logException(ex);
         }
     }
 
@@ -134,12 +124,7 @@ public class Sender {
             basicUtils.delID(id);
             Logger.glog(ip + "'s request handled successfully!" + "  ; id = " + id,host);
         }catch(Exception ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()) {
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
+            Logger.logException(ex);
         }
     }
 }

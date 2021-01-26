@@ -17,12 +17,7 @@ public class SubForwarder{
             new Piper(s.getInputStream(),req.out,s);
             Logger.glog("Forwarding request for " + req.getHost() + " from " + req.getIP() + " to " + address[0] + ":" + address[1],req.getHost());
         }catch(Exception ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()){
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
+            Logger.logException(ex);
         }
     }
 
@@ -60,12 +55,7 @@ public class SubForwarder{
                 try {
                     connection.close();
                 }catch (Exception ignored){}
-                String t = "";
-                for (StackTraceElement a : ex.getStackTrace()){
-                    t += a.toString() + " ;; ";
-                }
-                t += ex.toString();
-                Logger.ilog(t);
+                Logger.logException(ex);
             }
         }
     }

@@ -54,12 +54,7 @@ public class RequestProcessor {
                 this.stat = 0;
             }
         }catch(Exception ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()){
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
+            Logger.logException(ex);
         }
     }
 
@@ -75,12 +70,7 @@ public class RequestProcessor {
                 if (i == -1) break;
             }
         }catch(Exception ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()) {
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
+            Logger.logException(ex);
         }
         return sb.toString();
     }
@@ -158,12 +148,7 @@ public class RequestProcessor {
                 KA = false;
             }
         }catch(Exception ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()) {
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
+            Logger.logException(ex);
         }
     }
 
@@ -196,12 +181,7 @@ public class RequestProcessor {
                 Logger.glog(req.getIP() + "'s request is for " + u.getPath() + "; id = " + req.getID(), req.getHost());
             }
         }catch(Exception ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()){
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
+            Logger.logException(ex);
         }
     }
 
@@ -255,12 +235,7 @@ public class RequestProcessor {
                                     //Reads the body
                                     fw.write(req.is.readNBytes(length + 1));
                                 } catch (Exception ex) {
-                                    String t = "";
-                                    for (StackTraceElement a : ex.getStackTrace()) {
-                                        t += a.toString() + " ;; ";
-                                    }
-                                    t += ex.toString();
-                                    Logger.ilog(t);
+                                    Logger.logException(ex);
                                 }
                             } else this.sit = 413;
                         } else this.sit = 411;
@@ -269,12 +244,7 @@ public class RequestProcessor {
             } else this.sit = 400;
             fw.flush();
         }catch(Exception ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()){
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
+            Logger.logException(ex);
         }
     }
 
@@ -334,12 +304,7 @@ public class RequestProcessor {
             bf.close();
             if (!files.isEmpty()) new FileFixer(files,req.getCacheFile());
         }catch(Exception ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()){
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
+            Logger.logException(ex);
         }
     }
 

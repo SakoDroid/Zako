@@ -23,12 +23,7 @@ public class DELETE implements Method{
                 } else basicUtils.sendCode(404,req);
             }else basicUtils.sendCode(405,req);
         }catch(Exception ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()){
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
+            Logger.logException(ex);
         }
         return 0;
     }

@@ -31,12 +31,7 @@ public class Piper extends Thread{
                 connection1.close();
                 connection2.close();
             }catch (Exception ignored){}
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()) {
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
+            Logger.logException(ex);
         }
     }
 }

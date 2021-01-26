@@ -61,12 +61,7 @@ public class basicUtils {
             }
             LocalHostIP = LocalHostIP.strip().replace("\n","");
         }catch(Exception ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()){
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
+            Logger.logException(ex);
         }
     }
 
@@ -119,12 +114,7 @@ public class basicUtils {
             basicUtils.delID(req.getID());
             Logger.glog(req.getIP() + "'s request redirected to " + location + "!" + "  ; id = " + req.getID(),"NA");
         }catch(Exception ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()) {
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
+            Logger.logException(ex);
         }
     }
 
@@ -170,12 +160,7 @@ public class basicUtils {
                     killWindows(prcs);
             }
         }catch(Exception ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()){
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
+            Logger.logException(ex);
         }
     }
 
@@ -184,12 +169,7 @@ public class basicUtils {
             Runtime.getRuntime().exec((String[]) getKillCmdUbuntu(port).toArray());
             Logger.ilog("Process on port " + port + " has been killed.");
         }catch(Exception ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()){
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
+            Logger.logException(ex);
         }
     }
 
@@ -202,12 +182,7 @@ public class basicUtils {
                 Logger.ilog("Process (PID:) " + result + " has been killed.");
             }
         }catch(Exception ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()){
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
+            Logger.logException(ex);
         }
     }
 

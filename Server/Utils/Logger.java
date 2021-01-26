@@ -77,6 +77,9 @@ public class Logger {
         Thread t = new LoggerThread(error,4,filename);
     }
 
+    public static void logException(Exception ex){
+        new ExceptionLogger(ex);
+    }
 
     private synchronized static void writeInFile(File fl,String data){
         try(FileWriter glog = new FileWriter(fl,true)){
@@ -84,6 +87,26 @@ public class Logger {
             glog.flush();
         }catch(Exception ex){
             System.out.println(ex.toString());
+        }
+    }
+
+    private static class ExceptionLogger extends Thread{
+
+        private final Exception exc;
+
+        public ExceptionLogger(Exception ex){
+            this.exc = ex;
+            this.start();
+        }
+
+        @Override
+        public void run(){
+            StringBuilder t = new StringBuilder();
+            for (StackTraceElement a : exc.getStackTrace()){
+                t.append(a.toString()).append("  ;;  ");
+            }
+            t.append(exc.toString());
+            Logger.ilog(t.toString());
         }
     }
 }

@@ -72,12 +72,7 @@ public class CGIProcess extends CGI {
                 Logger.CGILog("Process Finished => Error. (Check CGI-Logs for error info) ; id = " + req.getID()+ "  ; PID = " + p.pid(),file.getName(),req.getHost());
             }
         }catch(Exception ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()){
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
+            Logger.logException(ex);
         }
     }
 

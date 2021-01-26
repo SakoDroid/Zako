@@ -74,13 +74,7 @@ public class FCGIResponse {
 
         }catch (IOException ex) {
             status = FCGIConstants.FCGI_REP_ERROR_IOEXCEPTION;
-            System.out.println("exp : " + ex.toString());
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()) {
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
+            Logger.logException(ex);
         }
         return temp;
     }

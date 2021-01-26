@@ -32,12 +32,7 @@ public class PUT implements Method{
                 snd.send(null,req.out,req.getIP(),req.getID(),req.getHost());
             }else basicUtils.sendCode(405,req);
         }catch(Exception ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()){
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
+            Logger.logException(ex);
         }
         return 0;
     }

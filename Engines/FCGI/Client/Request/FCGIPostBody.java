@@ -9,12 +9,7 @@ public class FCGIPostBody extends FCGIRequestComponent {
             if (data.length > 0) out.write(data);
             this.makeReadyForSend();
         }catch (Exception ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()) {
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
+            Logger.logException(ex);
         }
     }
 

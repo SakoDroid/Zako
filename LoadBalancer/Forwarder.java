@@ -27,12 +27,7 @@ public class Forwarder extends Thread {
             clientOut = new DataOutputStream(this.client.getOutputStream());
             this.start();
         }catch(Exception ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()) {
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
+            Logger.logException(ex);
         }
     }
 
@@ -57,12 +52,7 @@ public class Forwarder extends Thread {
                 clientOut.close();
             }
         }catch(Exception ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()) {
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
+            Logger.logException(ex);
             if (ex.toString().contains("Timeout")) this.sendCode(504);
             else this.sendCode(502);
         }

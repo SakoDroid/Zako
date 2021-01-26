@@ -110,12 +110,7 @@ public class Captcha {
         try{
             ImageIO.write(img,"png",out);
         }catch(Exception ex){
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()) {
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
+            Logger.logException(ex);
         }
         return out.toByteArray();
     }

@@ -24,12 +24,7 @@ public class FCGIRequest {
             byte[] paddingData = Configs.padding;
             if (paddingData != null && paddingData.length > 0) os.write(paddingData);
         }catch (Exception ex) {
-            String t = "";
-            for (StackTraceElement a : ex.getStackTrace()) {
-                t += a.toString() + " ;; ";
-            }
-            t += ex.toString();
-            Logger.ilog(t);
+            Logger.logException(ex);
         }
     }
 
