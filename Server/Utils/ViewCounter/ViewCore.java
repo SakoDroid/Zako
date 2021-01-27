@@ -59,4 +59,11 @@ public class ViewCore {
                 "\n--------------------------------------";
     }
 
+    public void reset24hViews(){
+        this.views24 = 0;
+    }
+
+    public void resetWeekViews(){
+        this.viewsWeek = 0;
+    }
 }

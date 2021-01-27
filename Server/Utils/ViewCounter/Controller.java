@@ -1,8 +1,7 @@
 package Server.Utils.ViewCounter;
 
-import Server.Utils.Logger;
-
 import java.util.HashMap;
+import java.util.TimerTask;
 
 public class Controller {
 
@@ -14,7 +13,8 @@ public class Controller {
             cores.put(host,
                     new ViewCore(hosts.get(host).get("Root"))
             );
-        new WriteThread(updateTime);
+        this.startWriteTimer(updateTime);
+        this.startResetTimers();
     }
 
     public ViewCore getViewCore(String hostName){
@@ -29,28 +29,42 @@ public class Controller {
         cnt = new Controller(hosts,updateTime);
     }
 
-    private class WriteThread extends Thread{
-
-        private final long ut;
-        private final Object lock = new Object();
-
-        public WriteThread(long updateTime){
-            this.ut = updateTime;
-            this.start();
-        }
-
-        @Override
-        public void run(){
-            synchronized (lock){
-                try{
-                    while (true){
-                        lock.wait(ut);
-                        new Writer(cores).writeAll();
-                    }
-                }catch(Exception ex){
-                    Logger.logException(ex);
-                }
+    private void startWriteTimer(long updateTime){
+        javax.swing.Timer writeTimer = new javax.swing.Timer((int)updateTime,e -> {
+            new Writer(cores).writeAll();
+        });
+        java.util.Timer writeTtimer = new java.util.Timer(false);
+        writeTtimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                writeTimer.start();
             }
-        }
+        },0);
+    }
+
+    private void startResetTimers(){
+        javax.swing.Timer dayTimer = new javax.swing.Timer(24 * 3600 * 1000, e -> {
+            for (ViewCore vc : cores.values())
+                vc.reset24hViews();
+        });
+        java.util.Timer dayTtimer = new java.util.Timer(false);
+        dayTtimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                dayTimer.start();
+            }
+        },0);
+
+        javax.swing.Timer weekTimer = new javax.swing.Timer(7 * 24 * 3600 * 1000, e -> {
+            for (ViewCore vc : cores.values())
+                vc.resetWeekViews();
+        });
+        java.util.Timer weekTtimer = new java.util.Timer(false);
+        weekTtimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                weekTimer.start();
+            }
+        },0);
     }
 }

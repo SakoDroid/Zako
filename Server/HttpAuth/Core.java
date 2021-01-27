@@ -242,20 +242,20 @@ public class Core {
 
     private class PasswdUpdater extends Thread{
 
-        private final Object lock = new Object();
-
         public PasswdUpdater(){
             this.start();
         }
 
         @Override
         public void run(){
-            synchronized (lock){
-                try{
-                    lock.wait(100);
-                    loadPasswd();
-                }catch (Exception ignored){}
-            }
+            javax.swing.Timer t  = new javax.swing.Timer(2000, e -> loadPasswd());
+            java.util.Timer tt = new java.util.Timer(false);
+            tt.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    t.start();
+                }
+            },0);
         }
     }
 }
