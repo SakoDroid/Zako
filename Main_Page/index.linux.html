@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width initial-scale=1.0"/>
+    <title>Zako</title>
+    <style id="style">
+        .zakoDiv{
+            width: fit-content;
+            width: -moz-fit-content;
+            margin: auto;
+            font-family: 'Rasa SemiBold',monospace;
+            font-size: 140px;
+            color: #581b1b;
+        }
+        .zako{
+            padding-bottom: 0;
+            margin-bottom: 0;
+            border-bottom: 0;
+            text-align: center;
+            color: #581b1b;
+            font-family: 'Rasa SemiBold',monospace;
+            font-size: 150px
+        }
+        .inCode{
+            padding-top: 0;
+            margin-top: 0;
+            border-top: 0;
+            text-align: center;
+            color: #1d6567;
+            font-family: 'Rasa SemiBold',monospace;
+            font-size: 48px;
+        }
+        button{
+            width: 200px;
+            padding: 15px;
+            font-size: 20px;
+            color: white;
+            background-color: darkred;
+            border-style: solid;
+            border-color: #581b1b;
+            border-radius: 30px;
+            border-width: 3px;
+        }
+        ol{
+            font-size: 14px;
+            font-family: "Fira Code Retina",monospace;
+            list-style-type: disc;
+        }
+        .info_div{
+            text-align: justify;
+            padding: 15px;
+            border-style: dashed;
+            border-width: 3px;
+            width: 750px;
+            margin: auto;
+            font-family: "DejaVu Sans",fantasy;
+            font-size: 16px;
+            line-height: 1.8;
+        }
+        .info_div a{
+            text-decoration: none;
+            color: inherit;
+        }
+        .info_div a:hover{
+            color: dimgrey;
+        }
+        .hd{
+            padding: 10px;
+            text-align: center;
+            color: white;font-size:20px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="header" style="margin: auto;top: 170px;position: relative;opacity: 0">
+        <p class="zako"><span id="Zspan" style="opacity: 0">Z</span>AKO</p>
+        <p id="trust" class="inCode">In <span style="color:rgba(1,0,96,0.84)">CODE</span> we trust</p>
+    </div>
+    <script type="text/javascript">
+        setTimeout(()=>{
+            const header = document.getElementById("header");
+            let op = 0;
+            const int = setInterval(()=>{
+                op += 0.1;
+                if (op < 1)
+                    header.style.opacity = op;
+                else{
+                    clearInterval(int);
+                    setTimeout(()=>{
+                        const trust = document.getElementById("trust");
+                        const Z = document.getElementById("Zspan");
+                        let opz = 0;
+                        let opt = 1;
+                        const int1 = setInterval(()=>{
+                            opz += 0.1
+                            opt -= 0.1;
+                            if (opt > 0){
+                                trust.style.opacity = opt;
+                                Z.style.opacity = opz;
+                            }
+                            else{
+                                clearInterval(int1);
+                            }
+                        },100);
+                        let pos = header.style.top.replace("px","");
+                        const int2 = setInterval(()=>{
+                            pos -= 4;
+                            if (pos > -100)
+                                header.style.top = pos + "px";
+                            else{
+                                clearInterval(int2);
+                                addButtons();
+                            }
+                        },15);
+                    },150);
+                }
+            },35);
+        },200);
+
+        function addButtons(){
+            let op = 0;
+            const div = document.createElement("div");
+            const b1 = document.createElement("button");
+            const b2 = document.createElement("button");
+            div.id = "buttons";
+            b1.addEventListener("click",showAbout);
+            b2.addEventListener("click",showManual);
+            b1.innerHTML = "About Zako";
+            b2.innerHTML = "How to use Zako";
+            div.append(b1,"    ",b2);
+            div.style.width = "fit-content";
+            div.style.margin = "auto";
+            div.style.opacity = String(op);
+            document.body.appendChild(div);
+            const int = setInterval(()=>{
+                op += 0.1;
+                if (op < 1)
+                    div.style.opacity = op;
+                else
+                    clearInterval(int);
+            },30);
+        }
+
+        function showAbout(){
+            const text = "<div style='background-color: lightblue;' class='hd'>About Zako</div>" +
+                "</br>Zako is a static web server that comes with great features such as : " +
+                "<ol><li>DDOS protection engine</li><li>View counter</li><li>Built in captcha generator</li><li>Custom headers for each file or extension</li>" +
+                "<li>IP blocking</li><li>And much more ...</li></ol>" +
+                "Cool features right !?</br></br>" +
+                "The project of Zako started in october 2020, mainly focusing on reliability, speed and " +
+                "never before seen features. We try our best to create something that you enjoy working with and gives you confident!</br>" +
+                "Zako offers you speed, flexibility, strength and cool features to play with! Also Zako takes any criticism and productive offers." +
+                " You can send your beautiful thoughts to us by <a target='_blank' href='http://xako.ir'>our website</a>!</br>" +
+                "</br><div style='background-color: lightblue;' class='hd'>How is Zako made</div></br>" +
+                "Zako has been written with love in pure java (java core, version 14 and above) and every single library that has been used in this project has been written " +
+                "by ourselves, so basically no external libraries has been used in this project. For example, Fast CGI (client) for Zako has been developed " +
+                "by our team!</br>" +
+                "Zako project is currently open source and you can see the codes in github. (also cool, right!?)</br>" +
+                "Since Zako is open source, you can clone the code and modify it so you can use it for your own purposes, but keep in mind that" +
+                " Zako is registered under <a target='_blank' href='https://choosealicense.com/licenses/apache-2.0/#'>apache2 license</a>." +
+                "<button style='margin-top:25px;background-color: #581b1b;color: wheat;width: inherit;border-style: unset;border-radius: 10px' onclick='showManual()'>Learn how to use Zako</button>";
+            const headerDiv = document.getElementById("header");
+            headerDiv.removeAttribute("style");
+            headerDiv.className = "info_div";
+            headerDiv.style.backgroundColor = "aliceblue";
+            headerDiv.style.borderColor = "#1d6567";
+            const btns = document.getElementById("buttons");
+            if (btns != null)
+                btns.remove();
+            headerDiv.innerHTML = text;
+        }
+
+        function showManual(){
+            const text = "<div style='background-color: #581b1b' class='hd'>How to use Zako</div></br>Hi! First of all, thank you for choosing Zako. We are honored that you chose Zako to server your website." +
+                " You can learn more about Zako by clicking the button at the end of this page. </br>" +
+                "This page which you are seeing right now is located at <u>/var/www/html</u> and you can replace this page by replacing index.html file. This " +
+                "page is basically default setback for the server, which means if Host header of a client's request is not defined in the Hosts.cfg " +
+                "this page is sent back. Now let's dive right into configurations : </br>" +
+                "There are 6 configuration files (.cfg) : " +
+                "<ol><li>API.cfg</li><li>Headers.cfg</li><li>Hosts.cfg</li><li>Load_Balancer.cfg</li><li>MIME.cfg</li><li>Zako.cfg</li></ol>" +
+                "And there are 3 other files which contain some information : " +
+                "<ol><li>IP-Blacklist</li><li>ILPD</li><li>passwd</li></ol></br>" +
+                "Now that you know the configuration files, let's talk about them. keep in mind that these files are located at <u>/etc/zako-web</u></br><ol style='list-style-type: decimal'>" +
+                "<li><b style='font-size: 15px'>Zako.cfg :</b></br>This file contains most of the configurations of the server such as ports, sockets timeout, SSL/TLS, scripts, Http authentication " +
+                "and ... . Zako.cfg contains comment for each configuration so we won't talk about it anymore.</li>" +
+                "</br><li><b style='font-size: 15px'>Load_Balancer.cfg :</b></br>This file contains servers which will be used by the Zako load balancer. You can enable load balancer in Zako.cfg</li>" +
+                "</br><li><b style='font-size: 15px'>MIME.cfg :</b></br>This files contains MIME types which server uses for Content-Type header. " +
+                "This file is based on extensions and can be modified.</li>" +
+                "</br><li><b style='font-size: 15px'>Hosts.cfg :</b></br>This file contains every host name that will be served by Zako. Host name is included in every Http request as " +
+                "Host header. This file uses xml format and tags are defined as below : <br/>" +
+                "<b style='font-size: 14px'>Name :</b> the name of the host. For example : example.com, example.com:3000</br>" +
+                "<b style='font-size: 14px'>Mode :</b> this tag indicates how server should react to this host name. This tag can have three values : " +
+                "<ol style='font-size: 13px'><li><b style='font-size: 14px'>Handle</b> : </br>Indicates that server should handle this host itself. If this option is chosen, then directories should be " +
+                "defined for this host and target tag should be left empty. (in case of Handle, server will ignore target tag anyway)</li>" +
+                "<li><b style='font-size: 14px'>Forward :</b></br>Indicates that server should forward requests for this host name to the address that has been written in target tag. Server" +
+                " will act as a proxy in this case.</li><li><b style='font-size: 14px'>Redirect :</b></br>Indicates that server should redirect requests for this host name to" +
+                " the address specified in target tag. (Directory tags are ignored in Forward and Redirect mode)</li></ol></br>" +
+                "<b style='font-size: 14px'>Target :</b> This tag contains the address that server forwards or redirects requests for this host name.</br>" +
+                "<b style='font-size: 14px'>...Dir :</b> Tags that end with 'Dir' are directories that server will use for this host name. If directories do not " +
+                "exist, server will create them automatically. Pay attention to the fact that entire RootDir and CGIDir will be visible to the client, so avoid putting" +
+                " files that should be hidden from client in those directories.</br>" +
+                "</br><li><b style='font-size: 15px'>API.cfg :</b></br> API.cfg contains configurations for forwarding a request to a specified path or assigning it to a file." +
+                "This file is based on regex so the syntax is : <blockquote>regex -> address or file</blockquote>" +
+                "For example we can forward request for example.com/blah to localhost:3000 by writing <blockquote>example.com/blah -> localhost:3000</blockquote> in API.cfg .</li>" +
+                "</br><li><b style='font-size: 15px'>Headers.cfg :</b></br> You can add custom headers based on extensions in this file. Server will add these custom headers to the default headers." +
+                "This file uses xml format as below :</br>" +
+                "<blockquote>&lt;Headers&gt;</br>" +
+                "&lt;rule ext=\".jpg , .png , .jpeg\"&gt;</br>" +
+                "&lt;Cache-Control&gt;max-age=60&lt;/Cache-Control&gt;</br>" +
+                "&lt;/rule&gt;</br>" +
+                "&lt;/Headers&gt;</blockquote></br>For every new custom header, you should add a new rule tag which has an attribute called 'ext' that contains" +
+                " all the extensions that this rule will apply to. You can add as many extension as you want by separating them with ',' . Then you can add " +
+                "custom headers by adding a new child to rule element. The child tag name should be the header name.</li>" +
+                "</ol></br>You did it! That was all you needed to know for configuring Zako to server your website(s). Oh and there is three more files which are basically files" +
+                " that contain some information for server to use. These files are located at <u>/etc/zako-web/sec</u> and they are :" +
+                "<ol style='list-style-type: decimal'><li><b style='font-size: 15px'>IP-Blacklist :</b> As you can tell by the name, this file contains ips that " +
+                "are banned from this website. The requests from these ips will be rejected with 403.</br></li>" +
+                "</br><li><b style='font-size: 15px'>ILPD :</b></br> ILPD stands for IPs for PUT and DELETE methods. Only ips that are mentioned in this file are allowed to use " +
+                "PUT and DELETE methods on this website. PUT and DELETE requests from other ips are rejected with 405.</li>" +
+                "</br><li><b style='font-size: 15px'>passwd :</b></br> This file contains user names and password that will be used for HTTP authentication. User names and their " +
+                "passwords are saved as key value pairs (username:pass). Example : Michael:12345</li></ol>" +
+                "<b>How does Zako view counter work?</b><blockquote>All the statistics related to views of a host name are saved in a file named " +
+                "\"views.json\". This file is located at every host names root directory. View counter can be configured in Zako.cfg .</blockquote></br>" +
+                "Hoooray! It's done and now you should be able to config Zako properly. If you have any question you can visit " +
+                "<a target='_blank' href='http://xako.ir'>our website</a>, we will be happy to see you there ;) .</br><p>Thanks again for choosing Zako! Good luck.</p>" +
+                "<button style='margin-top:25px;background-color: lightblue;color: darkblue;width: inherit;border-style: unset;border-radius: 10px' onclick='showAbout()'>Learn more about Zako</button>";
+            const zakoDiv = document.createElement("div");
+            const osLogo = document.createElement("img");
+            const span = document.createElement("span");
+            const zakoLogo = document.createElement("img");
+            zakoDiv.className = "zakoDiv";
+            osLogo.src = "data:image/png;base64,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";
+            zakoLogo.src = "data:image/png;base64,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";
+            span.innerHTML = "ZAKO";
+            span.style.marginLeft = "40px";
+            span.style.marginRight = "40px";
+            zakoDiv.append(osLogo,span,zakoLogo);
+            const headerDiv = document.getElementById("header");
+            document.body.insertBefore(zakoDiv,headerDiv);
+            headerDiv.removeAttribute("style");
+            headerDiv.className = "info_div";
+            headerDiv.style.backgroundColor = "white";
+            headerDiv.style.borderColor = "#581b1b";
+            const btns = document.getElementById("buttons");
+            if (btns != null)
+                btns.remove();
+            headerDiv.innerHTML = text;
+        }
+    </script>
+</body>
+</html>
