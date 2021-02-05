@@ -17,8 +17,8 @@ public class Interface {
         else status = false;
     }
 
-    public static boolean checkIP(String ip){
-        if (status) return core.trackIP(ip);
+    public static boolean checkIP(String ip,String hostName){
+        if (status) return core.trackIP(ip,hostName);
         else return true;
     }
 

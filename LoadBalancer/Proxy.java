@@ -33,7 +33,7 @@ public class Proxy extends Thread {
     public void run(){
         try{
             if (Perms.isIPAllowed(ip)){
-                if (Interface.checkIP(ip)) {
+                if (Interface.checkIP(ip,"Load balancer")) {
                     Logger.glog(ip + " request received. Forwarding to " + serverip,"not available");
                     new Piper(client.getInputStream(),server.getOutputStream(),client,server);
                     new Piper(server.getInputStream(),clientOut,client,server);

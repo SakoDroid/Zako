@@ -41,9 +41,11 @@ class Core {
 
     private class HandleWarnings extends Thread {
 
-        private String ip;
+        private final String ip;
+        private final String host;
 
-        public HandleWarnings (String ip){
+        public HandleWarnings (String ip,String hostName){
+            this.host = hostName;
             this.ip = ip;
             this.start();
         }
@@ -55,7 +57,7 @@ class Core {
         }
 
         private void addWarning(){
-            Logger.tlog("A warning has been added for " + ip);
+            Logger.tlog("A warning has been added for " + ip,host);
             if (warnings.get(ip) != null){
                 int wrn = warnings.get(ip);
                 warnings.replace(ip, ++wrn);
@@ -64,7 +66,7 @@ class Core {
 
         private void checkWarning(){
             if (warnings.get(ip) > 25){
-                Logger.tlog(ip + " warning numbers passed 25. ip has been blocked.");
+                Logger.tlog(ip + " warning numbers passed 25. ip has been blocked.",host);
                 Perms.addIPToBlackList(ip);
             }
         }
@@ -75,19 +77,19 @@ class Core {
         if (tmp != null) requests.get(ip)[1] += size;
     }
 
-    public boolean trackIP(String ip){
+    public boolean trackIP(String ip,String hostName){
         boolean perm = true;
         if (requests.get(ip) != null){
             requests.get(ip)[0]++;
             if (requests.get(ip)[0] > 150){
-                Logger.tlog("Possible DDOS or DOS attack detected from " + ip + ". Access has been disabled Temporarily . Tracking ip activity...");
+                Logger.tlog("Possible DDOS or DOS attack detected from " + ip + ". Access has been disabled Temporarily . Tracking ip activity...",hostName);
                 perm = false;
-                new HandleWarnings(ip);
+                new HandleWarnings(ip,hostName);
             }
             else if (requests.get(ip)[1] > 1500000000){
-                Logger.tlog("Possible DDOS or DOS attack detected from " + ip + ". Access has been disabled Temporarily . Tracking ip activity...");
+                Logger.tlog("Possible DDOS or DOS attack detected from " + ip + ". Access has been disabled Temporarily . Tracking ip activity...",hostName);
                 perm = false;
-                new HandleWarnings(ip);
+                new HandleWarnings(ip,hostName);
             }
         }else{
             long[] temp = {1,0};

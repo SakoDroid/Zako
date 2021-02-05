@@ -6,22 +6,24 @@ import java.util.Date;
 
 public class Logger {
 
-    private static String host;
     private static final SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss:SSS");
 
     private static class LoggerThread extends Thread{
 
+        private final String hostName;
         private final String log;
         private String filename;
         private final int logType;
 
-        public LoggerThread(String log,int logType){
+        public LoggerThread(String log,int logType,String host){
+            this.hostName = host;
             this.log = log;
             this.logType = logType;
             this.start();
         }
 
-        public LoggerThread(String log,int logType,String filename){
+        public LoggerThread(String log,int logType,String filename,String host){
+            this.hostName =  host;
             this.log = log;
             this.logType = logType;
             this.filename = filename;
@@ -38,62 +40,64 @@ public class Logger {
                 logDir = System.getProperty("user.dir") + "/Logs";
             switch (this.logType){
                 case 1 -> {
-                    String out = df.format(new Date()) + " | " + log + "\n------------------------------------\n";
+                    String out = df.format(new Date()) + " | " + hostName + " | " + log +
+                            "\n------------------------------------\n";
                     writeInFile(new File(logDir + "/access.log"),out);
                 }
                 case 2 -> {
-                    String out = df.format(new Date()) + " | " + log + "\n------------------------------------\n";
+                    String out = df.format(new Date()) + " | " + log +
+                            "\n------------------------------------\n";
                     writeInFile(new File(logDir + "/Internal-Logs.log"),out);
                 }
                 case 3 -> {
-                    String out = df.format(new Date()) + " | " + filename + " | " + log + "\n------------------------------------\n";
+                    String out = df.format(new Date()) + " | " + filename + " | "  + hostName + " | " + log +
+                            "\n------------------------------------\n";
                     writeInFile(new File(logDir + "/CGI-Logs.log"),out);
                 }
                 case 4 -> {
-                    String out = df.format(new Date()) + " | " + filename + " | " + log + "\n------------------------------------\n";
+                    String out = df.format(new Date()) + " | " + filename + " | " + hostName + " | " +  log +
+                            "\n------------------------------------\n";
                     writeInFile(new File(logDir + "/CGI-Errors.log"),out);
                 }
                 case 5 -> {
-                    String out = df.format(new Date()) + " | " + log + "\n------------------------------------\n";
+                    String out = df.format(new Date()) + " | " + hostName + " | " +  log +
+                            "\n------------------------------------\n";
                     writeInFile(new File(logDir + "/Threat.log"),out);
                 }
             }
         }
+
+        private void writeInFile(File fl,String data){
+            try(FileWriter glog = new FileWriter(fl,true)){
+                glog.write(data);
+                glog.flush();
+            }catch(Exception ex){
+                System.out.println(ex.toString());
+            }
+        }
     }
     public static void glog(String log,String hst){
-        host = hst;
-        Thread t = new LoggerThread(log,1);
+        new LoggerThread(log,1,hst);
     }
 
-    public static void tlog(String log){
-        Thread t = new LoggerThread(log,5);
+    public static void tlog(String log,String hst){
+        new LoggerThread(log,5,hst);
     }
 
     public static void ilog(String log){
-        if (!log.endsWith("Read timed out") && !log.endsWith("Socket closed")) new LoggerThread(log,2);
+        if (!log.endsWith("Read timed out") && !log.endsWith("Socket closed")) new LoggerThread(log,2,"");
     }
 
     public static void CGILog(String log,String filename,String hst){
-        host = hst;
-        Thread t = new LoggerThread(log,3,filename);
+        new LoggerThread(log,3,filename,hst);
     }
 
     public static void CGIError(String error,String filename,String hst){
-        host = hst;
-        Thread t = new LoggerThread(error,4,filename);
+        new LoggerThread(error,4,filename,hst);
     }
 
     public static void logException(Exception ex){
         new ExceptionLogger(ex);
-    }
-
-    private synchronized static void writeInFile(File fl,String data){
-        try(FileWriter glog = new FileWriter(fl,true)){
-            glog.write(data);
-            glog.flush();
-        }catch(Exception ex){
-            System.out.println(ex.toString());
-        }
     }
 
     private static class ExceptionLogger extends Thread{

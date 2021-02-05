@@ -182,7 +182,7 @@ public class RequestProcessor {
                 URL u = new URL(url);
                 req.getHeaders().replace("URL", u);
                 req.setURL(u);
-                Logger.glog(req.getIP() + "'s request is for " + u.getPath() + "; id = " + req.getID(), req.getHost());
+                Logger.glog(req.getIP() + "'s request is for ' " + u.getPath() + " '    ; id = " + req.getID(), req.getHost());
             }
         }catch(Exception ex){
             Logger.logException(ex);

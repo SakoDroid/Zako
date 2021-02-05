@@ -27,7 +27,7 @@ public class HttpListener extends Thread{
         try{
             Logger.glog(req.getFullip() + " Connected." + "  ; id = " + req.getID(), "not available");
             if (Perms.isIPAllowed(req.getIP())) {
-                if (Interface.checkIP(req.getIP())) {
+                if (Interface.checkIP(req.getIP(),req.getHost())) {
                     if (Runtime.getRuntime().freeMemory() > 1000) {
                         RequestProcessor rq = new RequestProcessor(req);
                         if (rq.stat == 1) new Response(rq, req);
