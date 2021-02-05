@@ -17,7 +17,7 @@ public class Writer {
         for (String host : writableCores.keySet()){
             String mainDir = Configs.getMainDir(host);
             if (mainDir == null)
-                mainDir = Configs.getLogsDir(host);
+                mainDir = Configs.getMainDir(host);
             File views  = new File(mainDir + "/views.json");
             if (!views.isFile()){
                 try{

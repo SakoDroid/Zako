@@ -7,10 +7,7 @@ import java.io.*;
 
 public class Proxy {
 
-    private final Socket client;
-
     public Proxy(String[] address, String read, Request req){
-        this.client = req.getSock();
         try{
             Socket s = new Socket(address[0], Integer.parseInt(address[1]));
             new Piper(read, req.is, s.getOutputStream(), s);
@@ -21,7 +18,7 @@ public class Proxy {
         }
     }
 
-    private class Piper extends Thread {
+    private static class Piper extends Thread {
 
         private String readReq;
         private final OutputStream out;

@@ -55,7 +55,6 @@ public class Configs {
                         HashMap<String, String> dirs = new HashMap<>();
                         dirs.put("Root", host.getElementsByTagName("RootDir").item(0).getTextContent().trim());
                         dirs.put("CGI", host.getElementsByTagName("CGIDir").item(0).getTextContent().trim());
-                        dirs.put("Logs", host.getElementsByTagName("LogsDir").item(0).getTextContent().trim());
                         dirs.put("Files", host.getElementsByTagName("TempFileUploadDir").item(0).getTextContent().trim());
                         Dirs.put(hostName, dirs);
                     }
@@ -153,14 +152,6 @@ public class Configs {
             return dirs.get("Root");
         else
             return getDef("Root");
-    }
-
-    public static String getLogsDir(String host){
-        HashMap<String,String> dirs = Dirs.get(host);
-        if (dirs != null)
-            return dirs.get("Logs");
-        else
-            return getDef("Logs");
     }
 
     public static String getCGIDir(String host){
