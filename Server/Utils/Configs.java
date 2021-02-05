@@ -84,9 +84,8 @@ public class Configs {
             dirs.put("Root", "/var/www/html");
             dirs.put("CGI", "/var/www/cgi-bin");
             dirs.put("Files", "/var/www/files");
+            Dirs.put("def",dirs);
         }
-        dirs.put("Logs",getCWD() + "/Logs");
-        Dirs.put("def",dirs);
     }
 
     private static void checkDirs(){

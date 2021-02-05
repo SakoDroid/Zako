@@ -11,9 +11,9 @@ public class Logger {
 
     private static class LoggerThread extends Thread{
 
-        private String log;
+        private final String log;
         private String filename;
-        private int logType;
+        private final int logType;
 
         public LoggerThread(String log,int logType){
             this.log = log;
@@ -30,26 +30,32 @@ public class Logger {
 
         @Override
         public void run(){
+            String logDir = "";
+            String platform = System.getProperty("os.name").toLowerCase();
+            if (platform.contains("linux"))
+                logDir = "/var/log/zako-web";
+            else if (platform.contains("windows"))
+                logDir = System.getProperty("user.dir") + "/Logs";
             switch (this.logType){
                 case 1 -> {
                     String out = df.format(new Date()) + " | " + log + "\n------------------------------------\n";
-                    writeInFile(new File(Configs.getLogsDir(host) + "/Access.log"),out);
+                    writeInFile(new File(logDir + "/access.log"),out);
                 }
                 case 2 -> {
                     String out = df.format(new Date()) + " | " + log + "\n------------------------------------\n";
-                    writeInFile(new File(Configs.getCWD() + "/Data/Internal-Logs.log"),out);
+                    writeInFile(new File(logDir + "/Internal-Logs.log"),out);
                 }
                 case 3 -> {
                     String out = df.format(new Date()) + " | " + filename + " | " + log + "\n------------------------------------\n";
-                    writeInFile(new File(Configs.getLogsDir(host) + "/CGI-Logs.log"),out);
+                    writeInFile(new File(logDir + "/CGI-Logs.log"),out);
                 }
                 case 4 -> {
                     String out = df.format(new Date()) + " | " + filename + " | " + log + "\n------------------------------------\n";
-                    writeInFile(new File(Configs.getLogsDir(host) + "/CGI-Errors.log"),out);
+                    writeInFile(new File(logDir + "/CGI-Errors.log"),out);
                 }
                 case 5 -> {
                     String out = df.format(new Date()) + " | " + log + "\n------------------------------------\n";
-                    writeInFile(new File(Configs.getLogsDir(host) + "/Threat.log"),out);
+                    writeInFile(new File(logDir + "/Threat.log"),out);
                 }
             }
         }
