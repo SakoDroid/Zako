@@ -48,14 +48,8 @@ public class Proxy {
             try{
                 if (readReq != null)
                     out.write(readReq.getBytes());
-                do{
-                    System.out.println("for");
-                    in.transferTo(out);
-                    System.out.println("done");
-                }
-                while (!client.isClosed());
+                in.transferTo(out);
             }catch(Exception ex){
-                System.out.println("ex");
                 try {
                     connection.close();
                 }catch (Exception ignored){}
