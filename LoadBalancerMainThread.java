@@ -1,8 +1,7 @@
-import LoadBalancer.Forwarder;
+import LoadBalancer.Proxy;
 import Server.Utils.Configs;
 import Server.Utils.Logger;
 import java.net.*;
-import java.nio.channels.ServerSocketChannel;
 
 public class LoadBalancerMainThread extends Thread{
 
@@ -15,7 +14,7 @@ public class LoadBalancerMainThread extends Thread{
         try{
             ServerSocket gate = new ServerSocket(Configs.getLBPort());
             Logger.ilog("Load balancer thread is now running on port " + Configs.getLBPort() + " ...");
-            while(true) new Forwarder(gate.accept());
+            while(true) new Proxy(gate.accept());
         }catch (Exception ex) {
             Logger.logException(ex);
         }

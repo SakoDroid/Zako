@@ -7,7 +7,7 @@ import Server.Utils.Configs;
 import java.net.*;
 import java.io.*;
 
-public class Forwarder extends Thread {
+public class Proxy extends Thread {
 
     private String serverip;
     private Socket client;
@@ -15,13 +15,11 @@ public class Forwarder extends Thread {
     private String ip;
     private DataOutputStream clientOut;
 
-    public Forwarder(Socket s){
+    public Proxy(Socket s){
         try {
             this.client = s;
-            this.client.setSoTimeout(Configs.timeout);
             String[] sv = Tracker.getServer();
             this.server = new Socket(sv[0],Integer.parseInt(sv[1]));
-            this.server.setSoTimeout(Configs.timeout);
             this.ip = s.getInetAddress().getHostAddress();
             this.serverip = sv[0];
             clientOut = new DataOutputStream(this.client.getOutputStream());

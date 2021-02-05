@@ -5,16 +5,16 @@ import Server.Utils.Logger;
 import java.net.Socket;
 import java.io.*;
 
-public class SubForwarder{
+public class Proxy {
 
     private final Socket client;
 
-    public SubForwarder(String[] address, String read, Request req){
+    public Proxy(String[] address, String read, Request req){
         this.client = req.getSock();
         try{
             Socket s = new Socket(address[0], Integer.parseInt(address[1]));
-            new Piper(read,req.is,s.getOutputStream(),s);
-            new Piper(s.getInputStream(),req.out,s);
+            new Piper(read, req.is, s.getOutputStream(), s);
+            new Piper(s.getInputStream(), req.out, s);
             Logger.glog("Forwarding request for " + req.getHost() + " from " + req.getIP() + " to " + address[0] + ":" + address[1],req.getHost());
         }catch(Exception ex){
             Logger.logException(ex);
@@ -48,10 +48,14 @@ public class SubForwarder{
             try{
                 if (readReq != null)
                     out.write(readReq.getBytes());
-                do
+                do{
+                    System.out.println("for");
                     in.transferTo(out);
-                while (!connection.isClosed() && !client.isClosed());
+                    System.out.println("done");
+                }
+                while (!client.isClosed());
             }catch(Exception ex){
+                System.out.println("ex");
                 try {
                     connection.close();
                 }catch (Exception ignored){}

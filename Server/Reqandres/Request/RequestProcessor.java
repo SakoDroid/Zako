@@ -3,7 +3,7 @@ package Server.Reqandres.Request;
 import Engines.DDOS.Interface;
 import Server.HttpListener;
 import Server.Method.Factory;
-import Server.Reqandres.SubForwarder;
+import Server.Reqandres.Proxy;
 import Server.Utils.*;
 import java.io.*;
 import java.net.URL;
@@ -118,8 +118,10 @@ public class RequestProcessor {
                                 }
                             } else {
                                 if (api.length > 1) {
+                                    req.getSock().setSoTimeout(0);
+                                    req.setHost(hostName);
                                     Logger.glog("request for API " + hostName + path + " received from " + req.getIP() + " .", hostName);
-                                    new SubForwarder(api, sb.substring(0, sb.length() - 2), req);
+                                    new Proxy(api, sb.substring(0, sb.length() - 2), req);
                                     this.stat = 0;
                                 } else {
                                     req.setHost(hostName);
@@ -128,8 +130,10 @@ public class RequestProcessor {
                                 }
                             }
                         } else if (status == 1) {
+                            req.getSock().setSoTimeout(0);
+                            req.setHost(hostName);
                             Logger.glog("request for " + hostName + " received from " + req.getIP() + " .", hostName);
-                            new SubForwarder(Configs.getForwardAddress(hostName), sb.substring(0, sb.length() - 2), req);
+                            new Proxy(Configs.getForwardAddress(hostName), sb.substring(0, sb.length() - 2), req);
                             this.stat = 0;
                         } else if (status == 2) {
                             basicUtils.redirect(307, Configs.getForwardAddress(hostName)[0], req);
