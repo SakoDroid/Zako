@@ -3,14 +3,20 @@ package Server.Utils.ViewCounter;
 import Server.Utils.JSON.JSONBuilder;
 import Server.Utils.JSON.JSONDocument;
 import java.io.File;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ViewCore {
 
     private long views = 0;
     private long views24 = 0;
     private long viewsWeek = 0;
-    private HashMap<String,Long> ipBasedViews;
+    private long viewsMonth = 0;
+    private long dayResetTime;
+    private long weekResetTime;
+    private long monthResetTime;
 
     public ViewCore(String rootAddress){
         this.load(rootAddress);
@@ -20,33 +26,41 @@ public class ViewCore {
         views ++;
         views24 ++;
         viewsWeek ++;
-        ipBasedViews.put(ip
-                , (ipBasedViews.containsKey(ip) ? ipBasedViews.get(ip) + 1 : 1)
-        );
+        viewsMonth ++;
     }
 
     private void load(String add){
         File vw = new File(add + "/views.json");
+        HashMap<String,Long> cfg;
         if (vw.isFile()){
             JSONBuilder builder = JSONBuilder.newInstance();
             HashMap data = (HashMap) builder.parse(vw).toJava();
             views = (Long) data.get("All views");
             views24 = (Long) data.get("Last day views");
             viewsWeek = (Long) data.get("Last week views");
-            ipBasedViews = (HashMap<String, Long>) data.get("IPs");
-        }else
-            ipBasedViews = new HashMap<>();
+            viewsMonth = (Long) data.get("Last month views");
+            cfg = (HashMap) data.get("Configs");
+        }else{
+            long currentTime = new Date().getTime();
+            cfg = new HashMap<>();
+            cfg.put("24",currentTime + (24L * 3600 * 1000));
+            cfg.put("7",currentTime + (7L * 24 * 3600 * 1000));
+            cfg.put("30",currentTime + (30L * 7 * 24 * 3600 * 1000));
+        }
+        startTimers(cfg);
     }
 
     public JSONDocument toJson(){
         HashMap data = new HashMap();
+        HashMap cfgs = new HashMap();
+        cfgs.put("24",dayResetTime);
+        cfgs.put("7",weekResetTime);
+        cfgs.put("30",monthResetTime);
         data.put("All views",views);
         data.put("Last day views",views24);
         data.put("Last week views",viewsWeek);
-        HashMap<String,Long> ips = new HashMap<>();
-        for (String ip : ipBasedViews.keySet())
-            ips.put(ip,ipBasedViews.get(ip));
-        data.put("IPs",ips);
+        data.put("Last month views",viewsMonth);
+        data.put("Configs",cfgs);
         return new JSONDocument(data);
     }
 
@@ -55,15 +69,78 @@ public class ViewCore {
         return "All views : " + views +
                 "\nviews24 : " + views24 +
                 "\nviews week : " + viewsWeek +
-                "\nips : " + ipBasedViews +
+                "\nview month : " + viewsMonth +
                 "\n--------------------------------------";
     }
 
-    public void reset24hViews(){
-        this.views24 = 0;
+    private void startTimers(HashMap<String,Long> configs){
+        startDayTimer(configs.get("24"));
+        startWeekTimer(configs.get("7"));
+        startMonthTimer(configs.get("30"));
     }
 
-    public void resetWeekViews(){
-        this.viewsWeek = 0;
+    private void startDayTimer(long time){
+        long currentTime = new Date().getTime();
+        if (currentTime >= time){
+            views24 = 0;
+            time = currentTime;
+        }
+        javax.swing.Timer writeTimer = new javax.swing.Timer(24 * 3600 * 1000,e -> {
+            dayResetTime = new Date().getTime() + (24 * 3600 * 1000);
+            views24 = 0;
+        });
+        java.util.Timer writeTtimer = new java.util.Timer(false);
+        writeTtimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                views24 = 0;
+                writeTimer.start();
+            }
+        },time - currentTime);
+    }
+
+    private void startWeekTimer(long time){
+        long currentTime = new Date().getTime();
+        if (currentTime >= time){
+            viewsWeek = 0;
+            time = currentTime;
+        }
+        javax.swing.Timer writeTimer = new javax.swing.Timer(7 * 24 * 3600 * 1000,e -> {
+            weekResetTime = new Date().getTime() + (7 * 24 * 3600 * 1000);
+            viewsWeek = 0;
+        });
+        java.util.Timer writeTtimer = new java.util.Timer(false);
+        writeTtimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                viewsWeek = 0;
+                writeTimer.start();
+            }
+        },time - currentTime);
+    }
+
+    private void startMonthTimer(long time){
+        long currentTime = new Date().getTime();
+        AtomicInteger day = new AtomicInteger(1);
+        if (currentTime >= time){
+            viewsMonth = 0;
+            time = currentTime;
+        }
+        javax.swing.Timer writeTimer = new javax.swing.Timer(7 * 24 * 3600 * 1000,e -> {
+            if (day.get() == 30){
+                viewsMonth = 0;
+                day.set(0);
+                monthResetTime = new Date().getTime() + (30L * 7 * 24 * 3600 * 1000);
+            }
+            else
+                day.getAndIncrement();
+        });
+        java.util.Timer writeTtimer = new java.util.Timer(false);
+        writeTtimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                writeTimer.start();
+            }
+        },time - currentTime);
     }
 }

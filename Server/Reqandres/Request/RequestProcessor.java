@@ -17,7 +17,7 @@ public class RequestProcessor {
 
     private final Request req;
     public Methods method;
-    public ArrayList<Byte> Body = new ArrayList();
+    public ArrayList<Byte> Body = new ArrayList<>();
     public int sit = 200;
     public int stat = 1;
     public boolean KA = false;
