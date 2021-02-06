@@ -1,7 +1,6 @@
 package Server.Utils.ViewCounter;
 
-import Server.Utils.JSON.JSONBuilder;
-import Server.Utils.JSON.JSONDocument;
+import Server.Utils.JSON.*;
 import java.io.File;
 import java.util.Date;
 import java.util.HashMap;
@@ -31,7 +30,7 @@ public class ViewCore {
 
     private void load(String add){
         File vw = new File(add + "/views.json");
-        HashMap<String,Long> cfg;
+        long currentTime = new Date().getTime();
         if (vw.isFile()){
             JSONBuilder builder = JSONBuilder.newInstance();
             HashMap data = (HashMap) builder.parse(vw).toJava();
@@ -39,15 +38,16 @@ public class ViewCore {
             views24 = (Long) data.get("Last day views");
             viewsWeek = (Long) data.get("Last week views");
             viewsMonth = (Long) data.get("Last month views");
-            cfg = (HashMap) data.get("Configs");
+            HashMap cfg = (HashMap) data.get("Configs");
+            dayResetTime = (Long) cfg.get("24");
+            weekResetTime = (Long) cfg.get("7");
+            monthResetTime = (Long) cfg.get("30");
         }else{
-            long currentTime = new Date().getTime();
-            cfg = new HashMap<>();
-            cfg.put("24",currentTime + (24L * 3600 * 1000));
-            cfg.put("7",currentTime + (7L * 24 * 3600 * 1000));
-            cfg.put("30",currentTime + (30L * 7 * 24 * 3600 * 1000));
+            dayResetTime = currentTime + (24 * 3600 * 1000);
+            weekResetTime = currentTime + (7 * 24 * 3600 * 1000);
+            monthResetTime = currentTime + (30L * 7 * 24 * 3600 * 1000);
         }
-        startTimers(cfg);
+        startTimers(currentTime);
     }
 
     public JSONDocument toJson(){
@@ -73,14 +73,13 @@ public class ViewCore {
                 "\n--------------------------------------";
     }
 
-    private void startTimers(HashMap<String,Long> configs){
-        startDayTimer(configs.get("24"));
-        startWeekTimer(configs.get("7"));
-        startMonthTimer(configs.get("30"));
+    private void startTimers(long ct){
+        startDayTimer(dayResetTime,ct);
+        startWeekTimer(weekResetTime,ct);
+        startMonthTimer(monthResetTime,ct);
     }
 
-    private void startDayTimer(long time){
-        long currentTime = new Date().getTime();
+    private void startDayTimer(long time,long currentTime){
         if (currentTime >= time){
             views24 = 0;
             time = currentTime;
@@ -99,8 +98,7 @@ public class ViewCore {
         },time - currentTime);
     }
 
-    private void startWeekTimer(long time){
-        long currentTime = new Date().getTime();
+    private void startWeekTimer(long time,long currentTime){
         if (currentTime >= time){
             viewsWeek = 0;
             time = currentTime;
@@ -119,8 +117,7 @@ public class ViewCore {
         },time - currentTime);
     }
 
-    private void startMonthTimer(long time){
-        long currentTime = new Date().getTime();
+    private void startMonthTimer(long time,long currentTime){
         AtomicInteger day = new AtomicInteger(1);
         if (currentTime >= time){
             viewsMonth = 0;
