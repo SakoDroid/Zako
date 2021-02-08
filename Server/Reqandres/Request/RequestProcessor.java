@@ -49,7 +49,6 @@ public class RequestProcessor {
                     req.getCacheFile().delete();
                 }
             } else {
-                req.out.flush();
                 req.getCacheFile().delete();
                 this.stat = 0;
             }
@@ -147,7 +146,6 @@ public class RequestProcessor {
                 }else
                     this.sit = 400;
             }else{
-                req.out.flush();
                 this.stat = 0;
                 KA = false;
             }

@@ -23,9 +23,7 @@ public class Piper extends Thread{
     @Override
     public void run(){
         try{
-            do
-                in.transferTo(out);
-            while (!connection1.isClosed() && !connection2.isClosed());
+            in.transferTo(out);
         }catch(Exception ex){
             try{
                 connection1.close();
