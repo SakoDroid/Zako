@@ -78,7 +78,7 @@ public class RequestProcessor {
         try{
             String line = this.readLine(req.is);
             if (line != null && line.length() > 5){
-                String path = "";
+                String path;
                 Pattern pathPattern = Pattern.compile(" /[^ ]*");
                 Matcher pathMatcher = pathPattern.matcher(line);
                 Pattern protPattern = Pattern.compile("HTTP/\\d[.]?\\d?");
@@ -104,8 +104,8 @@ public class RequestProcessor {
                     }
                     sb.append("\r\n").append(line).append("\r\n");
                     if (hostFound) {
-                        String hostName = line.split(":", 2)[1].trim()
-                                .replace("www.","");
+                        String hostName = URLDecoder.decode(line.split(":", 2)[1].trim()
+                                .replace("www.",""),StandardCharsets.UTF_8);
                         int status = Configs.getHostStatus(hostName);
                         if (status == 0) {
                             String[] api = APIConfigs.getAPIAddress(hostName + path);
