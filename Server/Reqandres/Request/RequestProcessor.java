@@ -28,13 +28,19 @@ public class RequestProcessor {
     }
 
     private void startProcessing(){
-        this.processRequest();
-        if (KA)
-            new HttpListener(req.getSock());
-        if (stat != 0)
-            this.continueProcess();
-        else
-            req.getCacheFile().delete();
+        if (ProxyConfigs.isOn){
+            Logger.glog("Proxy is on, request is being forwarded.","Not available");
+            req.setHost("Not available");
+            new Proxy(ProxyConfigs.getAddress(),null,req);
+        }else{
+            this.processRequest();
+            if (KA)
+                new HttpListener(req.getSock());
+            if (stat != 0)
+                this.continueProcess();
+            else
+                req.getCacheFile().delete();
+        }
     }
 
     private void continueProcess(){

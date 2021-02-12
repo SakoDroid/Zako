@@ -31,6 +31,8 @@ public class Loader {
         basicUtils.load();
         Logger.ilog("Loading ssl configurations ...");
         SSLConfigs.load();
+        Logger.ilog("Loading proxy configurations ...");
+        ProxyConfigs.load();
         FileTypes.load();
         Logger.ilog("Loading CAPTCHA configurations ...");
         CaptchaConfigs.load();
