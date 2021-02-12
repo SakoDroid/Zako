@@ -32,6 +32,7 @@ public class RequestProcessor {
             Logger.glog("Proxy is on, request is being forwarded.","Not available");
             req.setHost("Not available");
             new Proxy(ProxyConfigs.getAddress(),null,req);
+            this.stat = 0;
         }else{
             this.processRequest();
             if (KA)

@@ -24,7 +24,7 @@ public class ProxyConfigs {
         isOn = (Boolean) proxy.get("ON");
         if (isOn){
             String host = String.valueOf(proxy.get("Host"));
-            int port = (Integer) proxy.get("Port");
+            long port = (Long) proxy.get("Port");
             address = new String[]{host,String.valueOf(port)};
         }
     }
