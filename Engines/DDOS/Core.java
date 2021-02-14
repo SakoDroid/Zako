@@ -97,4 +97,8 @@ class Core {
         }
         return perm;
     }
+
+    public void addWarning(String ip, String host){
+        new HandleWarnings(ip,host);
+    }
 }

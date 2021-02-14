@@ -148,10 +148,14 @@ public class RequestProcessor {
                             req.setHost(hostName);
                             this.readRequest(sb.toString());
                         }
-                    } else
+                    } else{
                         this.sit = 400;
-                }else
+                        Interface.addWarning(req.getIP(),"Not available");
+                    }
+                }else{
                     this.sit = 400;
+                    Interface.addWarning(req.getIP(),"Not available");
+                }
             }else{
                 this.stat = 0;
                 KA = false;
@@ -250,7 +254,10 @@ public class RequestProcessor {
                         } else this.sit = 411;
                     }
                 }
-            } else this.sit = 400;
+            } else{
+                this.sit = 400;
+                Interface.addWarning(req.getIP(),req.getHost());
+            }
             fw.flush();
         }catch(Exception ex){
             Logger.logException(ex);

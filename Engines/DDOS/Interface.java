@@ -25,4 +25,9 @@ public class Interface {
     public static void addReqVol(String ip, long reqSize){
         if (core != null) core.increaseReqVol(ip,reqSize);
     }
+
+    public static void addWarning(String ip, String host){
+        if (core != null)
+            core.addWarning(ip,host);
+    }
 }
