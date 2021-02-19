@@ -19,7 +19,10 @@ public class Captcha {
 
     public Captcha(String ip,String host){
         Logger.glog("generating captcha for " + ip,host);
-        String ans = getRandomString(CaptchaConfigs.length);
+        int length = CaptchaConfigs.length;
+        if (length == 0)
+            length = rnd.nextInt(3) + 4;
+        String ans = getRandomString(length);
         image = getPicture(ans);
         Data.addRecord(ip,ans);
     }
