@@ -7,6 +7,7 @@ import java.util.HashMap;
 public class CaptchaConfigs {
 
     public static boolean ON;
+    public static boolean UCS;
     public static int length;
     public static int hardness;
     public static String CGA;
@@ -29,5 +30,6 @@ public class CaptchaConfigs {
         hardness =  Integer.parseInt(String.valueOf(cap.get("CAPTCHA hardness")));
         CGA = String.valueOf(cap.get("CGA"));
         CPA = String.valueOf(cap.get("CPA"));
+        UCS = (Boolean) cap.get("UCS");
     }
 }
