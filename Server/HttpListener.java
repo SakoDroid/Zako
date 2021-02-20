@@ -1,5 +1,6 @@
 package Server;
 
+import Engines.DDOS.CaptchaAuthentication;
 import Server.Reqandres.*;
 import Server.Reqandres.Request.Request;
 import Server.Reqandres.Request.RequestProcessor;
@@ -40,9 +41,7 @@ public class HttpListener extends Thread{
                     }
                 } else {
                     Logger.glog(req.getFullip() + " request rejected due to DDOS protection." + "  ; id = " + req.getID(), "not available");
-                    req.out.writeBytes(HTMLGen.genTooManyRequests(req.getIP()));
-                    req.out.flush();
-                    req.out.close();
+                    new CaptchaAuthentication(req).sendAuthPage();
                 }
             } else {
                 Logger.glog(req.getFullip() + " request rejected due to ip ban." + "  ; id = " + req.getID(), "not available");

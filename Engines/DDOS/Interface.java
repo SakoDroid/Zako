@@ -6,12 +6,10 @@ public class Interface {
 
     private static Core core;
     private static boolean status = true;
-    private static long time;
 
-    public static void load(boolean active,long tm){
+    public static void load(boolean active){
         if (active){
             core = new Core();
-            time = tm;
             Logger.ilog("DDOS protection is running ...");
         }
         else status = false;

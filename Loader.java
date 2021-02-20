@@ -47,7 +47,7 @@ public class Loader {
         JSONBuilder bld = JSONBuilder.newInstance();
         JSONDocument doc = bld.parse(fl);
         HashMap data = (HashMap) doc.toJava();
-        Interface.load((Boolean) data.get("DDOS Protection"), 200);
+        Interface.load((Boolean) data.get("DDOS Protection"));
         Logger.ilog("ALL OK!");
     }
 }
