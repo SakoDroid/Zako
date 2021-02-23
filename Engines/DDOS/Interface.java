@@ -28,4 +28,8 @@ public class Interface {
         if (core != null)
             core.addWarning(ip,host);
     }
+
+    public static void clearRecords(String ip){
+        core.clearRecord(ip);
+    }
 }

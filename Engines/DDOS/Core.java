@@ -101,4 +101,9 @@ class Core {
     public void addWarning(String ip, String host){
         new HandleWarnings(ip,host);
     }
+
+    public void clearRecord(String ip){
+        requests.get(ip)[0] = 0;
+        requests.get(ip)[1] = 0;
+    }
 }

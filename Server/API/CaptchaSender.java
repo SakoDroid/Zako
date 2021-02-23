@@ -1,17 +1,16 @@
 package Server.API;
 
-import Engines.Captcha.Data;
+import Engines.Captcha.Captcha;
 import Server.Reqandres.Request.Request;
 import Server.Reqandres.Request.RequestProcessor;
 import Server.Reqandres.Senders.FileSender;
-import Server.Utils.basicUtils;
 
-public class CapthaChecker implements API{
+public class CaptchaSender implements API{
     @Override
     public void init(Request req, RequestProcessor reqp) {
         FileSender fs = new FileSender(req.getProt(),200);
-        fs.setContentType("text/plain");
+        fs.setContentType("image/png");
         fs.setKeepAlive(false);
-        fs.send(Data.checkAnswer(req.getIP(),new String(basicUtils.toByteArray(reqp.Body))),req.out,req.getIP(),req.getID(),req.getHost());
+        fs.sendFile(req.getMethod(), new Captcha(req.getIP(),req.getHost()).image,req.out,req.getIP(),req.getID(),req.getHost());
     }
 }

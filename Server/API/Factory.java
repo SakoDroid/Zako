@@ -8,9 +8,9 @@ public class Factory {
         if (api.equals("/"))
             return new index();
         else if (api.equals(CaptchaConfigs.CGA))
-            return new CapthaSender();
+            return new CaptchaSender();
         else if (api.equals(CaptchaConfigs.CPA))
-            return new CapthaChecker();
+            return new CaptchaChecker();
         else
             return new Def();
     }
