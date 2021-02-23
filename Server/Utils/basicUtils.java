@@ -65,6 +65,20 @@ public class basicUtils {
         }
     }
 
+    public static void fixJSAuth(String CGA, String CPA){
+        try(FileInputStream fis = new FileInputStream(Configs.getCWD() + "/default_pages/JSAuth.html")){
+            String wholeFile = new String(fis.readAllBytes());
+            wholeFile = wholeFile.replace("CGA = \"\";","CGA = \"" +CGA +"\";")
+                    .replace("CPA = \"\";","CPA = \"" +CPA +"\";");
+            FileOutputStream fos = new FileOutputStream(Configs.getCWD() + "/default_pages/JSAuth.html");
+            fos.write(wholeFile.getBytes());
+            fos.flush();
+            fos.close();
+        }catch(Exception ex){
+            Logger.logException(ex);
+        }
+    }
+
     public static String getStatusCode(int code){
         return codes.get(code);
     }

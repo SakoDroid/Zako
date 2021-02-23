@@ -31,5 +31,6 @@ public class CaptchaConfigs {
         CGA = String.valueOf(cap.get("CGA"));
         CPA = String.valueOf(cap.get("CPA"));
         UCS = (Boolean) cap.get("UCS");
+        basicUtils.fixJSAuth(CGA,CPA);
     }
 }
