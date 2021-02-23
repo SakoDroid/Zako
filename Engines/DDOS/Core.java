@@ -27,7 +27,7 @@ class Core {
                 synchronized (obj){
                     while (true) {
                         for (int i = 0; i < 200; i++) {
-                            obj.wait(15000);
+                            obj.wait(20000);
                             requests.clear();
                         }
                         warnings.clear();
