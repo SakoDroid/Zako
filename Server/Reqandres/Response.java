@@ -22,7 +22,7 @@ public class Response {
             Logger.glog("Preparing response to " + request.getIP() + "  ; id = " + request.getID(), request.getHost());
             new View(request.getHost(),request.getIP());
             if (reqes.sit < 300)
-                Server.API.Factory.getAPI(request.getURL().getPath()).init(request, reqes);
+                Server.API.Factory.getAPI(request.Path).init(request, reqes);
             else
                 basicUtils.sendCode(reqes.sit,request);
         }catch (Exception ex) {
