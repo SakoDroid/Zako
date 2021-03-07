@@ -92,7 +92,10 @@ public class RequestProcessor {
                 Matcher protMatcher = protPattern.matcher(line);
                 if (pathMatcher.find() && protMatcher.find()){
                     path = URLDecoder.decode(pathMatcher.group().trim(), StandardCharsets.UTF_8);
-                    req.Path = path;
+                    Matcher mch = Pattern.compile("/[^?]+").matcher(path);
+                    if (mch.find())
+                        req.Path = mch.group();
+                    req.orgPath = path;
                     req.setProt(protMatcher.group());
                     StringBuilder sb = new StringBuilder();
                     sb.append(line);
@@ -187,7 +190,7 @@ public class RequestProcessor {
         try{
             if (this.method != Methods.CONNECT && this.method != Methods.OPTIONS) {
                 String prt = (String) req.getHeaders().get("Version");
-                String url = prt.split("/")[0] + "://" + req.getHost() + req.Path;
+                String url = prt.split("/")[0] + "://" + req.getHost() + req.orgPath;
                 URL u = new URL(url);
                 req.getHeaders().replace("URL", u);
                 req.setURL(u);
