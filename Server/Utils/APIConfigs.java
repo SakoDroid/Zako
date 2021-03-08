@@ -19,8 +19,7 @@ public class APIConfigs {
             apis.put(Pattern.compile(api[0].trim())
                     ,cleanURL(path).split(":"));
         else{
-            File fl = new File(path);
-            if (fl.exists())
+            if (new File(path).exists() || path.startsWith("/"))
                 apis.put(Pattern.compile(api[0].trim())
                         ,new String[]{path});
             else
