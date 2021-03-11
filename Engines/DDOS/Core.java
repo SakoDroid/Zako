@@ -26,7 +26,7 @@ class Core {
             try{
                 synchronized (obj){
                     while (true) {
-                        for (int i = 0; i < 200; i++) {
+                        for (int i = 0; i < 9000; i++) {
                             obj.wait(20000);
                             requests.clear();
                         }
