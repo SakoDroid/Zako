@@ -12,7 +12,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.regex.*;
 
-
 public class RequestProcessor {
 
     private final Request req;
@@ -67,6 +66,8 @@ public class RequestProcessor {
     private String readLine(InputStream in){
         StringBuilder sb = new StringBuilder();
         int i;
+        if (req.getSock().isClosed())
+            return null;
         try{
             i = in.read();
             if (i == -1) return null;
@@ -76,7 +77,13 @@ public class RequestProcessor {
                 if (i == -1) break;
             }
         }catch(Exception ex){
+            try {
+                req.getSock().close();
+            }catch (Exception ex2){
+                Logger.logException(ex2);
+            }
             Logger.logException(ex);
+            return null;
         }
         return sb.toString();
     }
