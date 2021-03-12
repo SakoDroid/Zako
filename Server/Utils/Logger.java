@@ -3,10 +3,14 @@ package Server.Utils;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 
 public class Logger {
 
     private static final SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss:SSS");
+    private static final String logDir = (System.getProperty("os.name").toLowerCase().contains("linux") ? "/var/log/zako-web" :
+            System.getProperty("user.dir") + "/Logs");
+    private static final SizeChecker sc = new SizeChecker();
 
     private static class LoggerThread extends Thread{
 
@@ -32,12 +36,6 @@ public class Logger {
 
         @Override
         public void run(){
-            String logDir = "";
-            String platform = System.getProperty("os.name").toLowerCase();
-            if (platform.contains("linux"))
-                logDir = "/var/log/zako-web";
-            else if (platform.contains("windows"))
-                logDir = System.getProperty("user.dir") + "/Logs";
             switch (this.logType){
                 case 1 -> {
                     String out = df.format(new Date()) + " | " + hostName + " | " + log +
@@ -98,6 +96,33 @@ public class Logger {
 
     public static void logException(Exception ex){
         new ExceptionLogger(ex);
+    }
+
+    private static class SizeChecker extends Thread{
+
+        private final Object obj = new Object();
+
+        public SizeChecker(){
+            this.start();
+        }
+
+        @Override
+        public void run(){
+            while (true){
+                for (String name : Objects.requireNonNull(new File(logDir).list())) {
+                    File fl = new File(logDir + "/" + name);
+                    if (fl.length() > 500 * 1000 * 1000)
+                        fl.delete();
+                }
+                synchronized (obj){
+                    try {
+                        obj.wait(3600 * 1000);
+                    }catch (Exception ex){
+                        logException(ex);
+                    }
+                }
+            }
+        }
     }
 
     private static class ExceptionLogger extends Thread{
