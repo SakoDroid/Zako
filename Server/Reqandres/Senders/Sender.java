@@ -120,6 +120,10 @@ public class Sender {
         Logger.glog("Sending response to " + ip + "  ; id = " + id,host);
         try{
             out.writeBytes(generateResponse(data));
+            if (!this.keepAlive) {
+                out.flush();
+                out.close();
+            }
             basicUtils.delID(id);
             Logger.glog(ip + "'s request handled successfully!" + "  ; id = " + id,host);
         }catch(Exception ex){

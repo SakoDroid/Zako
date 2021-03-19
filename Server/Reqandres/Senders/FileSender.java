@@ -42,6 +42,10 @@ public class FileSender extends Sender {
                 in.transferTo(out);
                 in.close();
             }
+            if (!this.keepAlive) {
+                out.flush();
+                out.close();
+            }
             Logger.glog(ip + "'s request handled successfully!" + "  ; id = " + id,host);
             basicUtils.delID(id);
         }catch(Exception ex){
@@ -55,6 +59,10 @@ public class FileSender extends Sender {
             out.writeBytes(generateHeaders(file.length));
             if(method != Methods.HEAD)
                 out.write(file);
+            if (!this.keepAlive) {
+                out.flush();
+                out.close();
+            }
             Logger.glog(ip + "'s request handled successfully!" + "  ; id = " + id,host);
             basicUtils.delID(id);
         }catch(Exception ex){
