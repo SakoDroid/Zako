@@ -16,7 +16,7 @@ public class PUT implements Method{
     @Override
     public int run(Request req, RequestProcessor reqp){
         try{
-            if(Perms.isIPAllowedForPUTAndDelete(req.getIP())){
+            if(Perms.isIPAllowedForPUTAndDelete(req.getIP(),req.getHost())){
                 RandomAccessFile bf = new RandomAccessFile(req.getCacheFile(),"r");
                 while(!bf.readLine().isEmpty()){}
                 File fl = new File(Configs.getMainDir(req.getHost()) + req.Path);

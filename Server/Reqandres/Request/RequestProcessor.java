@@ -125,7 +125,7 @@ public class RequestProcessor {
                                 .replace("www.",""),StandardCharsets.UTF_8);
                         int status = Configs.getHostStatus(hostName);
                         if (status == 0) {
-                            String[] api = APIConfigs.getAPIAddress(hostName + path);
+                            String[] api = APIConfigs.getAPIAddress(hostName + path,hostName);
                             if (api == null) {
                                 req.setHost(hostName);
                                 this.readRequest(sb.toString());

@@ -14,7 +14,7 @@ public class DELETE implements Method{
     @Override
     public int run(Request req, RequestProcessor reqp) {
         try{
-            if(Perms.isIPAllowedForPUTAndDelete(req.getIP())){
+            if(Perms.isIPAllowedForPUTAndDelete(req.getIP(), req.getHost())){
                 File fl = new File(Configs.getMainDir(req.getHost()) + req.Path);
                 if (fl.exists()) {
                     fl.delete();
