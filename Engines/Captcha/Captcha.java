@@ -11,6 +11,7 @@ import java.util.Random;
 public class Captcha {
 
     public byte[] image;
+    private final String host;
 
     private final char[] chars = {'a','A','b','B','0','c','1','C','d','D','e','E','2','f','F','g','G','h','3','H','i','I','4','j','J','k','K','l','L','5','m','M','n','N','o','O','p','6','P','q','Q',
             '7','r','R','s','S','t','8','T','u','U','v','9','V','w','W','x','X','y','Y','z','Z','0','1','2','3','4','5','6','7','8','9'};
@@ -19,12 +20,13 @@ public class Captcha {
 
     public Captcha(String ip,String host){
         Logger.glog("generating captcha for " + ip,host);
-        int length = CaptchaConfigs.length;
+        this.host = host;
+        int length = CaptchaConfigs.getLength(this.host);
         if (length == 0)
             length = rnd.nextInt(3) + 4;
         String ans = getRandomString(length);
         image = getPicture(ans);
-        Data.addRecord(ip,ans);
+        Data.addRecord(ip,ans,host);
     }
 
     private String getRandomString(int length){
@@ -37,7 +39,7 @@ public class Captcha {
 
     private byte[] getPicture(String cap){
         int mode = rnd.nextInt(3);
-        int hr = CaptchaConfigs.hardness;
+        int hr = CaptchaConfigs.getHardness(host);
         int startind = 20;
         BufferedImage img = new BufferedImage(140,80,BufferedImage.TYPE_INT_RGB);
         Graphics2D g = img.createGraphics();

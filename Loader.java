@@ -21,15 +21,13 @@ public class Loader {
                 Server.Utils.Configs.loadAHost(fl);
                 SSLConfigs.load(fl);
                 FileTypes.load(fl);
+                CaptchaConfigs.load(fl);
+                ScriptsConfigs.load(fl);
             }
         }
         Logger.ilog("Loading proxy configurations ...");
         System.out.println("Loading proxy configurations ...");
         ProxyConfigs.load();
-        Logger.ilog("Loading CAPTCHA configurations ...");
-        CaptchaConfigs.load();
-        Logger.ilog("Loading scripts configurations ...");
-        ScriptsConfigs.load();
         Logger.ilog("Loading permissions ...");
         Perms.load();
         Logger.ilog("Loading APIs configuration ...");

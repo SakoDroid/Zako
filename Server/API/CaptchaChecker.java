@@ -20,7 +20,7 @@ public class CaptchaChecker implements API{
         Pattern ptn = Pattern.compile("Target=[^&]+");
         Matcher mc = ptn.matcher(ans);
         if (mc.find()){
-            returnAns = Data.checkAnswer(req.getIP(),new String(basicUtils.toByteArray(reqp.Body)));
+            returnAns = Data.checkAnswer(req.getIP(),new String(basicUtils.toByteArray(reqp.Body)),req.getHost());
             new TargetChecker(mc.group(), returnAns, req.getIP());
         }
         fs.send(returnAns,req.out,req.getIP(),req.getID(),req.getHost());
