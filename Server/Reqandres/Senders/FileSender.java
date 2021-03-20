@@ -12,11 +12,11 @@ public class FileSender extends Sender {
         super(prot, status);
     }
 
-    private String generateHeaders(long contentLength){
+    private String generateHeaders(long contentLength,String host){
         String out = prot + " " + status + "\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako +
                 "\nContent-Length: " + contentLength + "\nContent-Type: " + contentType;
         if (ext != null)
-            out += FileTypes.getHeaders(ext);
+            out += FileTypes.getHeaders(ext,host);
         if (Double.parseDouble(prot.replace("HTTP/","")) < 2){
             if (keepAlive) out += "\nConnection: keep-alive";
             else out += "\nConnection: close";
@@ -36,7 +36,7 @@ public class FileSender extends Sender {
     public void sendFile(Methods method, File file, DataOutputStream out, String ip, int id, String host){
         Logger.glog("Sending requested file to " + ip + "   ; file name : " + file.getName() + "  ; id = " + id,host);
         try{
-            out.writeBytes(generateHeaders(file.length()));
+            out.writeBytes(generateHeaders(file.length(),host));
             if(method != Methods.HEAD){
                 FileInputStream in = new FileInputStream(file);
                 in.transferTo(out);
@@ -56,7 +56,7 @@ public class FileSender extends Sender {
     public void sendFile(Methods method, byte[] file, DataOutputStream out, String ip, int id, String host){
         Logger.glog("Sending a file (byte[]) to " + ip + "  ; id = " + id,host);
         try{
-            out.writeBytes(generateHeaders(file.length));
+            out.writeBytes(generateHeaders(file.length,host));
             if(method != Methods.HEAD)
                 out.write(file);
             if (!this.keepAlive) {

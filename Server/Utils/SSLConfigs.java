@@ -7,32 +7,38 @@ import java.util.HashMap;
 
 public class SSLConfigs {
 
-    public static boolean SSL;
-    private static String jks;
-    private static String pss;
+    private static final HashMap<String,SSLConfiguration> configs = new HashMap<>();
 
-    public static void load(){
-        File fl = null;
-        if (System.getProperty("os.name")
-                .toLowerCase().contains("windows"))
-            fl = new File(System.getProperty("user.dir") + "/Configs/Zako.cfg");
-        else if (System.getProperty("os.name")
-                .toLowerCase().contains("linux"))
-            fl = new File("/etc/zako-web/Zako.cfg");
+    public static void load(File fl){
         JSONBuilder bld = JSONBuilder.newInstance();
-        JSONDocument doc = bld.parse(fl);
+        JSONDocument doc = bld.parse(fl.getAbsolutePath() + "/Main.cfg");
         HashMap data = (HashMap) doc.toJava();
         HashMap ssl = (HashMap) data.get("SSL");
-        SSL = (Boolean) ssl.get("ON");
-        jks = (String) ssl.get("jks path");
-        pss = (String) ssl.get("jks pass");
+        configs.put(String.valueOf(data.get("Name")),new SSLConfiguration((Boolean) ssl.get("ON"),(String) ssl.get("jks path"),(String) ssl.get("jks pass")))
     }
 
-    public static String getJKS(){
-        return jks;
+    public static boolean isSSLOn(String host){
+        return configs.get(host).SSL;
     }
 
-    public static String getPass(){
-        return pss;
+    public static String getJKS(String host){
+        return configs.get(host).jks;
+    }
+
+    public static String getPass(String host){
+        return configs.get(host).pss;
+    }
+
+    private static class SSLConfiguration{
+
+        public final boolean SSL;
+        public final String jks;
+        public final String pss;
+
+        public SSLConfiguration(boolean ss, String jk, String ps){
+            SSL = ss;
+            jks = jk;
+            pss = ps;
+        }
     }
 }

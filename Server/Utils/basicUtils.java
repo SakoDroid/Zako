@@ -18,7 +18,7 @@ public class basicUtils {
     private static HashMap<String,String> execCmds;
     private static final ArrayList<Integer> ids = new ArrayList<>();
     private static final Random rnd = new Random();
-    public static String LocalHostIP = "", Zako = "Zako 1.1.4";
+    public static String LocalHostIP = "", Zako = "Zako 1.3.4";
 
     private basicUtils(){}
 
@@ -60,20 +60,6 @@ public class basicUtils {
                 LocalHostIP += (char)i;
             }
             LocalHostIP = LocalHostIP.strip().replace("\n","");
-        }catch(Exception ex){
-            Logger.logException(ex);
-        }
-    }
-
-    public static void fixJSAuth(String CGA, String CPA){
-        try(FileInputStream fis = new FileInputStream(Configs.getCWD() + "/default_pages/JSAuth.html")){
-            String wholeFile = new String(fis.readAllBytes());
-            wholeFile = wholeFile.replace("CGA = \"\";","CGA = \"" +CGA +"\";")
-                    .replace("CPA = \"\";","CPA = \"" +CPA +"\";");
-            FileOutputStream fos = new FileOutputStream(Configs.getCWD() + "/default_pages/JSAuth.html");
-            fos.write(wholeFile.getBytes());
-            fos.flush();
-            fos.close();
         }catch(Exception ex){
             Logger.logException(ex);
         }

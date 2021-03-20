@@ -3,6 +3,8 @@ package Server.Utils;
 import Server.Utils.JSON.*;
 import java.io.*;
 import java.util.HashMap;
+import java.util.Objects;
+
 import org.w3c.dom.*;
 import javax.xml.parsers.*;
 
@@ -12,68 +14,48 @@ public class Configs {
     private static final HashMap<String,HashMap<String,String>> Dirs = new HashMap<>();
     private static final HashMap<String,Integer> hostsStatus = new HashMap<>();
     private static final HashMap<String,String[]> targets = new HashMap<>();
+    private static final HashMap<String,Boolean> KAS = new HashMap<>();
+    private static final HashMap<String,Integer> timeOuts = new HashMap<>();
+    private static final HashMap<String,long[]> sizes = new HashMap<>();
+    private static final HashMap<String,Integer> ports = new HashMap<>();
 
+    public static final String baseAddress = (System.getProperty("os.name").toLowerCase().contains("linux") ?
+            "/etc/zako-web" :
+            "CFGS");
     private static boolean loadBalancer;
     private static boolean webServer;
-    private static int LBPort = 80;
-    private static int WSPort = 80;
-    private static long ViewCounterUpdate;
-
-    public static boolean ViewCounter;
     public static boolean autoUpdate;
-    public static boolean cache;
-    public static boolean keepAlive;
-    public static long generalSize = Long.MAX_VALUE;
-    public static long fileSize = Long.MAX_VALUE;
-    public static long postBodySize = Long.MAX_VALUE;
-    public static int timeout;
+    public static boolean BRS = true;
 
     private Configs(){}
 
-    private static void loadHosts(){
+    private static void loadHandle(HashMap data,String hostName){
         try{
-            File fl = null;
-            if (System.getProperty("os.name")
-                    .toLowerCase().contains("windows"))
-                fl = new File(System.getProperty("user.dir") + "/Configs/Hosts.cfg");
-            else if (System.getProperty("os.name")
-                    .toLowerCase().contains("linux"))
-                fl = new File("/etc/zako-web/Hosts.cfg");
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            Document doc = db.parse(fl);
-            NodeList nl = doc.getElementsByTagName("Host");
-            for (int i = 0 ; i < nl.getLength() ; i++){
-                Element host = (Element) nl.item(i);
-                String hostName = host.getElementsByTagName("Name").item(0).getTextContent().trim();
-                if (hostName.isEmpty())
-                    continue;
-                String mode =  host.getElementsByTagName("Mode").item(0).getTextContent().trim();
-                switch (mode) {
-                    case "Handle" -> {
-                        hostsStatus.put(hostName, 0);
-                        HashMap<String, String> dirs = new HashMap<>();
-                        dirs.put("Root", host.getElementsByTagName("RootDir").item(0).getTextContent().trim());
-                        dirs.put("CGI", host.getElementsByTagName("CGIDir").item(0).getTextContent().trim());
-                        dirs.put("Files", host.getElementsByTagName("TempFileUploadDir").item(0).getTextContent().trim());
-                        Dirs.put(hostName, dirs);
-                    }
-                    case "Forward" -> {
-                        hostsStatus.put(hostName, 1);
-                        String target = host.getElementsByTagName("Target").item(0).getTextContent().trim();
-                        String[] address = target.split(":");
-                        targets.put(hostName, ((address.length > 1) ? address : new String[]{address[0], "80"}));
-                    }
-                    case "Redirect" -> {
-                        hostsStatus.put(hostName, 2);
-                        targets.put(hostName, new String[]{host.getElementsByTagName("Target").item(0).getTextContent().trim()});
-                    }
+            String mode =  String.valueOf(data.get("Handle"));
+            switch (mode) {
+                case "Handle" -> {
+                    hostsStatus.put(hostName, 0);
+                    HashMap<String, String> dirs = new HashMap<>();
+                    dirs.put("Root", String.valueOf(data.get("RootDir")));
+                    dirs.put("CGI", String.valueOf(data.get("CGIDir")));
+                    dirs.put("Files", String.valueOf(data.get("TempFileUploadDir")));
+                    Dirs.put(hostName, dirs);
+                }
+                case "Forward" -> {
+                    hostsStatus.put(hostName, 1);
+                    String target = String.valueOf(data.get("Target"));
+                    String[] address = target.split(":");
+                    targets.put(hostName, ((address.length > 1) ? address : new String[]{address[0], "80"}));
+                }
+                case "Redirect" -> {
+                    hostsStatus.put(hostName, 2);
+                    targets.put(hostName, new String[]{String.valueOf(data.get("Target"))});
                 }
             }
         }catch(Exception ex){
             Logger.logException(ex);
         }
-        addDefaultSetback(Dirs.isEmpty());
+        //addDefaultSetback(Dirs.isEmpty());
         checkDirs();
     }
 
@@ -101,45 +83,37 @@ public class Configs {
         }
     }
 
-    private static void loadMain(){
+    public static void loadMain(){
         Logger.ilog("Loading main configs ...");
-        File fl = null;
-        if (System.getProperty("os.name")
-                .toLowerCase().contains("windows"))
-            fl = new File(System.getProperty("user.dir") + "/Configs/Zako.cfg");
-        else if (System.getProperty("os.name")
-                .toLowerCase().contains("linux"))
-            fl = new File("/etc/zako-web/Zako.cfg");
+        File fl = new File(baseAddress + "/Zako.cfg");
         JSONBuilder bld = JSONBuilder.newInstance();
         JSONDocument doc = bld.parse(fl);
         HashMap data = (HashMap) doc.toJava();
-        ViewCounter = (Boolean) data.get("View counter");
-        ViewCounterUpdate = (Long) data.get("View update frequency");
         autoUpdate = (Boolean) data.get("CFG Update");
-        keepAlive = (Boolean) data.get("Keep Alive");
-        cache = (Boolean) data.get("Cache Control");
         loadBalancer = (Boolean) data.get("Load Balancer");
         webServer = (Boolean) data.get("Web Server");
-        timeout = Integer.parseInt(String.valueOf(data.get("Sockets-Timeout")));
-        HashMap ports = (HashMap) data.get("Ports");
-        LBPort = Integer.parseInt(String.valueOf(ports.get("Load Balancer")));
-        WSPort = Integer.parseInt(String.valueOf(ports.get("Web Server")));
-        HashMap sizes = (HashMap) data.get("Sizes");
-        if (sizes.get("Post body") != null){
-            postBodySize = (int) sizes.get("Post body");
-        }
-        if (sizes.get("File size") != null){
-            fileSize = (int) sizes.get("File size");
-        }
-        HashMap auth = (HashMap) data.get("HTTP AUTH");
-        Server.HttpAuth.Interface.load((Boolean)auth.get("ON"));
+        BRS = (Boolean) data.get("BR Sensitivity");
     }
 
-    public static void load(){
-        loadMain();
-        loadHosts();
-        if (ViewCounter)
-            Server.Utils.ViewCounter.Controller.load(Dirs,ViewCounterUpdate);
+    public static void loadAHost(File dir){
+        HashMap mainData = (HashMap) JSONBuilder.newInstance().parse(new File(dir.getAbsolutePath() + "/Main.cfg")).toJava();
+        String name = String.valueOf(mainData.get("Name"));
+        loadHandle((HashMap) mainData.get("Reaction"),name);
+        KAS.put(name,(Boolean) mainData.get("Keep Alive"));
+        ports.put(name,(int) mainData.get("Port"));
+        if (KAS.get(name))
+            timeOuts.put(name,0);
+        else
+            timeOuts.put(name,(int) mainData.get("Sockets-Timeout"));
+        HashMap szs = (HashMap) mainData.get("Sizes");
+        Long pb = (Long) szs.get("Post body");
+        Long fs = (Long) szs.get("File size");
+        long[] szss = new long[]{Long.MAX_VALUE,Long.MIN_VALUE};
+        if (pb != null)
+            szss[0] = pb;
+        if (fs != null)
+            szss[1] = fs;
+        sizes.put(name,szss);
     }
 
     public static String getDef(String key){
@@ -180,9 +154,9 @@ public class Configs {
 
     public static boolean isWSOn(){return webServer;}
 
-    public static int getLBPort(){return LBPort;}
-
-    public static int getWSPort(){return WSPort;}
+    public static HashMap<String,Integer> getPorts() {
+        return ports;
+    }
 
     public static int getHostStatus(String host){
         if (hostsStatus.get(host) != null) return hostsStatus.get(host);
@@ -191,6 +165,22 @@ public class Configs {
 
     public static String[] getForwardAddress(String host){
         return targets.get(host);
+    }
+
+    public static boolean getKeepAlive(String host){
+        return KAS.get(host);
+    }
+
+    public static int getTimeOut(String host){
+        return timeOuts.get(host);
+    }
+
+    public static long getPostBodySize(String host){
+        return sizes.get(host)[0];
+    }
+
+    public static long getFileSize(String host){
+        return sizes.get(host)[1];
     }
 
 }

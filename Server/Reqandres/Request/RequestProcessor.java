@@ -160,11 +160,13 @@ public class RequestProcessor {
                         }
                     } else{
                         this.sit = 400;
-                        Interface.addWarning(req.getIP(),"Not available");
+                        if (Configs.BRS)
+                            Interface.addWarning(req.getIP(),"Not available");
                     }
                 }else{
                     this.sit = 400;
-                    Interface.addWarning(req.getIP(),"Not available");
+                    if (Configs.BRS)
+                        Interface.addWarning(req.getIP(),"Not available");
                 }
             }else{
                 this.stat = 0;
@@ -189,7 +191,7 @@ public class RequestProcessor {
         Object cnc = req.getHeaders().get("Connection");
         if (cnc != null) {
             String con = (String) cnc;
-            KA = Configs.keepAlive && !con.trim().equals("close");
+            KA = Configs.getKeepAlive(req.getHost()) && !con.trim().equals("close");
         } else KA = false;
     }
 
@@ -253,7 +255,7 @@ public class RequestProcessor {
                     if (this.method == Methods.POST || this.method == Methods.PUT) {
                         if (req.getHeaders().get("Content-Length") != null) {
                             int length = Integer.parseInt((String) req.getHeaders().get("Content-Length"));
-                            if (length < Configs.postBodySize) {
+                            if (length < Configs.getPostBodySize(req.getHost())) {
                                 try {
                                     //Reads the body
                                     fw.write(req.is.readNBytes(length + 1));
@@ -313,7 +315,7 @@ public class RequestProcessor {
                                     break;
                                 }
                             }
-                            if (off - on < Configs.fileSize) files.add(file);
+                            if (off - on < Configs.getFileSize(req.getHost())) files.add(file);
                         }else if (namemc.find()){
                             bf.readLine();
                             String val = bf.readLine();

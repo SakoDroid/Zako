@@ -18,7 +18,7 @@ public class Def implements API{
         File fl;
         if (!ext.isEmpty()){
             if (!ext.equals(".js")) {
-                String tempCntc = FileTypes.getContentType(ext);
+                String tempCntc = FileTypes.getContentType(ext,req.getHost());
                 if (tempCntc != null) {
                     if (tempCntc.equals("CGI")) {
                         new ScriptHandler(req, ext).process(basicUtils.toByteArray(reqp.Body),reqp.KA);
@@ -51,7 +51,7 @@ public class Def implements API{
     private void sendFile(File fl,String ext,Request req,boolean ka){
         if (fl.isFile()) {
             FileSender fs = new FileSender(req.getProt(), 200);
-            fs.setContentType(FileTypes.getContentType(ext));
+            fs.setContentType(FileTypes.getContentType(ext,req.getHost()));
             fs.setExtension(ext);
             fs.setKeepAlive(ka);
             fs.sendFile(req.getMethod(), fl, req.out, req.getIP(), req.getID(), req.getHost());
