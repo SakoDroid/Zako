@@ -10,22 +10,6 @@ import Server.Utils.JSON.JSONDocument;
 
 public class Loader {
 
-    public static boolean autoRs;
-    private static File fl = null;
-
-    public static void loadRs(){
-        if (System.getProperty("os.name")
-                .toLowerCase().contains("windows"))
-            fl = new File(System.getProperty("user.dir") + "/Configs/Zako.cfg");
-        else if (System.getProperty("os.name")
-                .toLowerCase().contains("linux"))
-            fl = new File("/etc/zako-web/Zako.cfg");
-        JSONBuilder bld = JSONBuilder.newInstance();
-        JSONDocument doc = bld.parse(fl);
-        HashMap data = (HashMap) doc.toJava();
-        autoRs = (Boolean) data.get("Auto Restart");
-    }
-
     public static void load(){
         Logger.ilog("Loading basic utilities ...");
         basicUtils.load();
@@ -45,7 +29,9 @@ public class Loader {
         Logger.ilog("Loading APIs configuration ...");
         APIConfigs.load();
         JSONBuilder bld = JSONBuilder.newInstance();
-        JSONDocument doc = bld.parse(fl);
+        JSONDocument doc = bld.parse(new File((System.getProperty("os.name").toLowerCase().contains("linux") ?
+                "/etc/zako-web/Zako.cfg" :
+                "CFGS/Zako.cfg")));
         HashMap data = (HashMap) doc.toJava();
         Interface.load((Boolean) data.get("DDOS Protection"));
         Logger.ilog("ALL OK!");
