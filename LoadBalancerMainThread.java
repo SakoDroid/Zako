@@ -18,7 +18,6 @@ public class LoadBalancerMainThread extends Thread{
         }catch (Exception ex) {
             Logger.logException(ex);
         }
-
         Logger.ilog("Load balancer is shutting down ...");
     }
 

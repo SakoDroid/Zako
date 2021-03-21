@@ -23,19 +23,18 @@ public class Loader {
                 FileTypes.load(fl);
                 CaptchaConfigs.load(fl);
                 ScriptsConfigs.load(fl);
+                Perms.load(fl);
+                APIConfigs.load(fl);
             }
         }
+        Logger.ilog("Loading ip blacklist ...");
+        System.out.println("Loading ip blacklist ...");
+        Perms.loadBlackList();
         Logger.ilog("Loading proxy configurations ...");
         System.out.println("Loading proxy configurations ...");
         ProxyConfigs.load();
-        Logger.ilog("Loading permissions ...");
-        Perms.load();
-        Logger.ilog("Loading APIs configuration ...");
-        APIConfigs.load();
         JSONBuilder bld = JSONBuilder.newInstance();
-        JSONDocument doc = bld.parse(new File((System.getProperty("os.name").toLowerCase().contains("linux") ?
-                "/etc/zako-web/Zako.cfg" :
-                "CFGS/Zako.cfg")));
+        JSONDocument doc = bld.parse(new File(Configs.baseAddress + "/Zako.cfg"));
         HashMap data = (HashMap) doc.toJava();
         Interface.load((Boolean) data.get("DDOS Protection"));
         Logger.ilog("Loading basic utilities ...");

@@ -14,7 +14,7 @@ public class SSLConfigs {
         JSONDocument doc = bld.parse(fl.getAbsolutePath() + "/Main.cfg");
         HashMap data = (HashMap) doc.toJava();
         HashMap ssl = (HashMap) data.get("SSL");
-        configs.put(String.valueOf(data.get("Name")),new SSLConfiguration((Boolean) ssl.get("ON"),(String) ssl.get("jks path"),(String) ssl.get("jks pass")))
+        configs.put(String.valueOf(data.get("Name")),new SSLConfiguration((Boolean) ssl.get("ON"),(String) ssl.get("jks path"),(String) ssl.get("jks pass")));
     }
 
     public static boolean isSSLOn(String host){

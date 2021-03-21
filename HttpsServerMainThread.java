@@ -7,7 +7,12 @@ import java.net.Socket;
 
 public class HttpsServerMainThread{
 
-    public HttpsServerMainThread(){
+    private final int port;
+    private final String host;
+
+    public HttpsServerMainThread(int port,String host){
+        this.port = port;
+        this.host = host;
         new HTTPS();
         new HTTP();
     }
@@ -62,12 +67,12 @@ public class HttpsServerMainThread{
         @Override
         public void run () {
             try {
-                System.setProperty("javax.net.ssl.keyStore", SSLConfigs.getJKS());
-                System.setProperty("javax.net.ssl.keyStorePassword", SSLConfigs.getPass());
+                System.setProperty("javax.net.ssl.keyStore", SSLConfigs.getJKS(host));
+                System.setProperty("javax.net.ssl.keyStorePassword", SSLConfigs.getPass(host));
                 SSLServerSocketFactory sslServerSocketfactory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
-                SSLServerSocket sslServerSocket = (SSLServerSocket) sslServerSocketfactory.createServerSocket(Configs.getWSPort());
-                Logger.ilog("Https server thread is now running (jks : " + SSLConfigs.getJKS() + " ,, jks pass : " + SSLConfigs.getPass() + ") ...");
-                while (true) new HttpListener((SSLSocket) sslServerSocket.accept());
+                SSLServerSocket sslServerSocket = (SSLServerSocket) sslServerSocketfactory.createServerSocket(port);
+                Logger.ilog("Https server thread is now running (jks : " + SSLConfigs.getJKS(host) + " ,, jks pass : " + SSLConfigs.getPass(host) + ") ...");
+                while (true) new HttpListener((SSLSocket) sslServerSocket.accept(),host);
             } catch (Exception ex) {
                 Logger.logException(ex);
             }

@@ -119,6 +119,11 @@ public class basicUtils {
     }
 
     public static void killPrcs(){
+        for (String host : Configs.getPorts().keySet())
+            killPrc(host);
+    }
+
+    public static void killPrc(String host){
         ArrayList<String> commands;
         String platform = System.getProperty("os.name");
         try{
@@ -136,14 +141,14 @@ public class basicUtils {
                 }
             }
             if (Configs.isWSOn()){
-                commands = getCheckCmd(Configs.getWSPort());
+                commands = getCheckCmd(Configs.getPorts().get(host));
                 ProcessBuilder pb = new ProcessBuilder(commands);
                 Process p = pb.start();
                 InputStream in = p.getInputStream();
                 String prcs = new String(in.readAllBytes());
                 if (!prcs.isEmpty()){
                     if (platform.toLowerCase().contains("linux"))
-                        killLinux(Configs.getWSPort());
+                        killLinux(Configs.getPorts().get(host));
                     else if (platform.toLowerCase().contains("windows"))
                         killWindows(prcs);
                 }

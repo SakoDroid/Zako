@@ -1,6 +1,8 @@
 import LoadBalancer.Reporter;
 import Server.Utils.*;
 
+import java.util.HashSet;
+
 public class Main extends Thread{
 
     @Override
@@ -17,9 +19,21 @@ public class Main extends Thread{
                 LoadBalancer.Configs.load();
                 new LoadBalancerMainThread();
             }
-            if (Configs.isWSOn()){
-                if (SSLConfigs.SSL) new HttpsServerMainThread();
-                else new HttpServerMainThread();
+            HashSet<Integer> openedHttpPorts = new HashSet<>();
+            boolean sslSocketOpened = false;
+            for (String host : Configs.getPorts().keySet()){
+                int port = Configs.getPorts().get(host);
+                if (!openedHttpPorts.contains(port)){
+                    openedHttpPorts.add(port);
+                    if (SSLConfigs.isSSLOn(host)){
+                        if (!sslSocketOpened){
+                            sslSocketOpened = true;
+                            new HttpsServerMainThread(port,host);
+                        }else
+                            Logger.ilog("Error! Cant serve more than two https enabled web sites on one port.");
+                    }else
+                        new HttpServerMainThread(port);
+                }
             }
         } catch (Exception ex) {
             Logger.logException(ex);

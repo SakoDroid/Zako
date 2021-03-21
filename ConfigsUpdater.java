@@ -1,3 +1,4 @@
+import Server.Utils.Configs;
 import Server.Utils.JSON.JSONBuilder;
 import Server.Utils.Logger;
 import java.io.File;
@@ -13,15 +14,8 @@ public class ConfigsUpdater extends Thread{
 
     @Override
     public void run(){
-        File fl = null;
-        if (System.getProperty("os.name")
-                .toLowerCase().contains("windows"))
-            fl = new File(System.getProperty("user.dir") + "/Configs/Zako.cfg");
-        else if (System.getProperty("os.name")
-                .toLowerCase().contains("linux"))
-            fl = new File("/etc/zako-web/Zako.cfg");
         HashMap data = (HashMap) JSONBuilder.newInstance()
-                .parse(fl)
+                .parse(new File(Configs.baseAddress + "/Zako.cfg"))
                 .toJava();
         long time = (Long) data.get("CFG Update period");
         while (true){

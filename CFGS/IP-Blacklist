@@ -2,4 +2,5 @@
 #  Zako server ip blacklist. (since 0.1)                                                            #
 #                                                                                                   #
 #  This file contains the ips that are not allowed to connect to the website.                       #
-#####################################################################################################s
+#  Any ip added to this list will blocked from accessing any host served by this web server.        #
+#####################################################################################################

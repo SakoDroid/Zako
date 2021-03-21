@@ -30,7 +30,6 @@ public class Request {
         this.fullip = client.getRemoteSocketAddress().toString();
         this.TempFile = new File(Configs.getCWD() + "/Temp/temp" + id + ".tmp");
         try{
-            this.sck.setSoTimeout(Configs.timeout);
             this.is = client.getInputStream();
             this.out = new DataOutputStream(client.getOutputStream());
         }catch(Exception ex){
@@ -76,6 +75,11 @@ public class Request {
 
     public void setHost(String host){
         this.Host = host;
+        try {
+            this.sck.setSoTimeout(Configs.getTimeOut(host));
+        }catch (Exception ex){
+            Logger.logException(ex);
+        }
     }
 
     public String getHost(){

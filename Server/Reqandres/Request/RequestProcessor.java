@@ -35,7 +35,7 @@ public class RequestProcessor {
         }else{
             this.processRequest();
             if (KA)
-                new HttpListener(req.getSock());
+                new HttpListener(req.getSock(),"Not available");
             if (stat != 0)
                 this.continueProcess();
             else

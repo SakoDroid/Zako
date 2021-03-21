@@ -3,6 +3,7 @@ package Server.Utils;
 import Server.Utils.JSON.*;
 import java.io.*;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Objects;
 
 import org.w3c.dom.*;
@@ -18,7 +19,9 @@ public class Configs {
     private static final HashMap<String,Integer> timeOuts = new HashMap<>();
     private static final HashMap<String,long[]> sizes = new HashMap<>();
     private static final HashMap<String,Integer> ports = new HashMap<>();
+    private static final HashSet<String> availableHosts = new HashSet<>();
 
+    private static int LBPort;
     public static final String baseAddress = (System.getProperty("os.name").toLowerCase().contains("linux") ?
             "/etc/zako-web" :
             "CFGS");
@@ -93,6 +96,7 @@ public class Configs {
         loadBalancer = (Boolean) data.get("Load Balancer");
         webServer = (Boolean) data.get("Web Server");
         BRS = (Boolean) data.get("BR Sensitivity");
+        LBPort = (Integer) data.get("Load Balancer Port");
     }
 
     public static void loadAHost(File dir){
@@ -114,6 +118,7 @@ public class Configs {
         if (fs != null)
             szss[1] = fs;
         sizes.put(name,szss);
+        availableHosts.add(name);
     }
 
     public static String getDef(String key){
@@ -181,6 +186,14 @@ public class Configs {
 
     public static long getFileSize(String host){
         return sizes.get(host)[1];
+    }
+
+    public static boolean isHostAvailable(String host){
+        return availableHosts.contains(host);
+    }
+
+    public static int getLBPort(){
+        return LBPort;
     }
 
 }
