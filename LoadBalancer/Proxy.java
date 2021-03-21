@@ -59,6 +59,6 @@ public class Proxy extends Thread {
     private void sendCode(int code){
         FileSender fs = new FileSender("HTTP/1.1",code);
         fs.setContentType("text/html");
-        fs.sendFile(Methods.GET,new File(Configs.getCWD() + "/default_pages/" + code + ".html"),clientOut,ip,0,"NA");
+        fs.sendFile(Methods.GET,new File(Configs.getCWD() + "/default_pages/" + code + ".html"),clientOut,ip,0,"default");
     }
 }

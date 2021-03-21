@@ -102,7 +102,7 @@ public class basicUtils {
         FileSender fs = new FileSender(req.getProt(),code);
         fs.setContentType("text/html");
         fs.setExtension(".html");
-        fs.sendFile(Methods.GET,new File(Configs.getCWD() + "/default_pages/" + code + ".html"),req.out,req.getIP(),req.getID(),"NA");
+        fs.sendFile(Methods.GET,new File(Configs.getCWD() + "/default_pages/" + code + ".html"),req.out,req.getIP(),req.getID(), req.getHost());
     }
 
     public static void redirect(int code,String location, Request req){
@@ -112,7 +112,7 @@ public class basicUtils {
             req.out.flush();
             req.out.close();
             basicUtils.delID(req.getID());
-            Logger.glog(req.getIP() + "'s request redirected to " + location + "!" + "  ; id = " + req.getID(),"NA");
+            Logger.glog(req.getIP() + "'s request redirected to " + location + "!" + "  ; id = " + req.getID(),req.getHost());
         }catch(Exception ex){
             Logger.logException(ex);
         }

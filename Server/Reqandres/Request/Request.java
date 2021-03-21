@@ -29,6 +29,7 @@ public class Request {
         this.ip = client.getInetAddress().getHostAddress();
         this.fullip = client.getRemoteSocketAddress().toString();
         this.TempFile = new File(Configs.getCWD() + "/Temp/temp" + id + ".tmp");
+        this.setHost("default");
         try{
             this.is = client.getInputStream();
             this.out = new DataOutputStream(client.getOutputStream());

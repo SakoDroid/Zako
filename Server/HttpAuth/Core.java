@@ -30,7 +30,7 @@ public class Core {
         loadPasswd();
         HashMap data = (HashMap) JSONBuilder
                 .newInstance()
-                .parse(fl.getAbsolutePath() + "/Main.cfg")
+                .parse(new File(fl.getAbsolutePath() + "/Main.cfg"))
                 .toJava();
         HashMap authCfg = (HashMap) data.get("HTTP AUTH");
         String mech = String.valueOf(authCfg.get("Auth mechanism"));

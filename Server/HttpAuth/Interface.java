@@ -15,7 +15,7 @@ public class Interface {
     private Interface(){
         File fl = new File(Configs.baseAddress);
         for (String li : Objects.requireNonNull(fl.list())) {
-            File dir = new File(Configs.baseAddress + "/li");
+            File dir = new File(Configs.baseAddress + "/" + li);
             if (dir.isDirectory())
                 cores.put(li,new Core(dir));
         }
