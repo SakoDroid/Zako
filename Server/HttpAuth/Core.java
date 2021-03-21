@@ -54,7 +54,7 @@ public class Core {
                     if (!line.startsWith("#") && !line.isEmpty()) {
                         String[] entry = line.split(":");
                         if (entry.length > 1)
-                            passwd.put(entry[0], entry[1]);
+                            passwd.put(entry[0].trim(), entry[1].trim());
                     }
                 }
             }
@@ -92,9 +92,9 @@ public class Core {
         String[] usPass = entry.split(":",2);
         if (usPass.length > 1){
             String pass = passwd.get(usPass[0]);
-            if (pass != null) {
+            if (pass != null)
                 return pass.equals(usPass[1]);
-            } else
+            else
                 return false;
         }else
             return false;
