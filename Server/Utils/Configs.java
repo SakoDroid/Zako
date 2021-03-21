@@ -12,15 +12,10 @@ import javax.xml.parsers.*;
 public class Configs {
 
     //Status 0 means handle, 1 means forward, 2 means redirect.
-    private static final HashMap<String,HashMap<String,String>> Dirs = new HashMap<>();
-    private static final HashMap<String,Integer> hostsStatus = new HashMap<>();
-    private static final HashMap<String,String[]> targets = new HashMap<>();
-    private static final HashMap<String,Boolean> KAS = new HashMap<>();
-    private static final HashMap<String,Integer> timeOuts = new HashMap<>();
-    private static final HashMap<String,long[]> sizes = new HashMap<>();
+
+    private static final HashMap<String,Config> configs = new HashMap<>();
     private static final HashMap<String,Integer> ports = new HashMap<>();
     private static final HashSet<String> availableHosts = new HashSet<>();
-
     private static int LBPort;
     public static final String baseAddress = (System.getProperty("os.name").toLowerCase().contains("linux") ?
             "/etc/zako-web" :
@@ -32,60 +27,6 @@ public class Configs {
 
     private Configs(){}
 
-    private static void loadHandle(HashMap data,String hostName){
-        try{
-            String mode =  String.valueOf(data.get("Handle"));
-            switch (mode) {
-                case "Handle" -> {
-                    hostsStatus.put(hostName, 0);
-                    HashMap<String, String> dirs = new HashMap<>();
-                    dirs.put("Root", String.valueOf(data.get("RootDir")));
-                    dirs.put("CGI", String.valueOf(data.get("CGIDir")));
-                    dirs.put("Files", String.valueOf(data.get("TempFileUploadDir")));
-                    Dirs.put(hostName, dirs);
-                }
-                case "Forward" -> {
-                    hostsStatus.put(hostName, 1);
-                    String target = String.valueOf(data.get("Target"));
-                    String[] address = target.split(":");
-                    targets.put(hostName, ((address.length > 1) ? address : new String[]{address[0], "80"}));
-                }
-                case "Redirect" -> {
-                    hostsStatus.put(hostName, 2);
-                    targets.put(hostName, new String[]{String.valueOf(data.get("Target"))});
-                }
-            }
-        }catch(Exception ex){
-            Logger.logException(ex);
-        }
-        //addDefaultSetback(Dirs.isEmpty());
-        checkDirs();
-    }
-
-    private static void addDefaultSetback(boolean hostsAdded){
-        HashMap<String,String> dirs = new HashMap<>();
-        if (hostsAdded){
-            dirs.put("Root", "/var/www/html");
-            dirs.put("CGI", "/var/www/cgi-bin");
-            dirs.put("Files", "/var/www/files");
-            Dirs.put("def",dirs);
-        }
-    }
-
-    private static void checkDirs(){
-        File temp = new File(getCWD() + "/Temp");
-        if (!temp.isDirectory())
-            temp.mkdirs();
-        for (String hostName : Dirs.keySet()){
-            HashMap<String,String> dirs = Dirs.get(hostName);
-            for (String dir : dirs.values()){
-                File fl = new File(dir);
-                if (!fl.isDirectory())
-                    fl.mkdirs();
-            }
-        }
-    }
-
     public static void loadMain(){
         Logger.ilog("Loading main configs ...");
         File fl = new File(baseAddress + "/Zako.cfg");
@@ -96,55 +37,38 @@ public class Configs {
         loadBalancer = (Boolean) data.get("Load Balancer");
         webServer = (Boolean) data.get("Web Server");
         BRS = (Boolean) data.get("BR Sensitivity");
-        LBPort = (Integer) data.get("Load Balancer Port");
+        LBPort = (int)(long) data.get("Load Balancer Port");
+        Server.Utils.ViewCounter.Controller.load(availableHosts,(Long) data.get("View update frequency"));
     }
 
     public static void loadAHost(File dir){
-        HashMap mainData = (HashMap) JSONBuilder.newInstance().parse(new File(dir.getAbsolutePath() + "/Main.cfg")).toJava();
-        String name = String.valueOf(mainData.get("Name"));
-        loadHandle((HashMap) mainData.get("Reaction"),name);
-        KAS.put(name,(Boolean) mainData.get("Keep Alive"));
-        ports.put(name,(int) mainData.get("Port"));
-        if (KAS.get(name))
-            timeOuts.put(name,0);
-        else
-            timeOuts.put(name,(int) mainData.get("Sockets-Timeout"));
-        HashMap szs = (HashMap) mainData.get("Sizes");
-        Long pb = (Long) szs.get("Post body");
-        Long fs = (Long) szs.get("File size");
-        long[] szss = new long[]{Long.MAX_VALUE,Long.MIN_VALUE};
-        if (pb != null)
-            szss[0] = pb;
-        if (fs != null)
-            szss[1] = fs;
-        sizes.put(name,szss);
-        availableHosts.add(name);
+        configs.put(dir.getName(),new Config(dir));
     }
 
     public static String getDef(String key){
-        return Dirs.get("def").get(key);
+        return configs.get("default").dirs.get(key);
     }
 
     public static String getMainDir(String host){
-        HashMap<String,String> dirs = Dirs.get(host);
-        if (dirs != null)
-            return dirs.get("Root");
+        Config hst = configs.get(host);
+        if (hst != null)
+            return hst.dirs.get("Root");
         else
             return getDef("Root");
     }
 
     public static String getCGIDir(String host){
-        HashMap<String,String> dirs = Dirs.get(host);
-        if (dirs != null)
-            return dirs.get("CGI");
+        Config hst = configs.get(host);
+        if (hst != null)
+            return hst.dirs.get("CGI");
         else
             return getDef("CGI");
     }
 
     public static String getUploadDir(String host){
-        HashMap<String,String> dirs = Dirs.get(host);
-        if (dirs != null)
-            return dirs.get("Files");
+        Config hst = configs.get(host);
+        if (hst != null)
+            return hst.dirs.get("Files");
         else
             return getDef("Files");
     }
@@ -164,28 +88,29 @@ public class Configs {
     }
 
     public static int getHostStatus(String host){
-        if (hostsStatus.get(host) != null) return hostsStatus.get(host);
+        if (configs.get(host) != null)
+            return configs.get(host).hostStatus;
         else return 3;
     }
 
     public static String[] getForwardAddress(String host){
-        return targets.get(host);
+        return configs.get(host).target;
     }
 
     public static boolean getKeepAlive(String host){
-        return KAS.get(host);
+        return configs.get(host).KA;
     }
 
     public static int getTimeOut(String host){
-        return timeOuts.get(host);
+        return configs.get(host).timeOut;
     }
 
     public static long getPostBodySize(String host){
-        return sizes.get(host)[0];
+        return configs.get(host).pb;
     }
 
     public static long getFileSize(String host){
-        return sizes.get(host)[1];
+        return configs.get(host).fs;
     }
 
     public static boolean isHostAvailable(String host){
@@ -196,4 +121,84 @@ public class Configs {
         return LBPort;
     }
 
+    public static boolean isVCOn(String host){
+        return configs.get(host).vc;
+    }
+
+
+    private static class Config{
+
+        private final HashMap<String,String> dirs = new HashMap<>();
+        private int hostStatus;
+        private String[] target;
+        private boolean KA;
+        private int timeOut;
+        private long pb;
+        private long fs;
+        private boolean vc;
+
+        public Config(File fl){
+            this.load(fl);
+        }
+
+        private void load(File fl){
+            HashMap mainData = (HashMap) JSONBuilder.newInstance().parse(new File(fl.getAbsolutePath() + "/Main.cfg")).toJava();
+            String name = String.valueOf(mainData.get("Name"));
+            loadHandle((HashMap) mainData.get("Reaction"));
+            KA = (Boolean) mainData.get("Keep Alive");
+            ports.put(name,(int)(long) mainData.get("Port"));
+            if (KA)
+                timeOut = 0;
+            else
+                timeOut = (int)(long) mainData.get("Sockets-Timeout");
+            HashMap szs = (HashMap) mainData.get("Sizes");
+            Long p = (Long) szs.get("Post body");
+            Long f = (Long) szs.get("File size");
+            if (p != null)
+                pb = Long.MAX_VALUE;
+            if (f != null)
+                fs = Long.MAX_VALUE;
+            vc = (Boolean) mainData.get("View counter");
+            availableHosts.add(name);
+        }
+
+        private void loadHandle(HashMap data){
+            try{
+                String mode =  String.valueOf(data.get("Handle"));
+                switch (mode) {
+                    case "Handle" -> {
+                        hostStatus = 0;
+                        dirs.put("Root", String.valueOf(data.get("RootDir")));
+                        dirs.put("CGI", String.valueOf(data.get("CGIDir")));
+                        dirs.put("Files", String.valueOf(data.get("TempFileUploadDir")));
+                    }
+                    case "Forward" -> {
+                        hostStatus = 1;
+                        String tr = String.valueOf(data.get("Target"));
+                        String[] address = tr.split(":");
+                        target = ((address.length > 1) ? address : new String[]{address[0], "80"});
+                    }
+                    case "Redirect" -> {
+                        hostStatus = 2;
+                        target = new String[]{String.valueOf(data.get("Target"))};
+                    }
+                }
+            }catch(Exception ex){
+                Logger.logException(ex);
+            }
+            checkDirs();
+        }
+
+        private void checkDirs(){
+            File temp = new File(getCWD() + "/Temp");
+            if (!temp.isDirectory())
+                temp.mkdirs();
+            for (String key : dirs.keySet()){
+                File fl = new File(key);
+                if (!fl.isDirectory())
+                    fl.mkdirs();
+
+            }
+        }
+    }
 }

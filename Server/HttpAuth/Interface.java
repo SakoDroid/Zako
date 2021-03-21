@@ -1,38 +1,45 @@
 package Server.HttpAuth;
 
 import Server.Reqandres.Request.Request;
+import Server.Utils.Configs;
+
+import java.io.File;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class Interface {
 
-    private static Core core ;
-    private static boolean ON = true;
+    private final HashMap<String,Core> cores = new HashMap<>();
+    private static final Interface inf = new Interface();
 
-    public static void load (boolean status){
-        if (status){
-            if (core == null)
-                core = new Core();
+    private Interface(){
+        File fl = new File(Configs.baseAddress);
+        for (String li : Objects.requireNonNull(fl.list())) {
+            File dir = new File(Configs.baseAddress + "/li");
+            if (dir.isDirectory())
+                cores.put(li,new Core(dir));
         }
-        ON = status;
     }
 
-    public static boolean needAuth(String path){
-        if (ON)
-            return core.apiContains(path);
-        else return false;
+    public boolean needAuth(String path,String host){
+        return cores.get(host).apiContains(path);
     }
 
-    public static int evaluate(HashMap headers,String ip){
+    public int evaluate(HashMap headers,String ip,String host){
         int temp;
         Object auth = headers.get("Authorization");
         if (auth != null){
-            temp = core.checkAuth(String.valueOf(auth),ip);
+            temp = cores.get(host).checkAuth(String.valueOf(auth),ip);
         }else
             temp = 401;
         return temp;
     }
 
-    public static void send401(Request req){
-        core.askForAuth(req);
+    public void send401(Request req){
+        cores.get(req.getHost()).askForAuth(req);
+    }
+
+    public static Interface getInstance(){
+        return inf;
     }
 }

@@ -14,7 +14,6 @@ public class Loader {
     public static void load(){
         Logger.ilog("Loading hosts configurations ...");
         System.out.println("Loading hosts configurations ...");
-        Server.Utils.Configs.loadMain();
         for (String li : Objects.requireNonNull(new File(Server.Utils.Configs.baseAddress).list())){
             File fl = new File(Server.Utils.Configs.baseAddress + "/" + li);
             if (fl.isDirectory()){
@@ -27,6 +26,7 @@ public class Loader {
                 APIConfigs.load(fl);
             }
         }
+        Server.Utils.Configs.loadMain();
         Logger.ilog("Loading ip blacklist ...");
         System.out.println("Loading ip blacklist ...");
         Perms.loadBlackList();

@@ -14,7 +14,7 @@ public class Perms {
     }
 
     public static void loadBlackList(){
-        try (BufferedReader bf = new BufferedReader(new FileReader(Configs.baseAddress + "IP-Blacklist"))){
+        try (BufferedReader bf = new BufferedReader(new FileReader(Configs.baseAddress + "/IP-Blacklist"))){
             String line;
             while((line = bf.readLine()) != null)
                 if (!line.startsWith("#") && !line.isEmpty())
@@ -48,12 +48,12 @@ public class Perms {
         private final File fl;
 
         public PConfig(File fl){
-            this.load();
             this.fl = fl;
+            this.load();
         }
 
         private void load(){
-            try (BufferedReader bf = new BufferedReader(new FileReader(fl.getAbsolutePath() + "/ILPD"))){
+            try (BufferedReader bf = new BufferedReader(new FileReader(this.fl.getAbsolutePath() + "/sec/ILPD"))){
                 String line;
                 while((line = bf.readLine()) != null){
                     if (!line.startsWith("#") && !line.isEmpty()) ipsAuthorizedForPUTAndDelete.add(line);

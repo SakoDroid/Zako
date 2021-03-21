@@ -1,8 +1,10 @@
 package Server.Utils.ViewCounter;
 
+import Server.Utils.Configs;
 import Server.Utils.Logger;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.TimerTask;
 
 public class Controller {
@@ -10,10 +12,10 @@ public class Controller {
     private final HashMap<String,ViewCore> cores = new HashMap<>();
     private static Controller cnt;
 
-    private Controller(HashMap<String,HashMap<String,String>> hosts, long updateTime){
-        for (String host : hosts.keySet())
+    private Controller(HashSet<String> hosts, long updateTime){
+        for (String host : hosts)
             cores.put(host,
-                    new ViewCore(hosts.get(host).get("Root"))
+                    new ViewCore(Configs.getMainDir(host))
             );
         this.startWriters(updateTime);
     }
@@ -26,7 +28,7 @@ public class Controller {
         return cnt;
     }
 
-    public static void load(HashMap<String,HashMap<String,String>> hosts, long updateTime){
+    public static void load(HashSet<String> hosts, long updateTime){
         cnt = new Controller(hosts,updateTime);
         Logger.ilog("View counter is active ...");
     }

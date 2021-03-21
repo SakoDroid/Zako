@@ -18,7 +18,7 @@ public class index implements API{
         }
         if (ind.exists()){
             FileSender fs = new FileSender(req.getProt(),200);
-            fs.setKeepAlive(Configs.keepAlive && reqp.KA);
+            fs.setKeepAlive(Configs.getKeepAlive(req.getHost()) && reqp.KA);
             fs.setContentType("text/html");
             fs.setExtension(".html");
             fs.sendFile(req.getMethod(), ind, req.out, req.getIP(), req.getID(), req.getHost());

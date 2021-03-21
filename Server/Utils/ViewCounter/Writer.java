@@ -15,6 +15,8 @@ public class Writer {
 
     public void writeAll(){
         for (String host : writableCores.keySet()){
+            if (!Configs.isVCOn(host))
+                continue;
             String mainDir = Configs.getMainDir(host);
             if (mainDir == null)
                 mainDir = Configs.getMainDir(host);

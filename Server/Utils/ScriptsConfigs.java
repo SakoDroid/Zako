@@ -27,7 +27,7 @@ public class ScriptsConfigs {
 
         private void load(File fl){
             JSONBuilder bld = JSONBuilder.newInstance();
-            JSONDocument doc = bld.parse(fl.getAbsolutePath() + "/Main.cfg");
+            JSONDocument doc = bld.parse(new File(fl.getAbsolutePath() + "/Main.cfg"));
             HashMap data = (HashMap) doc.toJava();
             HashMap scripts = (HashMap) data.get("Scripts");
             for (Object obj : scripts.keySet()){

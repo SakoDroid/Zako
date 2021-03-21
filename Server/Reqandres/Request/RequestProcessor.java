@@ -178,11 +178,11 @@ public class RequestProcessor {
     }
 
     private void authenticate(){
-        if (Server.HttpAuth.Interface.needAuth(req.getHost() + req.Path)){
-            this.sit = Server.HttpAuth.Interface.evaluate(req.getHeaders(),req.getIP());
+        if (Server.HttpAuth.Interface.getInstance().needAuth(req.getHost() + req.Path,req.getHost())){
+            this.sit = Server.HttpAuth.Interface.getInstance().evaluate(req.getHeaders(),req.getIP(), req.getHost());
             if (this.sit == 401){
                 this.stat = 0;
-                Server.HttpAuth.Interface.send401(req);
+                Server.HttpAuth.Interface.getInstance().send401(req);
             }
         }
     }

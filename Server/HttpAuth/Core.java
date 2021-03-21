@@ -16,26 +16,21 @@ public class Core {
     private final HashMap<String,String> passwd = new HashMap<>();
     private final HashMap<String,String> opaques = new HashMap<>();
     private final HashSet<String> stales = new HashSet<>();
+    private final File fl;
     private Mechanisms Mechanism;
     private String alg;
     private String realm;
 
-    public Core (){
+    public Core (File fl){
+        this.fl = fl;
         this.load();
     }
 
     private void load(){
         loadPasswd();
-        File fl = null;
-        if (System.getProperty("os.name")
-                .toLowerCase().contains("windows"))
-            fl = new File(System.getProperty("user.dir") + "/Configs/Zako.cfg");
-        else if (System.getProperty("os.name")
-                .toLowerCase().contains("linux"))
-            fl = new File("/etc/zako-web/Zako.cfg");
         HashMap data = (HashMap) JSONBuilder
                 .newInstance()
-                .parse(fl)
+                .parse(fl.getAbsolutePath() + "/Main.cfg")
                 .toJava();
         HashMap authCfg = (HashMap) data.get("HTTP AUTH");
         String mech = String.valueOf(authCfg.get("Auth mechanism"));
@@ -52,16 +47,8 @@ public class Core {
     }
 
     private void loadPasswd(){
-        File fl = null;
-        if (System.getProperty("os.name")
-                .toLowerCase().contains("windows"))
-            fl = new File(System.getProperty("user.dir") + "/Configs/sec/passwd");
-        else if (System.getProperty("os.name")
-                .toLowerCase().contains("linux"))
-            fl = new File("/etc/zako-web/sec/passwd");
         try {
-            assert fl != null;
-            try(BufferedReader bf = new BufferedReader(new FileReader(fl))) {
+            try(BufferedReader bf = new BufferedReader(new FileReader(fl.getAbsolutePath() + "/sec/passwd"))) {
                 String line;
                 while ((line = bf.readLine()) != null) {
                     if (!line.startsWith("#") && !line.isEmpty()) {
@@ -227,10 +214,10 @@ public class Core {
             String decoded = new String(Base64.getDecoder().decode(nonce));
             String[] items = decoded.split(" ");
             if (ip.equals(items[1]))
-                 if (new Date().getTime() - Long.parseLong(items[0]) < 10000)
-                     return 0;
-                 else
-                     return 1;
+                if (new Date().getTime() - Long.parseLong(items[0]) < 10000)
+                    return 0;
+                else
+                    return 1;
             else
                 return 2;
         }

@@ -13,10 +13,9 @@ public class View extends Thread{
 
     @Override
     public void run(){
-        if (Server.Utils.Configs.ViewCounter
+        if (Server.Utils.Configs.isVCOn(host)
                 && Records.getInstance().isValid(ip)){
-            ViewCore vc = Controller.getInstance().getViewCore(host);
-            vc.addView(ip);
+            Controller.getInstance().getViewCore(host).addView(ip);
             Records.getInstance().addRecord(ip);
         }
     }

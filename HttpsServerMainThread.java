@@ -51,6 +51,7 @@ public class HttpsServerMainThread{
             try{
                 ServerSocket ss = new ServerSocket(80);
                 Logger.ilog("Http thread is running on port 80 for redirection ...");
+                System.out.println("Http thread is running on port 80 for redirection ...");
                 while (true) new Redirect(ss.accept());
             }catch (Exception ex) {
                 Logger.logException(ex);
@@ -72,11 +73,13 @@ public class HttpsServerMainThread{
                 SSLServerSocketFactory sslServerSocketfactory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
                 SSLServerSocket sslServerSocket = (SSLServerSocket) sslServerSocketfactory.createServerSocket(port);
                 Logger.ilog("Https server thread is now running (jks : " + SSLConfigs.getJKS(host) + " ,, jks pass : " + SSLConfigs.getPass(host) + ") ...");
+                System.out.println("Https server thread is now running (jks : " + SSLConfigs.getJKS(host) + " ,, jks pass : " + SSLConfigs.getPass(host) + ") ...");
                 while (true) new HttpListener((SSLSocket) sslServerSocket.accept(),host);
             } catch (Exception ex) {
                 Logger.logException(ex);
             }
             Logger.ilog("Server is shutting down ...");
+            System.out.println("Server is shutting down ...");
         }
     }
 }
