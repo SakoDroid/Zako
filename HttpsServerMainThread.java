@@ -7,23 +7,21 @@ import java.net.Socket;
 
 public class HttpsServerMainThread{
 
-    private final int port;
     private final String host;
 
     public HttpsServerMainThread(int port,String host){
-        this.port = port;
         this.host = host;
         new HTTPS();
         new HTTP();
     }
 
-    private class HTTP extends Thread{
+    private static class HTTP extends Thread{
 
         public HTTP(){
             this.start();
         }
 
-        private class Redirect extends Thread{
+        private static class Redirect extends Thread{
 
             private final Socket sock;
 
@@ -71,7 +69,7 @@ public class HttpsServerMainThread{
                 System.setProperty("javax.net.ssl.keyStore", SSLConfigs.getJKS(host));
                 System.setProperty("javax.net.ssl.keyStorePassword", SSLConfigs.getPass(host));
                 SSLServerSocketFactory sslServerSocketfactory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
-                SSLServerSocket sslServerSocket = (SSLServerSocket) sslServerSocketfactory.createServerSocket(port);
+                SSLServerSocket sslServerSocket = (SSLServerSocket) sslServerSocketfactory.createServerSocket(443);
                 Logger.ilog("Https server thread is now running (jks : " + SSLConfigs.getJKS(host) + " ,, jks pass : " + SSLConfigs.getPass(host) + ") ...");
                 System.out.println("Https server thread is now running (jks : " + SSLConfigs.getJKS(host) + " ,, jks pass : " + SSLConfigs.getPass(host) + ") ...");
                 while (true) new HttpListener((SSLSocket) sslServerSocket.accept(),host);
