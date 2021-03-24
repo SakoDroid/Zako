@@ -40,13 +40,17 @@ public class Main extends Thread{
                 }
                 for (int port : toBeOpenedPorts){
                     if (port == 80){
-                        if (sslSocketOpened)
+                        if (sslSocketOpened){
                             Logger.ilog("Error! SSL for one of the sites is enabled. Port 80 has been opened for redirection., can't run an http website on port 80.");
+                            System.out.println("!** Error! SSL for one of the sites is enabled. Port 80 has been opened for redirection., can't run an http website on port 80.");
+                        }
                         else
                             new HttpServerMainThread(port);
                     }
-                    else if (port == 443)
-                        Logger.ilog("Port 443 cannot be opened for HTTP website.");
+                    else if (port == 443){
+                        Logger.ilog("Error! Port 443 cannot be opened for HTTP website.");
+                        System.out.println("!** Error! Port 443 cannot be opened for HTTP website.");
+                    }
                     else
                         new HttpServerMainThread(port);
                 }
