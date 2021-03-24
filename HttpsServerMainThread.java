@@ -1,9 +1,18 @@
+import Engines.DDOS.Interface;
 import Server.HttpListener;
+import Server.Reqandres.Request.Request;
 import Server.Utils.*;
 import javax.net.ssl.*;
+import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class HttpsServerMainThread{
 
@@ -15,13 +24,13 @@ public class HttpsServerMainThread{
         new HTTP();
     }
 
-    private static class HTTP extends Thread{
+    private class HTTP extends Thread{
 
         public HTTP(){
             this.start();
         }
 
-        private static class Redirect extends Thread{
+        private class Redirect extends Thread{
 
             private final Socket sock;
 
@@ -33,11 +42,77 @@ public class HttpsServerMainThread{
             @Override
             public void run(){
                 try{
-                    DataOutputStream out = new DataOutputStream(sock.getOutputStream());
-                    out.writeBytes("HTTP/1.1 426 Upgrade Required\nServer: " + basicUtils.Zako + "\nUpgrade: TLS/1.3, HTTP/1.1\nConnection: Upgrade");
-                    out.flush();
-                    out.close();
+                    BufferedReader bfr = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+                    String firstLine = bfr.readLine();
+                    if (firstLine != null && firstLine.length() > 5){
+                        Pattern pathPattern = Pattern.compile(" /[^ ]*");
+                        Matcher pathMatcher = pathPattern.matcher(firstLine);
+                        if (pathMatcher.find()){
+                            String path = pathMatcher.group().trim();
+                            String upHeader;
+                            boolean hostFound = false;
+                            boolean upFound = false;
+                            String line = "";
+                            while (!hostFound){
+                                line = bfr.readLine();
+                                if (line != null){
+                                    if (line.startsWith("Host"))
+                                        hostFound = true;
+                                    else if (line.startsWith("Upgrade-Insecure-Requests"))
+                                        upFound = true;
+                                    else if (line.length() < 5)
+                                        break;
+                                }else
+                                    break;
+                            }
+                            if (hostFound){
+                                String hostHeader = line.split(":")[1].trim();
+                                if (hostHeader.equals(host)){
+                                    if (!upFound){
+                                        while (!upFound){
+                                            line = bfr.readLine();
+                                            if (line != null){
+                                                if (line.startsWith("Upgrade-Insecure-Requests"))
+                                                    upFound = true;
+                                                else if (line.length() < 5)
+                                                    break;
+                                            }else
+                                                break;
+                                        }
+                                    }
+                                    if (upFound){
+                                            upHeader = line.split(":")[1].trim();
+                                            if (upHeader.equals("1"))
+                                                this.red("https://" + host + path);
+                                            else{
+                                                DataOutputStream out = new DataOutputStream(sock.getOutputStream());
+                                                out.writeBytes("HTTP/1.1 426 Upgrade Required\nServer: " + basicUtils.Zako + "\nDate: " + new java.util.Date().toString() + "\nConnection: upgrade\nUpgrade: TLS/1.3, HTTP/1.1\r\n\r\n");
+                                            }
+                                    }else
+                                        this.red("https://" + host + path);
+                                }else {
+                                    Interface.addWarning(sock.getInetAddress().getHostAddress(),host);
+                                    basicUtils.sendCode(400,new Request(sock));
+                                }
+                            }else {
+                                Interface.addWarning(sock.getInetAddress().getHostAddress(),host);
+                                basicUtils.sendCode(400,new Request(sock));
+                            }
+                        }else{
+                            Interface.addWarning(sock.getInetAddress().getHostAddress(),host);
+                            basicUtils.sendCode(400,new Request(sock));
+                        }
+                    }
                 }catch(Exception ex){
+                    Logger.logException(ex);
+                }
+            }
+
+            private void red(String path){
+                try{
+                    DataOutputStream out = new DataOutputStream(sock.getOutputStream());
+                    out.writeBytes("HTTP/1.1 301 Moved Permanently\nServer: " + basicUtils.Zako + "\nDate: " + new java.util.Date().toString() + "\nLocation: " + URLDecoder.decode(path, StandardCharsets.UTF_8) + "\r\n\r\n");
+                }catch (Exception ex){
                     Logger.logException(ex);
                 }
             }

@@ -25,21 +25,30 @@ public class Main extends Thread{
                     LoadBalancer.Configs.load();
                     new LoadBalancerMainThread();
                 }
-                HashSet<Integer> openedHttpPorts = new HashSet<>();
+                HashSet<Integer> toBeOpenedPorts = new HashSet<>();
                 boolean sslSocketOpened = false;
                 for (String host : Configs.getPorts().keySet()) {
                     int port = Configs.getPorts().get(host);
-                    if (!openedHttpPorts.contains(port)) {
-                        openedHttpPorts.add(port);
-                        if (SSLConfigs.isSSLOn(host)) {
-                            if (!sslSocketOpened) {
-                                sslSocketOpened = true;
-                                new HttpsServerMainThread(port, host);
-                            } else
-                                Logger.ilog("Error! Cant serve more than two https enabled web sites on one port.");
+                    if (SSLConfigs.isSSLOn(host)) {
+                        if (!sslSocketOpened) {
+                            sslSocketOpened = true;
+                            new HttpsServerMainThread(port, host);
                         } else
+                            Logger.ilog("Error! Cant serve more than one https enabled web site on one webserver.");
+                    }else
+                        toBeOpenedPorts.add(port);
+                }
+                for (int port : toBeOpenedPorts){
+                    if (port == 80){
+                        if (sslSocketOpened)
+                            Logger.ilog("Error! SSL for one of the sites is enabled. Port 80 has been opened for redirection., can't run an http website on port 80.");
+                        else
                             new HttpServerMainThread(port);
                     }
+                    else if (port == 443)
+                        Logger.ilog("Port 443 cannot be opened for HTTP website.");
+                    else
+                        new HttpServerMainThread(port);
                 }
             } catch (Exception ex) {
                 Logger.logException(ex);

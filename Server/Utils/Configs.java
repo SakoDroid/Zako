@@ -194,7 +194,7 @@ public class Configs {
             if (!temp.isDirectory())
                 temp.mkdirs();
             for (String key : dirs.keySet()){
-                File fl = new File(key);
+                File fl = new File(dirs.get(key));
                 if (!fl.isDirectory())
                     fl.mkdirs();
 
