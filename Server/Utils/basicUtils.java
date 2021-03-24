@@ -18,7 +18,7 @@ public class basicUtils {
     private static HashMap<String,String> execCmds;
     private static final ArrayList<Integer> ids = new ArrayList<>();
     private static final Random rnd = new Random();
-    public static String LocalHostIP = "", Zako = "Zako 1.4.0";
+    public static String LocalHostIP = "", Zako = "Zako 1.4.2";
 
     private basicUtils(){}
 
