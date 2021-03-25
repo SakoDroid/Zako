@@ -5,6 +5,8 @@ import Server.Reqandres.Request.Request;
 import Server.Reqandres.Request.RequestProcessor;
 import Server.Utils.*;
 import Engines.DDOS.Interface;
+
+import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSocket;
 import java.net.Socket;
 
@@ -19,9 +21,19 @@ public class HttpListener extends Thread{
     }
 
     public HttpListener(SSLSocket client,String host){
-        this.hostName= host;
+        this.hostName = host;
         this.req = new Request(client);
-        this.start();
+        try{
+            SSLParameters sslp = client.getSSLParameters();
+            sslp.setApplicationProtocols(new String[]{"TLS/1.3","TLS/1.2","TLS/1.1","TLS/1","http/1.1","h2c","h2"});
+            client.setSSLParameters(sslp);
+            client.startHandshake();
+            req.setProt(client.getApplicationProtocol());
+            this.start();
+        }catch (Exception ex){
+            Logger.logException(ex);
+        }
+
     }
 
     @Override

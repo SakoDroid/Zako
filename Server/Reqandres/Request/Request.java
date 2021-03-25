@@ -67,7 +67,12 @@ public class Request {
     }
 
     public void setProt(String prot){
-        this.Prot = prot;
+        if (this.Prot == null){
+            if (prot.equals("http/1.1"))
+                this.Prot = "HTTP/1.1";
+            else if (prot.equals("h2") || prot.equals("h2c"))
+                this.Prot = "HTTP/2";
+        }
     }
 
     public String getProt(){

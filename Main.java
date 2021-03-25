@@ -28,6 +28,8 @@ public class Main extends Thread{
                 HashSet<Integer> toBeOpenedPorts = new HashSet<>();
                 boolean sslSocketOpened = false;
                 for (String host : Configs.getPorts().keySet()) {
+                    if (host.equals("default") && Configs.getPorts().keySet().size() > 1)
+                        continue;
                     int port = Configs.getPorts().get(host);
                     if (SSLConfigs.isSSLOn(host)) {
                         if (!sslSocketOpened) {
