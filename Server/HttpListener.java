@@ -1,8 +1,8 @@
 package Server;
 
-import Server.Reqandres.*;
 import Server.Reqandres.Request.Request;
 import Server.Reqandres.Request.RequestProcessor;
+import Server.Reqandres.Response.Response;
 import Server.Utils.*;
 import Engines.DDOS.Interface;
 
@@ -14,6 +14,7 @@ public class HttpListener extends Thread{
 
     private final Request req;
     private final String hostName;
+
     public HttpListener(Socket client,String host){
         this.hostName = host;
         this.req = new Request(client);
@@ -32,8 +33,12 @@ public class HttpListener extends Thread{
             this.start();
         }catch (Exception ex){
             Logger.logException(ex);
+            try {
+                client.close();
+            }catch (Exception exc){
+                Logger.logException(exc);
+            }
         }
-
     }
 
     @Override

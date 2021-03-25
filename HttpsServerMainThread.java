@@ -36,7 +36,25 @@ public class HttpsServerMainThread{
 
             public Redirect(Socket s){
                 this.sock = s;
-                this.start();
+                try{
+                    if (Perms.isIPAllowed(s.getInetAddress().getHostAddress())){
+                        if (Interface.checkIP(s.getInetAddress().getHostAddress(),host))
+                            this.start();
+                        else{
+                            Logger.glog(s.getInetAddress().getHostAddress() + " request rejected due to DDOS protection." + "  ; id = " + 0 , host);
+                            s.getOutputStream().write(HTMLGen.genTooManyRequests(s.getInetAddress().getHostAddress()).getBytes());
+                            s.getOutputStream().flush();
+                            s.getOutputStream().close();
+                        }
+                    }else{
+                        Logger.glog(s.getInetAddress().getHostAddress() + " request rejected due to ip ban." + "  ; id = " + "  ; id = " + 0 , host);
+                        s.getOutputStream().write(HTMLGen.genIPBan(s.getInetAddress().getHostAddress()).getBytes());
+                        s.getOutputStream().flush();
+                        s.getOutputStream().close();
+                    }
+                }catch (Exception ex){
+                    Logger.logException(ex);
+                }
             }
 
             @Override

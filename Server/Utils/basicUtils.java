@@ -118,6 +118,11 @@ public class basicUtils {
         }
     }
 
+    public static boolean isProtAllowed(String prot){
+        return prot.equalsIgnoreCase("http/1.1") || prot.equalsIgnoreCase("h2c") || prot.equalsIgnoreCase("h2")
+                || prot.equalsIgnoreCase("http/2");
+    }
+
     public static void killPrcs(){
         for (String host : Configs.getPorts().keySet())
             killPrc(host);
