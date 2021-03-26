@@ -1,4 +1,6 @@
-package Server.Utils;
+package Server.Utils.Configs;
+
+import Server.Utils.Logger;
 
 import java.io.*;
 import java.util.HashMap;

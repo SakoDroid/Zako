@@ -1,9 +1,9 @@
 package Server.API;
 
-import Server.Reqandres.Request.ServerRequest;
+import Server.Reqandres.Request.Request;
 import Server.Reqandres.Request.RequestProcessor;
 
 public interface API {
 
-    void init(ServerRequest req, RequestProcessor reqp);
+    void init(Request req, RequestProcessor reqp);
 }

@@ -1,6 +1,6 @@
 package Engines.Captcha;
 
-import Server.Utils.CaptchaConfigs;
+import Server.Utils.Configs.CaptchaConfigs;
 import java.util.HashMap;
 import java.util.regex.*;
 

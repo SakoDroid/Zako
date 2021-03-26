@@ -1,7 +1,7 @@
 package Server.HttpAuth;
 
-import Server.Reqandres.Request.ServerRequest;
-import Server.Utils.Configs;
+import Server.Reqandres.Request.Request;
+import Server.Utils.Configs.Configs;
 
 import java.io.File;
 import java.util.HashMap;
@@ -35,7 +35,7 @@ public class Interface {
         return temp;
     }
 
-    public void send401(ServerRequest req){
+    public void send401(Request req){
         cores.get(req.getHost()).askForAuth(req);
     }
 

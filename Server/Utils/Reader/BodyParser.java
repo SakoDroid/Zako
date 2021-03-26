@@ -1,6 +1,7 @@
-package Server.Reqandres.Request;
+package Server.Utils.Reader;
 
-import Server.Utils.Configs;
+import Server.Reqandres.Request.Request;
+import Server.Utils.Configs.Configs;
 import Server.Utils.FileFixer;
 import Server.Utils.Logger;
 import java.io.RandomAccessFile;
@@ -9,9 +10,9 @@ import java.util.regex.*;
 
 public class BodyParser {
 
-    private final ServerRequest req;
+    private final Request req;
 
-    public BodyParser(ServerRequest reqs){
+    public BodyParser(Request reqs){
         this.req = reqs;
     }
 
@@ -36,7 +37,7 @@ public class BodyParser {
                         if(mc.find()){
                             String fileName = mc.group().replace("filename=","").replace("\"","");
                             if (fileName.isEmpty()) continue;
-                            String filead = Configs.getUploadDir((String)this.req.getHeaders().get("Host")) + "/" + fileName;
+                            String filead = Configs.getUploadDir(this.req.getHost()) + "/" + fileName;
                             if(namemc.find()) this.req.addToBody('&' + namemc.group().replace("name=","").replace("\"","") + "=" + filead);
                             String[] file = new String[3];
                             file[0] = filead;

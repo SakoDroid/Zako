@@ -1,9 +1,10 @@
 package Server.Reqandres.Senders;
 
-import Server.Reqandres.Request.ServerRequest;
+import Server.Reqandres.Request.Request;
 import Server.Utils.Logger;
 import java.util.Date;
 import java.text.SimpleDateFormat;
+
 import Server.Utils.basicUtils;
 
 public class Sender {
@@ -69,12 +70,12 @@ public class Sender {
     }
 
 
-    public void sendOptionsMethod(ServerRequest req){
+    public void sendOptionsMethod(Request req){
         try{
             Logger.glog("Sending back options method response to " + req.getIP() + "  ; debug_id = " + req.getID(),req.getHost());
-            req.out.writeBytes(prot + " 200 OK\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako + "\nConnection: close\nAllow: GET,HEAD,POST,OPTIONS,TRACE,CONNECT,PUT,DELETE");
-            req.out.flush();
-            req.out.close();
+            req.getOutStream().writeBytes(prot + " 200 OK\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako + "\nConnection: close\nAllow: GET,HEAD,POST,OPTIONS,TRACE,CONNECT,PUT,DELETE");
+            req.getOutStream().flush();
+            req.getOutStream().close();
             Logger.glog(req.getIP() + "'s request handled successfully!" + "  ; debug_id = " + req.getID(),req.getHost());
             req.clearRequest();
         }catch (Exception ex){
@@ -82,12 +83,12 @@ public class Sender {
         }
     }
 
-    public void sendConnectMethod(ServerRequest req){
+    public void sendConnectMethod(Request req){
         try{
             Logger.glog("Sending back connect method response to " + req.getIP() + "  ; debug_id = " + req.getID(),req.getHost());
-            req.out.writeBytes(prot + " 200 Connection established\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako);
-            req.out.flush();
-            req.out.close();
+            req.getOutStream().writeBytes(prot + " 200 Connection established\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako);
+            req.getOutStream().flush();
+            req.getOutStream().close();
             Logger.glog(req.getIP() + "'s request handled successfully!" + "  ; debug_id = " + req.getID(),req.getHost());
             req.clearRequest();
         }catch (Exception ex){
@@ -95,13 +96,13 @@ public class Sender {
         }
     }
 
-    public void send(String data, ServerRequest req){
+    public void send(String data, Request req){
         Logger.glog("Sending response to " + req.getID() + "  ; debug_id = " + req.getID(),req.getHost());
         try{
-            req.out.writeBytes(generateResponse(data));
+            req.getOutStream().writeBytes(generateResponse(data));
             if (!this.keepAlive) {
-                req.out.flush();
-                req.out.close();
+                req.getOutStream().flush();
+                req.getOutStream().close();
             }
             Logger.glog(req.getID() + "'s request handled successfully!" + "  ; debug_id = " + req.getID(),req.getHost());
             req.clearRequest();

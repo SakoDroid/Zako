@@ -1,6 +1,6 @@
 package Server.Utils.ViewCounter;
 
-import Server.Utils.Configs;
+import Server.Utils.Configs.Configs;
 import Server.Utils.JSON.JSONBuilder;
 import java.io.File;
 import java.util.HashMap;

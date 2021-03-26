@@ -1,4 +1,4 @@
-package Server.Utils;
+package Server.Utils.Configs;
 
 import java.io.File;
 import java.util.HashMap;

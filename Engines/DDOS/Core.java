@@ -1,7 +1,7 @@
 package Engines.DDOS;
 
 import Server.Utils.Logger;
-import Server.Utils.Perms;
+import Server.Utils.Configs.Perms;
 import java.util.HashMap;
 
 class Core {

@@ -1,12 +1,12 @@
 package Server.Method;
 
-import Server.Reqandres.Request.ServerRequest;
+import Server.Reqandres.Request.Request;
 import Server.Reqandres.Request.RequestProcessor;
+import Server.Reqandres.Senders.QuickSender;
 import Server.Reqandres.Senders.Sender;
-import Server.Utils.Configs;
+import Server.Utils.Configs.Configs;
 import Server.Utils.Logger;
-import Server.Utils.Perms;
-import Server.Utils.basicUtils;
+import Server.Utils.Configs.Perms;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.RandomAccessFile;
@@ -14,7 +14,7 @@ import java.io.RandomAccessFile;
 public class PUT implements Method{
 
     @Override
-    public int run(ServerRequest req, RequestProcessor reqp){
+    public int run(Request req, RequestProcessor reqp){
         try{
             if(Perms.isIPAllowedForPUTAndDelete(req.getIP(),req.getHost())){
                 RandomAccessFile bf = new RandomAccessFile(req.getCacheFile(),"r");
@@ -30,7 +30,7 @@ public class PUT implements Method{
                 bf.close();
                 Sender snd = new Sender(req.getProt(),201);
                 snd.send(null,req);
-            }else basicUtils.sendCode(405,req);
+            }else new QuickSender(req).sendCode(405);
         }catch(Exception ex){
             Logger.logException(ex);
         }

@@ -1,8 +1,8 @@
 package Engines;
 
 import Engines.FCGI.Client.Utils.Utils;
-import Server.Reqandres.Request.ServerRequest;
-import Server.Utils.Configs;
+import Server.Reqandres.Request.Request;
+import Server.Utils.Configs.Configs;
 import Server.Utils.Methods;
 import Server.Utils.basicUtils;
 import java.io.File;
@@ -13,7 +13,7 @@ public abstract class CGI {
     protected boolean FCGI = false;
     protected String extension;
     protected File file;
-    protected ServerRequest req;
+    protected Request req;
     protected Map<String,String> envs;
 
     public abstract void exec(byte[] body,boolean ka);

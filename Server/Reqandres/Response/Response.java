@@ -1,17 +1,18 @@
 package Server.Reqandres.Response;
 
-import Server.Reqandres.Request.ServerRequest;
+import Server.Reqandres.Request.Request;
 import Server.Reqandres.Request.RequestProcessor;
+import Server.Reqandres.Senders.QuickSender;
 import Server.Utils.*;
 import Server.Utils.ViewCounter.View;
 
 public class Response {
 
     private final RequestProcessor reqes;
-    private final ServerRequest request;
+    private final Request request;
 
 
-    public Response(RequestProcessor rq, ServerRequest req){
+    public Response(RequestProcessor rq, Request req){
         this.reqes = rq;
         this.request = req;
         this.handleRes();
@@ -29,7 +30,8 @@ public class Response {
                     Server.API.Factory.getAPI(request.getPath(), request.getHost()).init(request, reqes);
             }
             else
-                basicUtils.sendCode(reqes.sit,request);
+                new QuickSender(request).sendCode(reqes.sit);
+
         }catch (Exception ex) {
             Logger.logException(ex);
         }

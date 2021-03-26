@@ -1,7 +1,11 @@
 import Engines.DDOS.Interface;
 import Server.HttpListener;
-import Server.Reqandres.Request.ServerRequest;
+import Server.Reqandres.Request.Request;
+import Server.Reqandres.Senders.QuickSender;
 import Server.Utils.*;
+import Server.Utils.Configs.Perms;
+import Server.Utils.Configs.SSLConfigs;
+
 import javax.net.ssl.*;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -108,15 +112,15 @@ public class HttpsServerMainThread{
                                         this.red("https://" + host + path);
                                 }else {
                                     Interface.addWarning(sock.getInetAddress().getHostAddress(),host);
-                                    basicUtils.sendCode(400,new ServerRequest(sock));
+                                    new QuickSender(new Request(sock)).sendBadReq("\"Host\" header conflict.");
                                 }
                             }else {
                                 Interface.addWarning(sock.getInetAddress().getHostAddress(),host);
-                                basicUtils.sendCode(400,new ServerRequest(sock));
+                                new QuickSender(new Request(sock)).sendBadReq("\"Host\" header not found.");
                             }
                         }else{
                             Interface.addWarning(sock.getInetAddress().getHostAddress(),host);
-                            basicUtils.sendCode(400,new ServerRequest(sock));
+                            new QuickSender(new Request(sock)).sendBadReq("Path not found in first line.");
                         }
                     }
                 }catch(Exception ex){
@@ -163,7 +167,7 @@ public class HttpsServerMainThread{
                 SSLServerSocket sslServerSocket = (SSLServerSocket) sslServerSocketfactory.createServerSocket(443);
                 Logger.ilog("Https server thread is now running (jks : " + SSLConfigs.getJKS(host) + " ,, jks pass : " + SSLConfigs.getPass(host) + ") ...");
                 System.out.println("Https server thread is now running (jks : " + SSLConfigs.getJKS(host) + " ,, jks pass : " + SSLConfigs.getPass(host) + ") ...");
-                while (true) new HttpListener((SSLSocket) sslServerSocket.accept(),host);
+                while (true) new HttpListener((SSLSocket) sslServerSocket.accept(),host,false);
             } catch (Exception ex) {
                 Logger.logException(ex);
             }

@@ -1,6 +1,6 @@
 package Server.Reqandres.Senders;
 
-import Server.Reqandres.Request.ServerRequest;
+import Server.Reqandres.Request.Request;
 import Server.Utils.*;
 import java.io.*;
 import java.util.Date;
@@ -34,7 +34,7 @@ public class FileSender extends Sender {
         this.ext = ext;
     }
 
-    public void sendFile(File file, ServerRequest req){
+    public void sendFile(File file, Request req){
         Logger.glog("Sending requested file to " + req.getIP() + "   ; file name : " + file.getName() + "  ; debug_id = " + req.getID(),req.getHost());
         try{
             req.out.writeBytes(generateHeaders(file.length(),req.getHost()));
@@ -54,7 +54,7 @@ public class FileSender extends Sender {
         }
     }
 
-    public void sendFile(byte[] file, ServerRequest req){
+    public void sendFile(byte[] file, Request req){
         Logger.glog("Sending a file (byte[]) to " + req.getIP() + "  ; debug_id = " + req.getID(), req.getHost());
         try{
             req.out.writeBytes(generateHeaders(file.length,req.getHost()));

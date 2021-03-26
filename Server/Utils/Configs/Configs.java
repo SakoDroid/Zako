@@ -1,4 +1,4 @@
-package Server.Utils;
+package Server.Utils.Configs;
 
 import Server.Utils.JSON.*;
 import java.io.*;
@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Objects;
 
+import Server.Utils.Logger;
 import org.w3c.dom.*;
 import javax.xml.parsers.*;
 

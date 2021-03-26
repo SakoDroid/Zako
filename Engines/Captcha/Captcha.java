@@ -1,6 +1,6 @@
 package Engines.Captcha;
 
-import Server.Utils.CaptchaConfigs;
+import Server.Utils.Configs.CaptchaConfigs;
 import Server.Utils.Logger;
 import javax.imageio.ImageIO;
 import java.awt.*;

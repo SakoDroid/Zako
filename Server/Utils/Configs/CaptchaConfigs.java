@@ -1,4 +1,4 @@
-package Server.Utils;
+package Server.Utils.Configs;
 
 import Server.Utils.JSON.*;
 import java.io.File;

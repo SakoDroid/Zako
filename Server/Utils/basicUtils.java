@@ -1,7 +1,8 @@
 package Server.Utils;
 
-import Server.Reqandres.Request.ServerRequest;
-import Server.Reqandres.Senders.FileSender;
+import Server.Reqandres.Request.Request;
+import Server.Utils.Configs.Configs;
+
 import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
@@ -82,14 +83,7 @@ public class basicUtils {
         return temp;
     }
 
-    public static void sendCode(int code, ServerRequest req){
-        FileSender fs = new FileSender(req.getProt(),code);
-        fs.setContentType("text/html");
-        fs.setExtension(".html");
-        fs.sendFile(Methods.GET,new File(Configs.getCWD() + "/default_pages/" + code + ".html"),req.out,req.getIP(),req.getID(), req.getHost());
-    }
-
-    public static void redirect(int code,String location, ServerRequest req){
+    public static void redirect(int code,String location, Request req){
         Logger.glog("Redirecting " + req.getIP() + " to " + location + "  ; id = " + req.getID(),req.getHost());
         try{
             req.out.writeBytes("HTTP/1.1 " + getStatusCodeComp(code) + "\nServer: " + basicUtils.Zako + "\nLocation: " + location + "\nConnection: close\n\n");

@@ -1,6 +1,6 @@
 package Server.API;
 
-import Server.Utils.CaptchaConfigs;
+import Server.Utils.Configs.CaptchaConfigs;
 
 public class Factory {
 

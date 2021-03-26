@@ -1,5 +1,7 @@
 package Server.Utils.ViewCounter;
 
+import Server.Utils.Configs.Configs;
+
 public class View extends Thread{
 
     private final String host;
@@ -13,7 +15,7 @@ public class View extends Thread{
 
     @Override
     public void run(){
-        if (Server.Utils.Configs.isVCOn(host)
+        if (Configs.isVCOn(host)
                 && Records.getInstance().isValid(ip)){
             Controller.getInstance().getViewCore(host).addView(ip);
             Records.getInstance().addRecord(ip);

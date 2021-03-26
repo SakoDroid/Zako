@@ -1,14 +1,14 @@
 package Server.Reqandres.Response;
 
-import Server.Reqandres.Request.ServerRequest;
+import Server.Reqandres.Request.Request;
 import Server.Reqandres.Senders.Sender;
-import Server.Utils.HTAccess;
+import Server.Utils.Configs.HTAccess;
 
 public class ProtocolSwitcher {
 
-    private final ServerRequest request;
+    private final Request request;
 
-    public ProtocolSwitcher(ServerRequest req){
+    public ProtocolSwitcher(Request req){
         this.request = req;
         this.initiateProtocolSwitch();
     }

@@ -1,6 +1,8 @@
 package Server.Reqandres.Request;
 
 import Server.Utils.*;
+import Server.Utils.Configs.Configs;
+
 import java.io.*;
 import java.net.Socket;
 import java.net.URL;
@@ -9,7 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class ServerRequest implements Server.Utils.Request {
+public class Request {
 
     private String id;
     private String ip;
@@ -28,7 +30,7 @@ public class ServerRequest implements Server.Utils.Request {
     private ArrayList<Byte> body = new ArrayList<>();
     private boolean keepAlive;
 
-    public ServerRequest(Socket client){
+    public Request(Socket client){
         this.id = java.util.UUID.randomUUID().toString();
         this.sck = client;
         this.ip = client.getInetAddress().getHostAddress();
@@ -71,6 +73,14 @@ public class ServerRequest implements Server.Utils.Request {
         return this.method;
     }
 
+    public void setTimeout(int timeout){
+        try {
+            this.sck.setSoTimeout(timeout);
+        }catch (Exception ex){
+            Logger.logException(ex);
+        }
+    }
+
     public void setProt(String prot){
         if (this.Prot == null){
             if (prot.equalsIgnoreCase("http/1.1"))
@@ -86,11 +96,7 @@ public class ServerRequest implements Server.Utils.Request {
 
     public void setHost(String host){
         this.Host = URLDecoder.decode(host,StandardCharsets.UTF_8);
-        try {
-            this.sck.setSoTimeout(Configs.getTimeOut(this.Host));
-        }catch (Exception ex){
-            Logger.logException(ex);
-        }
+        this.setTimeout(Configs.getTimeOut(this.Host));
     }
 
     public void setPath(String path){
@@ -135,6 +141,15 @@ public class ServerRequest implements Server.Utils.Request {
         return this.ip;
     }
 
+    public DataOutputStream getOutStream() {
+        return this.out;
+    }
+
+
+    public InputStream getInStream() {
+        return this.is;
+    }
+
     public String getFullip(){
         return this.fullip;
     }
@@ -143,7 +158,7 @@ public class ServerRequest implements Server.Utils.Request {
         return this.TempFile;
     }
 
-    public Socket getSock(){
+    public Socket getSocket(){
         return this.sck;
     }
 
@@ -155,7 +170,6 @@ public class ServerRequest implements Server.Utils.Request {
         return this.body;
     }
 
-    @Override
     public void clearRequest(){
         this.Path = null;
         this.body.clear();

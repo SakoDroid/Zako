@@ -1,5 +1,4 @@
 import Server.HttpListener;
-import Server.Utils.Configs;
 import Server.Utils.Logger;
 import java.net.ServerSocket;
 
@@ -18,7 +17,7 @@ public class HttpServerMainThread extends Thread{
             ServerSocket server = new ServerSocket(port);
             Logger.ilog("Http server thread is now running on port " + port + " ...");
             System.out.println("Http server thread is now running on port " + port + " ...");
-            while(true) new HttpListener(server.accept(),"Not available");
+            while(true) new HttpListener(server.accept(),"default",false);
         }catch (Exception ex) {
             Logger.logException(ex);
         }

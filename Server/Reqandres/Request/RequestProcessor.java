@@ -3,7 +3,12 @@ package Server.Reqandres.Request;
 import Engines.DDOS.Interface;
 import Server.HttpListener;
 import Server.Method.Factory;
-import Server.Reqandres.Proxy;
+import Server.Utils.Configs.APIConfigs;
+import Server.Utils.Configs.Configs;
+import Server.Utils.Configs.ProxyConfigs;
+import Server.Reqandres.Senders.QuickSender;
+import Server.Utils.Reader.BodyParser;
+import Server.Utils.Proxy;
 import Server.Utils.*;
 import java.io.*;
 import java.net.URL;
@@ -14,14 +19,14 @@ import java.util.regex.*;
 
 public class RequestProcessor {
 
-    private final ServerRequest req;
+    private final Request req;
     public Methods method;
     public ArrayList<Byte> Body = new ArrayList<>();
     public int sit = 200;
     public int stat = 1;
     public boolean KA = false;
 
-    public RequestProcessor(ServerRequest rq){
+    public RequestProcessor(Request rq){
         this.req = rq;
         this.startProcessing();
     }
@@ -34,7 +39,7 @@ public class RequestProcessor {
         }else{
             this.processRequest();
             if (KA)
-                new HttpListener(req.getSock(),req.getHost());
+                new HttpListener(req.getSocket(),req.getHost(),false);
             if (stat != 0)
                 this.continueProcess();
             else
@@ -49,7 +54,7 @@ public class RequestProcessor {
                 if (this.sit < 400) {
                     this.stat = Factory.getMt(this.method).run(req, this);
                 } else {
-                    basicUtils.sendCode(this.sit, req);
+                    new QuickSender(this.req).sendCode(this.sit);
                     this.stat = 0;
                     req.getCacheFile().delete();
                 }
@@ -65,7 +70,7 @@ public class RequestProcessor {
     private String readLine(InputStream in){
         StringBuilder sb = new StringBuilder();
         int i;
-        if (req.getSock().isClosed())
+        if (req.getSocket().isClosed())
             return null;
         try{
             i = in.read();
@@ -77,7 +82,7 @@ public class RequestProcessor {
             }
         }catch(Exception ex){
             try {
-                req.getSock().close();
+                req.getSocket().close();
             }catch (Exception ex2){
                 Logger.logException(ex2);
             }
@@ -132,7 +137,7 @@ public class RequestProcessor {
                                 }
                             } else {
                                 if (api.length > 1) {
-                                    req.getSock().setSoTimeout(0);
+                                    req.getSocket().setSoTimeout(0);
                                     req.setHost(hostName);
                                     Logger.glog("request for API " + hostName + req.getPath() + " received from " + req.getIP() + " .", hostName);
                                     new Proxy(api, sb.substring(0, sb.length() - 2), req);
@@ -144,7 +149,7 @@ public class RequestProcessor {
                                 }
                             }
                         } else if (status == 1) {
-                            req.getSock().setSoTimeout(0);
+                            req.getSocket().setSoTimeout(0);
                             req.setHost(hostName);
                             Logger.glog("request for " + hostName + " received from " + req.getIP() + " .", hostName);
                             new Proxy(Configs.getForwardAddress(hostName), sb.substring(0, sb.length() - 2), req);
@@ -157,14 +162,16 @@ public class RequestProcessor {
                             this.readRequest(sb.toString());
                         }
                     } else{
-                        this.sit = 400;
+                        this.stat = 0;
+                        new QuickSender(req).sendBadReq("\"Host\" header not found.");
                         if (Configs.BRS)
-                            Interface.addWarning(req.getIP(),"Not available");
+                            Interface.addWarning(req.getIP(),req.getHost());
                     }
                 }else{
-                    this.sit = 400;
+                    this.stat = 0;
+                    new QuickSender(req).sendBadReq("Invalid headers.");
                     if (Configs.BRS)
-                        Interface.addWarning(req.getIP(),"Not available");
+                        Interface.addWarning(req.getIP(),req.getHost());
                 }
             }else{
                 this.stat = 0;
@@ -257,7 +264,8 @@ public class RequestProcessor {
                     }
                 }
             } else{
-                this.sit = 400;
+                this.stat = 0;
+                new QuickSender(req).sendBadReq("Invalid method.");
                 Interface.addWarning(req.getIP(),req.getHost());
             }
             fw.flush();
