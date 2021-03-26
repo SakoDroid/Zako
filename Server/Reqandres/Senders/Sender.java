@@ -26,7 +26,7 @@ public class Sender {
     }
 
     private String generateResponse(String body){
-        String out = prot + " " + status + "\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako;
+        String out = prot + " " + status + "\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako + "\nStatus: " + this.status;
         if (body != null)
             out += "\nContent-Length: " + body.length();
         if (contentType != null)
@@ -50,7 +50,7 @@ public class Sender {
     }
 
     public void setStatus(int statusCode){
-        status = basicUtils.getStatusCodeComp(statusCode);
+        this.status = basicUtils.getStatusCodeComp(statusCode);
     }
 
     public void setContentType(String cnt){

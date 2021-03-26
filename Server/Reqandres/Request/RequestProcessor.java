@@ -191,7 +191,7 @@ public class RequestProcessor {
         Object cnc = req.getHeaders().get("Connection");
         if (cnc != null) {
             String con = (String) cnc;
-            KA = Configs.getKeepAlive(req.getHost()) && !con.trim().equals("close");
+            KA = Configs.getKeepAlive(req.getHost()) && con.trim().equals("keep-alive");
         } else KA = false;
     }
 

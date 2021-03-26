@@ -24,6 +24,7 @@ public class Loader {
                 ScriptsConfigs.load(fl);
                 Perms.load(fl);
                 APIConfigs.load(fl);
+                HTAccess.getInstance().load(fl);
             }
         }
         Server.Utils.Configs.loadMain();

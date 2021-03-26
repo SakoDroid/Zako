@@ -23,7 +23,7 @@ public class Response {
             new View(request.getHost(),request.getIP());
             if (reqes.sit < 300){
                 if (this.isClientRequestingProtocolSwitch()){
-                    if (this.isClientsRequestForProtocolSwitchValid())
+                    if (ProtocolSwitcher.isClientsRequestForProtocolSwitchValid(String.valueOf(request.getHeaders().get("Upgrade")), request.getHost() , request.getProt()))
                         new ProtocolSwitcher(this.request);
                 }else
                     Server.API.Factory.getAPI(request.Path, request.getHost()).init(request, reqes);
@@ -43,18 +43,6 @@ public class Response {
                 Object up = request.getHeaders().get("Upgrade");
                 return up != null;
             }
-        }
-        return false;
-    }
-
-    private boolean isClientsRequestForProtocolSwitchValid(){
-        Object up = request.getHeaders().get("Upgrade");
-        if (up != null){
-            if (request.getProt().equals("HTTP/1.1"))
-                return !String.valueOf(up).equalsIgnoreCase("http/1.1");
-            else if (request.getProt().equals("HTTP/2"))
-                return !String.valueOf(up).equalsIgnoreCase("h2") && !String.valueOf(up).equalsIgnoreCase("h2c") &&
-                        !String.valueOf(up).equalsIgnoreCase("http/2");
         }
         return false;
     }

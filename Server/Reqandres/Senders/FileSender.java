@@ -14,7 +14,7 @@ public class FileSender extends Sender {
 
     private String generateHeaders(long contentLength,String host){
         String out = prot + " " + status + "\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako +
-                "\nContent-Length: " + contentLength + "\nContent-Type: " + contentType;
+                "\nContent-Length: " + contentLength + "\nContent-Type: " + contentType + "\nStatus: " + this.status;
         if (ext != null)
             out += FileTypes.getHeaders(ext,host);
         if (Double.parseDouble(prot.replace("HTTP/","")) < 2){
