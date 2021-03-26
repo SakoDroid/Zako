@@ -4,8 +4,6 @@ import Server.Reqandres.Request.Request;
 import Server.Reqandres.Senders.Sender;
 import Server.Utils.HTAccess;
 
-import java.io.DataOutputStream;
-
 public class ProtocolSwitcher {
 
     private final Request request;

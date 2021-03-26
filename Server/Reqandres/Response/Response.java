@@ -22,10 +22,10 @@ public class Response {
             Logger.glog("Preparing response to " + request.getIP() + "  ; id = " + request.getID(), request.getHost());
             new View(request.getHost(),request.getIP());
             if (reqes.sit < 300){
-                if (this.isClientRequestingProtocolSwitch()){
-                    if (ProtocolSwitcher.isClientsRequestForProtocolSwitchValid(String.valueOf(request.getHeaders().get("Upgrade")), request.getHost() , request.getProt()))
-                        new ProtocolSwitcher(this.request);
-                }else
+                if (this.isClientRequestingProtocolSwitch() &&
+                ProtocolSwitcher.isClientsRequestForProtocolSwitchValid(String.valueOf(request.getHeaders().get("Upgrade")), request.getHost() , request.getProt()))
+                    new ProtocolSwitcher(this.request);
+                else
                     Server.API.Factory.getAPI(request.Path, request.getHost()).init(request, reqes);
             }
             else

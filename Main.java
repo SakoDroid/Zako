@@ -65,13 +65,13 @@ public class Main extends Thread{
         }
     }
 
-    private boolean runTest(){
-        try{
-            ProcessBuilder pb = new ProcessBuilder("zako","test","-a");
+    private boolean runTest() {
+        try {
+            ProcessBuilder pb = new ProcessBuilder("zako", "test", "-a");
             Process p = pb.start();
             String res = new String(p.getInputStream().readAllBytes());
             return res.trim().equals("true");
-        }catch (Exception ex){
+        } catch (Exception ex) {
             Logger.logException(ex);
             return false;
         }

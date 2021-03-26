@@ -39,12 +39,13 @@ public class HTAccess {
         private final HashSet<String> allowableUpgrades = new HashSet<>();
 
         public HTAccessConfig(File fl){
-            HashMap mainData = (HashMap) JSONBuilder.newInstance().parse(new File(fl.getAbsolutePath() + "htaccess.conf")).toJava();
+            HashMap mainData = (HashMap) JSONBuilder.newInstance().parse(new File(fl.getAbsolutePath() + "/htaccess.conf")).toJava();
             upgradeIsAllowed = (Boolean) mainData.get("allow upgrades");
-            keepAliveTimeOut = (int) mainData.get("keep alive default timeout");
+            keepAliveTimeOut = (int)(long) mainData.get("keep alive default timeout");
             String allowableUpgradesList = String.valueOf(mainData.get("Allowable upgrades"));
-            for (String prot : allowableUpgradesList.split(","))
+            for (String prot : allowableUpgradesList.split(" "))
                 allowableUpgrades.add(prot.trim());
+            this.fixTheUpgradeList();
         }
 
         private void fixTheUpgradeList(){
