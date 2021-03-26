@@ -1,6 +1,6 @@
 import Engines.DDOS.Interface;
 import Server.HttpListener;
-import Server.Reqandres.Request.Request;
+import Server.Reqandres.Request.ServerRequest;
 import Server.Utils.*;
 import javax.net.ssl.*;
 import java.io.BufferedReader;
@@ -10,9 +10,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.regex.*;
 
 public class HttpsServerMainThread{
 
@@ -110,15 +108,15 @@ public class HttpsServerMainThread{
                                         this.red("https://" + host + path);
                                 }else {
                                     Interface.addWarning(sock.getInetAddress().getHostAddress(),host);
-                                    basicUtils.sendCode(400,new Request(sock));
+                                    basicUtils.sendCode(400,new ServerRequest(sock));
                                 }
                             }else {
                                 Interface.addWarning(sock.getInetAddress().getHostAddress(),host);
-                                basicUtils.sendCode(400,new Request(sock));
+                                basicUtils.sendCode(400,new ServerRequest(sock));
                             }
                         }else{
                             Interface.addWarning(sock.getInetAddress().getHostAddress(),host);
-                            basicUtils.sendCode(400,new Request(sock));
+                            basicUtils.sendCode(400,new ServerRequest(sock));
                         }
                     }
                 }catch(Exception ex){

@@ -1,6 +1,6 @@
 package Server.Reqandres.Response;
 
-import Server.Reqandres.Request.Request;
+import Server.Reqandres.Request.ServerRequest;
 import Server.Reqandres.Request.RequestProcessor;
 import Server.Utils.*;
 import Server.Utils.ViewCounter.View;
@@ -8,10 +8,10 @@ import Server.Utils.ViewCounter.View;
 public class Response {
 
     private final RequestProcessor reqes;
-    private final Request request;
+    private final ServerRequest request;
 
 
-    public Response(RequestProcessor rq, Request req){
+    public Response(RequestProcessor rq, ServerRequest req){
         this.reqes = rq;
         this.request = req;
         this.handleRes();
@@ -26,7 +26,7 @@ public class Response {
                 ProtocolSwitcher.isClientsRequestForProtocolSwitchValid(String.valueOf(request.getHeaders().get("Upgrade")), request.getHost() , request.getProt()))
                     new ProtocolSwitcher(this.request);
                 else
-                    Server.API.Factory.getAPI(request.Path, request.getHost()).init(request, reqes);
+                    Server.API.Factory.getAPI(request.getPath(), request.getHost()).init(request, reqes);
             }
             else
                 basicUtils.sendCode(reqes.sit,request);

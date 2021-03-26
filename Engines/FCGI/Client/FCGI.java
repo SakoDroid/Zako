@@ -4,7 +4,7 @@ import Engines.CGI;
 import Engines.CGIClient.CGIDataSender;
 import Engines.FCGI.Client.Response.FCGIResponse;
 import Engines.FCGI.Client.Utils.FCGIConstants;
-import Server.Reqandres.Request.Request;
+import Server.Reqandres.Request.ServerRequest;
 import Server.Utils.Logger;
 import Server.Utils.basicUtils;
 
@@ -12,7 +12,7 @@ import java.io.File;
 
 public class FCGI extends CGI {
 
-    public FCGI(String ext, File cgiFile, Request req){
+    public FCGI(String ext, File cgiFile, ServerRequest req){
         this.extension = ext;
         this.file = cgiFile;
         this.req = req;

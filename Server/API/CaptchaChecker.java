@@ -1,7 +1,7 @@
 package Server.API;
 
 import Engines.Captcha.Data;
-import Server.Reqandres.Request.Request;
+import Server.Reqandres.Request.ServerRequest;
 import Server.Reqandres.Request.RequestProcessor;
 import Server.Reqandres.Senders.FileSender;
 import Server.Utils.basicUtils;
@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 
 public class CaptchaChecker implements API{
     @Override
-    public void init(Request req, RequestProcessor reqp) {
+    public void init(ServerRequest req, RequestProcessor reqp) {
         String returnAns = "NA";
         String ans = new String(basicUtils.toByteArray(reqp.Body));
         FileSender fs = new FileSender(req.getProt(),200);

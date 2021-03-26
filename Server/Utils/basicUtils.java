@@ -1,12 +1,11 @@
 package Server.Utils;
 
-import Server.Reqandres.Request.Request;
+import Server.Reqandres.Request.ServerRequest;
 import Server.Reqandres.Senders.FileSender;
 import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,8 +15,6 @@ public class basicUtils {
     private static final File cmds = new File (Configs.getCWD() + "/Data/cmds.sak");
     private static HashMap<Integer,String> codes;
     private static HashMap<String,String> execCmds;
-    private static final ArrayList<Integer> ids = new ArrayList<>();
-    private static final Random rnd = new Random();
     public static String LocalHostIP = "", Zako = "Zako 1.4.2";
 
     private basicUtils(){}
@@ -77,15 +74,6 @@ public class basicUtils {
         return execCmds.get(ext);
     }
 
-    public static int getID(){
-        int id = Math.abs(rnd.nextInt());
-        while (ids.contains(id) || id == 0) {
-            id = rnd.nextInt();
-        }
-        ids.add(id);
-        return id;
-    }
-
     public static byte[] toByteArray(ArrayList<Byte> bytes){
         byte[] temp = new byte[bytes.size()];
         int i = 0;
@@ -94,24 +82,19 @@ public class basicUtils {
         return temp;
     }
 
-    public static void delID(int id){
-        ids.remove((Integer) id);
-    }
-
-    public static void sendCode(int code, Request req){
+    public static void sendCode(int code, ServerRequest req){
         FileSender fs = new FileSender(req.getProt(),code);
         fs.setContentType("text/html");
         fs.setExtension(".html");
         fs.sendFile(Methods.GET,new File(Configs.getCWD() + "/default_pages/" + code + ".html"),req.out,req.getIP(),req.getID(), req.getHost());
     }
 
-    public static void redirect(int code,String location, Request req){
+    public static void redirect(int code,String location, ServerRequest req){
         Logger.glog("Redirecting " + req.getIP() + " to " + location + "  ; id = " + req.getID(),req.getHost());
         try{
             req.out.writeBytes("HTTP/1.1 " + getStatusCodeComp(code) + "\nServer: " + basicUtils.Zako + "\nLocation: " + location + "\nConnection: close\n\n");
             req.out.flush();
             req.out.close();
-            basicUtils.delID(req.getID());
             Logger.glog(req.getIP() + "'s request redirected to " + location + "!" + "  ; id = " + req.getID(),req.getHost());
         }catch(Exception ex){
             Logger.logException(ex);

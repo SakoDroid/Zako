@@ -1,14 +1,14 @@
 package Server.Method;
 
-import Server.Reqandres.Request.Request;
+import Server.Reqandres.Request.ServerRequest;
 import Server.Reqandres.Request.RequestProcessor;
 import Server.Reqandres.Senders.Sender;
 
 public class OPTIONS implements Method{
     @Override
-    public int run(Request req, RequestProcessor reqp) {
+    public int run(ServerRequest req, RequestProcessor reqp) {
         Sender snd = new Sender(req.getProt(),200);
-        snd.sendOptionsMethod(req.out,req.getIP(),req.getID(),req.getHost());
+        snd.sendOptionsMethod(req);
         return 0;
     }
 }

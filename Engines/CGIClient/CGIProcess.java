@@ -1,7 +1,7 @@
 package Engines.CGIClient;
 
 import Engines.CGI;
-import Server.Reqandres.Request.Request;
+import Server.Reqandres.Request.ServerRequest;
 import Server.Reqandres.Senders.FileSender;
 import Server.Utils.*;
 import java.io.*;
@@ -11,7 +11,7 @@ public class CGIProcess extends CGI {
 
     private List<String> commands;
 
-    public CGIProcess(String ext,File cgiFile,Request req){
+    public CGIProcess(String ext, File cgiFile, ServerRequest req){
         this.extension = ext;
         this.file = cgiFile;
         this.req = req;
@@ -19,7 +19,7 @@ public class CGIProcess extends CGI {
         this.getParams();
     }
 
-    public CGIProcess(String ext,File cgiFile,Request req,String args){
+    public CGIProcess(String ext, File cgiFile, ServerRequest req, String args){
         this.extension = ext;
         this.file = cgiFile;
         this.req = req;
@@ -28,7 +28,7 @@ public class CGIProcess extends CGI {
         this.getParams();
     }
 
-    public CGIProcess(File cgiFile,Request req,List<String> commands){
+    public CGIProcess(File cgiFile, ServerRequest req, List<String> commands){
         this.extension = "NA";
         this.file = cgiFile;
         this.req = req;

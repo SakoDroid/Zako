@@ -1,11 +1,7 @@
 package Server.Reqandres.Senders;
 
-import Server.Utils.Configs;
+import Server.Reqandres.Request.ServerRequest;
 import Server.Utils.Logger;
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileReader;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 import Server.Utils.basicUtils;
@@ -73,59 +69,42 @@ public class Sender {
     }
 
 
-    public void sendOptionsMethod(DataOutputStream out,String ip,int id,String host){
+    public void sendOptionsMethod(ServerRequest req){
         try{
-            Logger.glog("Sending back options method response to " + ip + "  ; id = " + id,host);
-            out.writeBytes(prot + " 200 OK\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako + "\nConnection: close\nAllow: GET,HEAD,POST,OPTIONS,TRACE,CONNECT,PUT,DELETE\nx-IPS-Allowed-For-PUT-DELETE: ");
-            File fl = null;
-            if (System.getProperty("os.name")
-                    .toLowerCase().contains("windows"))
-                fl = new File(System.getProperty("user.dir") + "/Configs/sec/ILPD");
-            else if (System.getProperty("os.name")
-                    .toLowerCase().contains("linux"))
-                fl = new File("/etc/zako-web/sec/ILPD");
-            assert fl != null;
-            BufferedReader bf = new BufferedReader(new FileReader(fl));
-            String line;
-            String ips = "";
-            while ((line = bf.readLine()) != null){
-                if (!line.startsWith("#")) ips += line + ", ";
-            }
-            bf.close();
-            if (ips.isEmpty()) out.writeBytes("");
-            else out.writeBytes(ips.substring(0,ips.length()-1));
-            out.flush();
-            out.close();
-            basicUtils.delID(id);
-            Logger.glog(ip + "'s request handled successfully!" + "  ; id = " + id,host);
+            Logger.glog("Sending back options method response to " + req.getIP() + "  ; debug_id = " + req.getID(),req.getHost());
+            req.out.writeBytes(prot + " 200 OK\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako + "\nConnection: close\nAllow: GET,HEAD,POST,OPTIONS,TRACE,CONNECT,PUT,DELETE");
+            req.out.flush();
+            req.out.close();
+            Logger.glog(req.getIP() + "'s request handled successfully!" + "  ; debug_id = " + req.getID(),req.getHost());
+            req.clearRequest();
         }catch (Exception ex){
             Logger.logException(ex);
         }
     }
 
-    public void sendConnectMethod(DataOutputStream out,String ip,int id,String host){
+    public void sendConnectMethod(ServerRequest req){
         try{
-            Logger.glog("Sending back connect method response to " + ip + "  ; id = " + id,host);
-            out.writeBytes(prot + " 200 Connection established\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako);
-            out.flush();
-            out.close();
-            basicUtils.delID(id);
-            Logger.glog(ip + "'s request handled successfully!" + "  ; id = " + id,host);
+            Logger.glog("Sending back connect method response to " + req.getIP() + "  ; debug_id = " + req.getID(),req.getHost());
+            req.out.writeBytes(prot + " 200 Connection established\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako);
+            req.out.flush();
+            req.out.close();
+            Logger.glog(req.getIP() + "'s request handled successfully!" + "  ; debug_id = " + req.getID(),req.getHost());
+            req.clearRequest();
         }catch (Exception ex){
             Logger.logException(ex);
         }
     }
 
-    public void send(String data, DataOutputStream out,String ip,int id,String host){
-        Logger.glog("Sending response to " + ip + "  ; id = " + id,host);
+    public void send(String data, ServerRequest req){
+        Logger.glog("Sending response to " + req.getID() + "  ; debug_id = " + req.getID(),req.getHost());
         try{
-            out.writeBytes(generateResponse(data));
+            req.out.writeBytes(generateResponse(data));
             if (!this.keepAlive) {
-                out.flush();
-                out.close();
+                req.out.flush();
+                req.out.close();
             }
-            basicUtils.delID(id);
-            Logger.glog(ip + "'s request handled successfully!" + "  ; id = " + id,host);
+            Logger.glog(req.getID() + "'s request handled successfully!" + "  ; debug_id = " + req.getID(),req.getHost());
+            req.clearRequest();
         }catch(Exception ex){
             Logger.logException(ex);
         }

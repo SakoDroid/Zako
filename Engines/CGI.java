@@ -1,7 +1,7 @@
 package Engines;
 
 import Engines.FCGI.Client.Utils.Utils;
-import Server.Reqandres.Request.Request;
+import Server.Reqandres.Request.ServerRequest;
 import Server.Utils.Configs;
 import Server.Utils.Methods;
 import Server.Utils.basicUtils;
@@ -13,7 +13,7 @@ public abstract class CGI {
     protected boolean FCGI = false;
     protected String extension;
     protected File file;
-    protected Request req;
+    protected ServerRequest req;
     protected Map<String,String> envs;
 
     public abstract void exec(byte[] body,boolean ka);
@@ -25,12 +25,12 @@ public abstract class CGI {
         String ck = (String)req.getHeaders().get("Cookie");
         if (FCGI) envs.put("GATEWAY_INTERFACE", "FastCGI/1.0");
         envs.put("QUERY_STRING", ((query != null) ? query : ""));
-        envs.put("PATH_INFO",req.orgPath);
+        envs.put("PATH_INFO",req.getOrgPath());
         envs.put("DOCUMENT_ROOT", file.getAbsolutePath().replace("/" + file.getName(),""));
         envs.put("HTTP_COOKIE",((ck != null) ? ck : ""));
         envs.put("HTTP_USER_AGENT",(String)req.getHeaders().get("User-Agent"));
         envs.put("REQUEST_METHOD",String.valueOf(mthd));
-        envs.put("REQUEST_URI", req.Path);
+        envs.put("REQUEST_URI", req.getPath());
         envs.put("SCRIPT_FILENAME", file.getAbsolutePath());
         envs.put("SCRIPT_NAME",file.getName());
         envs.put("REMOTE_ADDR",req.getIP());

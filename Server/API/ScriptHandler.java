@@ -3,23 +3,23 @@ package Server.API;
 import Engines.CGI;
 import Engines.CGIClient.CGIProcess;
 import Engines.FCGI.Client.FCGI;
-import Server.Reqandres.Request.Request;
+import Server.Reqandres.Request.ServerRequest;
 import Server.Utils.*;
 
 import java.io.File;
 
 public class ScriptHandler {
 
-    private final Request req;
+    private final ServerRequest req;
     private final String ext;
 
-    public ScriptHandler(Request req,String extension){
+    public ScriptHandler(ServerRequest req, String extension){
         this.req = req;
         this.ext = extension;
     }
 
     public void process(byte[] body,boolean ka){
-        File fl = new File(Configs.getCGIDir(req.getHost()) + req.Path);
+        File fl = new File(Configs.getCGIDir(req.getHost()) + req.getPath());
         if (fl.exists()){
             int status = ScriptsConfigs.getHandleMode(req.getHost(),ext);
             CGI client = ((status == 0) ? new CGIProcess(ext,fl,req) : new FCGI(ext,fl,req));

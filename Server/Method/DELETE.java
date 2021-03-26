@@ -1,6 +1,6 @@
 package Server.Method;
 
-import Server.Reqandres.Request.Request;
+import Server.Reqandres.Request.ServerRequest;
 import Server.Reqandres.Request.RequestProcessor;
 import Server.Reqandres.Senders.Sender;
 import Server.Utils.Configs;
@@ -12,14 +12,14 @@ import java.io.File;
 
 public class DELETE implements Method{
     @Override
-    public int run(Request req, RequestProcessor reqp) {
+    public int run(ServerRequest req, RequestProcessor reqp) {
         try{
             if(Perms.isIPAllowedForPUTAndDelete(req.getIP(), req.getHost())){
-                File fl = new File(Configs.getMainDir(req.getHost()) + req.Path);
+                File fl = new File(Configs.getMainDir(req.getHost()) + req.getPath());
                 if (fl.exists()) {
                     fl.delete();
                     Sender snd = new Sender(req.getProt(),200);
-                    snd.send(null,req.out,req.getIP(),req.getID(),req.getHost());
+                    snd.send(null,req);
                 } else basicUtils.sendCode(404,req);
             }else basicUtils.sendCode(405,req);
         }catch(Exception ex){

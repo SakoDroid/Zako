@@ -1,13 +1,13 @@
 package Server.Reqandres;
 
-import Server.Reqandres.Request.Request;
+import Server.Reqandres.Request.ServerRequest;
 import Server.Utils.Logger;
 import java.net.Socket;
 import java.io.*;
 
 public class Proxy {
 
-    public Proxy(String[] address, String read, Request req){
+    public Proxy(String[] address, String read, ServerRequest req){
         try{
             Socket s = new Socket(address[0], Integer.parseInt(address[1]));
             new Piper(read, req.is, s.getOutputStream(), s);

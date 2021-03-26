@@ -1,6 +1,6 @@
 package Server;
 
-import Server.Reqandres.Request.Request;
+import Server.Reqandres.Request.ServerRequest;
 import Server.Reqandres.Request.RequestProcessor;
 import Server.Reqandres.Response.Response;
 import Server.Utils.*;
@@ -12,18 +12,18 @@ import java.net.Socket;
 
 public class HttpListener extends Thread{
 
-    private final Request req;
+    private final ServerRequest req;
     private final String hostName;
 
     public HttpListener(Socket client,String host){
         this.hostName = host;
-        this.req = new Request(client);
+        this.req = new ServerRequest(client);
         this.start();
     }
 
     public HttpListener(SSLSocket client,String host){
         this.hostName = host;
-        this.req = new Request(client);
+        this.req = new ServerRequest(client);
         try{
             SSLParameters sslp = client.getSSLParameters();
             sslp.setApplicationProtocols(new String[]{"TLS/1.3","TLS/1.2","TLS/1.1","TLS/1","http/1.1","h2c","h2"});

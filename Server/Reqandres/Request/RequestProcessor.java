@@ -14,28 +14,27 @@ import java.util.regex.*;
 
 public class RequestProcessor {
 
-    private final Request req;
+    private final ServerRequest req;
     public Methods method;
     public ArrayList<Byte> Body = new ArrayList<>();
     public int sit = 200;
     public int stat = 1;
     public boolean KA = false;
 
-    public RequestProcessor(Request rq){
+    public RequestProcessor(ServerRequest rq){
         this.req = rq;
         this.startProcessing();
     }
 
     private void startProcessing(){
         if (ProxyConfigs.isOn){
-            Logger.glog("Proxy is on, request is being forwarded.","Not available");
-            req.setHost("Not available");
+            Logger.glog("Proxy is on, request is being forwarded.",req.getHost());
             new Proxy(ProxyConfigs.getAddress(),null,req);
             this.stat = 0;
         }else{
             this.processRequest();
             if (KA)
-                new HttpListener(req.getSock(),"Not available");
+                new HttpListener(req.getSock(),req.getHost());
             if (stat != 0)
                 this.continueProcess();
             else
@@ -92,17 +91,16 @@ public class RequestProcessor {
         try{
             String line = this.readLine(req.is);
             if (line != null && line.length() > 5){
-                String path;
                 Pattern pathPattern = Pattern.compile(" /[^ ]*");
                 Matcher pathMatcher = pathPattern.matcher(line);
                 Pattern protPattern = Pattern.compile("HTTP/\\d[.]?\\d?");
                 Matcher protMatcher = protPattern.matcher(line);
                 if (pathMatcher.find() && protMatcher.find()){
-                    path = URLDecoder.decode(pathMatcher.group().trim(), StandardCharsets.UTF_8);
-                    Matcher mch = Pattern.compile("/[^?]+").matcher(path);
+                    req.setOrgPath(pathMatcher.group());
+                    req.setPath(req.getOrgPath());
+                    Matcher mch = Pattern.compile("/[^?]+").matcher(req.getOrgPath());
                     if (mch.find())
-                        req.Path = mch.group();
-                    req.orgPath = path;
+                        req.setPath(mch.group());
                     req.setProt(protMatcher.group());
                     StringBuilder sb = new StringBuilder();
                     sb.append(line);
@@ -125,23 +123,23 @@ public class RequestProcessor {
                                 .replace("www.",""),StandardCharsets.UTF_8);
                         int status = Configs.getHostStatus(hostName);
                         if (status == 0) {
-                            String[] api = APIConfigs.getAPIAddress(hostName + path,hostName);
+                            String[] api = APIConfigs.getAPIAddress(hostName + req.getPath(),hostName);
                             if (api == null) {
                                 req.setHost(hostName);
                                 this.readRequest(sb.toString());
                                 if (this.method == Methods.POST && this.sit == 200) {
-                                    this.parseBody();
+                                    new BodyParser(this.req).parseBody();
                                 }
                             } else {
                                 if (api.length > 1) {
                                     req.getSock().setSoTimeout(0);
                                     req.setHost(hostName);
-                                    Logger.glog("request for API " + hostName + path + " received from " + req.getIP() + " .", hostName);
+                                    Logger.glog("request for API " + hostName + req.getPath() + " received from " + req.getIP() + " .", hostName);
                                     new Proxy(api, sb.substring(0, sb.length() - 2), req);
                                     this.stat = 0;
                                 } else {
                                     req.setHost(hostName);
-                                    req.Path = api[0];
+                                    req.setPath(api[0]);
                                     this.readRequest(sb.toString());
                                 }
                             }
@@ -178,7 +176,7 @@ public class RequestProcessor {
     }
 
     private void authenticate(){
-        if (Server.HttpAuth.Interface.getInstance().needAuth(req.getHost() + req.Path,req.getHost())){
+        if (Server.HttpAuth.Interface.getInstance().needAuth(req.getHost() + req.getPath(),req.getHost())){
             this.sit = Server.HttpAuth.Interface.getInstance().evaluate(req.getHeaders(),req.getIP(), req.getHost());
             if (this.sit == 401){
                 this.stat = 0;
@@ -188,22 +186,19 @@ public class RequestProcessor {
     }
 
     private void determineKeepAlive(){
-        Object cnc = req.getHeaders().get("Connection");
+        String cnc = req.getHeaders().get("Connection");
         if (cnc != null) {
-            String con = (String) cnc;
-            KA = Configs.getKeepAlive(req.getHost()) && con.trim().equals("keep-alive");
+            KA = Configs.getKeepAlive(req.getHost()) && cnc.trim().equals("keep-alive");
         } else KA = false;
     }
 
     private void fixTheHeaders(){
         try{
             if (this.method != Methods.CONNECT && this.method != Methods.OPTIONS) {
-                String prt = (String) req.getHeaders().get("Version");
-                String url = prt.split("/")[0] + "://" + req.getHost() + req.orgPath;
-                URL u = new URL(url);
-                req.getHeaders().replace("URL", u);
-                req.setURL(u);
-                Logger.glog(req.getIP() + "'s request is for ' " + u.getPath() + " '    ; id = " + req.getID(), req.getHost());
+                String prt = req.getHeaders().get("Protocol");
+                String url = prt.split("/")[0] + "://" + req.getHost() + req.getOrgPath();
+                req.setURL(new URL(url));
+                Logger.glog(req.getIP() + " is requesting " + req.getPath() + "   ;; debug_id = " + req.getID(), req.getHost());
             }
         }catch(Exception ex){
             Logger.logException(ex);
@@ -229,12 +224,7 @@ public class RequestProcessor {
             req.setMethod(this.method);
             if (this.method != Methods.UNKNOWN) {
                 req.setProt(p[2].trim());
-                req.getHeaders().put("Method", this.method);
-                req.getHeaders().put("URL", p[1]);
-                req.getHeaders().put("Version", p[2]);
-                req.orgPath = URLDecoder.decode(p[1],StandardCharsets.UTF_8);
-                if (req.Path == null)
-                    req.Path = req.orgPath;
+                req.getHeaders().put("Protocol", p[2]);
                 for (int i = 1; i < currentRead.length; i++) {
                     String[] tmp = currentRead[i].split(":", 2);
                     if (tmp.length != 1) req.getHeaders().put(tmp[0].trim(), tmp[1].trim());
@@ -273,74 +263,6 @@ public class RequestProcessor {
             fw.flush();
         }catch(Exception ex){
             Logger.logException(ex);
-        }
-    }
-
-    public void parseBody(){
-        try(RandomAccessFile bf = new RandomAccessFile(req.getCacheFile(), "r")){
-            Pattern ptn = Pattern.compile("boundary=[^\n]+");
-            Matcher mc = ptn.matcher((String)req.getHeaders().get("Content-Type"));
-            String bnd ;
-            String line;
-            while(!bf.readLine().isEmpty()){}
-            ArrayList<String[]> files = new ArrayList<>();
-            if (mc.find()) {
-                bnd = "--" + mc.group().replace("boundary=", "");
-                while((line = bf.readLine()) != null){
-                    if(line.startsWith(bnd)){
-                        String detailLine = bf.readLine();
-                        if (detailLine == null) break;
-                        ptn = Pattern.compile("filename=\"[^\"]+");
-                        mc = ptn.matcher(detailLine);
-                        Pattern nameptn = Pattern.compile("name=\"[^\"]+");
-                        Matcher namemc = nameptn.matcher(detailLine);
-                        if(mc.find()){
-                            String fileName = mc.group().replace("filename=","").replace("\"","");
-                            if (fileName.isEmpty()) continue;
-                            String filead = Configs.getUploadDir((String)this.req.getHeaders().get("Host")) + "/" + fileName;
-                            if(namemc.find()) this.addToCGIBody((namemc.group().replace("name=","").replace("\"","") + "=" + filead).getBytes());
-                            String[] file = new String[3];
-                            file[0] = filead;
-                            bf.readLine();
-                            bf.readLine();
-                            long on = bf.getFilePointer();
-                            file[1] = String.valueOf(on);
-                            long off;
-                            while(true){
-                                off = bf.getFilePointer();
-                                line = bf.readLine();
-                                if (line.startsWith(bnd)){
-                                    file[2] = String.valueOf(off);
-                                    bf.seek(off);
-                                    break;
-                                }
-                            }
-                            if (off - on < Configs.getFileSize(req.getHost())) files.add(file);
-                        }else if (namemc.find()){
-                            bf.readLine();
-                            String val = bf.readLine();
-                            if(!val.isEmpty()) this.addToCGIBody((namemc.group().replace("name=\"","") + "=" + val).getBytes());
-                        }
-                    }
-                }
-            }else {
-                bf.read();
-                byte[] temp = new byte[(int)(bf.length() - bf.getFilePointer())];
-                bf.read(temp);
-                this.addToCGIBody(temp);
-            }
-            bf.close();
-            if (!files.isEmpty()) new FileFixer(files,req.getCacheFile());
-        }catch(Exception ex){
-            Logger.logException(ex);
-        }
-    }
-
-    private void addToCGIBody(byte[] data){
-        if(Body.isEmpty()) for (byte b : data) Body.add(b);
-        else{
-            Body.add((byte)'&');
-            for (byte b : data) Body.add(b);
         }
     }
 }

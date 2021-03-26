@@ -1,6 +1,6 @@
 package Server.HttpAuth;
 
-import Server.Reqandres.Request.Request;
+import Server.Reqandres.Request.ServerRequest;
 import Server.Reqandres.Senders.Sender;
 import Server.Utils.JSON.JSONBuilder;
 import Server.Utils.Logger;
@@ -112,14 +112,14 @@ public class Core {
             return  403;
     }
 
-    public void askForAuth(Request req){
+    public void askForAuth(ServerRequest req){
         Server.Reqandres.Senders.Sender snd = new Sender(req.getProt(),401);
         snd.setKeepAlive(true);
         snd.addHeader(getHeader(req));
         snd.send(null,req.out,req.getIP(),req.getID(),req.getHost());
     }
 
-    private String getHeader(Request req){
+    private String getHeader(ServerRequest req){
         String header = "WWW-Authenticate: " + Mechanism + " realm=\"" + realm + "\"";
         if (Mechanism == Mechanisms.Digest){
             header += ",algorithm=" + alg;

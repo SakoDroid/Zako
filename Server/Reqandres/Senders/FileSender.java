@@ -1,5 +1,6 @@
 package Server.Reqandres.Senders;
 
+import Server.Reqandres.Request.ServerRequest;
 import Server.Utils.*;
 import java.io.*;
 import java.util.Date;
@@ -33,38 +34,38 @@ public class FileSender extends Sender {
         this.ext = ext;
     }
 
-    public void sendFile(Methods method, File file, DataOutputStream out, String ip, int id, String host){
-        Logger.glog("Sending requested file to " + ip + "   ; file name : " + file.getName() + "  ; id = " + id,host);
+    public void sendFile(File file, ServerRequest req){
+        Logger.glog("Sending requested file to " + req.getIP() + "   ; file name : " + file.getName() + "  ; debug_id = " + req.getID(),req.getHost());
         try{
-            out.writeBytes(generateHeaders(file.length(),host));
-            if(method != Methods.HEAD){
+            req.out.writeBytes(generateHeaders(file.length(),req.getHost()));
+            if(req.getMethod() != Methods.HEAD){
                 FileInputStream in = new FileInputStream(file);
-                in.transferTo(out);
+                in.transferTo(req.out);
                 in.close();
             }
             if (!this.keepAlive) {
-                out.flush();
-                out.close();
+                req.out.flush();
+                req.out.close();
             }
-            Logger.glog(ip + "'s request handled successfully!" + "  ; id = " + id,host);
-            basicUtils.delID(id);
+            Logger.glog(req.getIP() + "'s request handled successfully!" + "  ; debug_id = " + req.getID(), req.getHost());
+            req.clearRequest();
         }catch(Exception ex){
             Logger.logException(ex);
         }
     }
 
-    public void sendFile(Methods method, byte[] file, DataOutputStream out, String ip, int id, String host){
-        Logger.glog("Sending a file (byte[]) to " + ip + "  ; id = " + id,host);
+    public void sendFile(byte[] file, ServerRequest req){
+        Logger.glog("Sending a file (byte[]) to " + req.getIP() + "  ; debug_id = " + req.getID(), req.getHost());
         try{
-            out.writeBytes(generateHeaders(file.length,host));
-            if(method != Methods.HEAD)
-                out.write(file);
+            req.out.writeBytes(generateHeaders(file.length,req.getHost()));
+            if(req.getMethod() != Methods.HEAD)
+                req.out.write(file);
             if (!this.keepAlive) {
-                out.flush();
-                out.close();
+                req.out.flush();
+                req.out.close();
             }
-            Logger.glog(ip + "'s request handled successfully!" + "  ; id = " + id,host);
-            basicUtils.delID(id);
+            Logger.glog(req.getIP() + "'s request handled successfully!" + "  ; debug_id = " + req.getID(),req.getHost());
+            req.clearRequest();
         }catch(Exception ex){
             Logger.logException(ex);
         }
