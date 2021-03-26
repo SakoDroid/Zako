@@ -171,6 +171,7 @@ public class Request {
     }
 
     public void clearRequest(){
+        boolean bl = this.TempFile.delete();
         this.Path = null;
         this.body.clear();
         this.body = null;

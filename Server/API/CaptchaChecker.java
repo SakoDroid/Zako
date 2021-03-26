@@ -23,7 +23,7 @@ public class CaptchaChecker implements API{
             returnAns = Data.checkAnswer(req.getIP(),new String(basicUtils.toByteArray(reqp.Body)),req.getHost());
             new TargetChecker(mc.group(), returnAns, req.getIP());
         }
-        fs.send(returnAns,req.out,req.getIP(),req.getID(),req.getHost());
+        fs.send(returnAns,req);
     }
 
     private static class TargetChecker extends Thread{

@@ -33,10 +33,10 @@ public class FCGI extends CGI {
         CGIDataSender ds = new CGIDataSender(req.getProt(),200);
         ds.setKeepAlive(KA);
         if (response.status == 0 && response.getErrorContent().isEmpty())
-            ds.sendFCGIData(basicUtils.toByteArray(response.getContent()),req.out,req.getIP(),req.getID(),req.getHost());
+            ds.sendFCGIData(basicUtils.toByteArray(response.getContent()),req);
         else{
             Logger.CGIError(response.getErrorContent() + ";;; FCGI request id : " + client.reqID,file.getName(),req.getHost());
-            ds.sendFCGIData(response.getErrorContent(),req.out,req.getIP(),req.getID(),req.getHost());
+            ds.sendFCGIData(response.getErrorContent(),req);
         }
     }
 

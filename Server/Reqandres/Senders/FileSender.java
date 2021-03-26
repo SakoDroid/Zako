@@ -48,7 +48,6 @@ public class FileSender extends Sender {
                 req.out.close();
             }
             Logger.glog(req.getIP() + "'s request handled successfully!" + "  ; debug_id = " + req.getID(), req.getHost());
-            req.clearRequest();
         }catch(Exception ex){
             Logger.logException(ex);
         }
@@ -65,7 +64,6 @@ public class FileSender extends Sender {
                 req.out.close();
             }
             Logger.glog(req.getIP() + "'s request handled successfully!" + "  ; debug_id = " + req.getID(),req.getHost());
-            req.clearRequest();
         }catch(Exception ex){
             Logger.logException(ex);
         }

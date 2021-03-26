@@ -18,7 +18,7 @@ public class ProtocolSwitcher {
         String up = String.valueOf(request.getHeaders().get("Upgrade"));
         snd.addHeader("Upgrade: " + up.trim());
         snd.setKeepAlive(false);
-        snd.send(null,request.out, request.getIP(), request.getID(), request.getHost());
+        snd.send(null,request);
     }
 
     public static boolean isClientsRequestForProtocolSwitchValid (String upgradeHeader,String hostName,String prot){

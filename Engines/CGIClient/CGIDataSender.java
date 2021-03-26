@@ -1,5 +1,6 @@
 package Engines.CGIClient;
 
+import Server.Reqandres.Request.Request;
 import Server.Reqandres.Senders.Sender;
 import Server.Utils.Logger;
 import Server.Utils.basicUtils;
@@ -30,49 +31,46 @@ public class CGIDataSender extends Sender {
         return out;
     }
 
-    public void send(DataOutputStream out, String ip, int id, String host){
-        Logger.glog("Sending CGI output to " + ip + "  ; id = " + id,host);
+    public void send(Request req){
+        Logger.glog("Sending CGI output to " + req.getIP() + "  ; debug_id = " + req.getID(),req.getHost());
         try{
-            out.writeBytes(generateResponse());
+            req.out.writeBytes(generateResponse());
             int i = in.read();
-            if (i != 10) out.writeBytes("\n");
-            out.write(i);
+            if (i != 10) req.out.writeBytes("\n");
+            req.out.write(i);
             while((i = in.read()) != -1){
-                out.write(i);
+                req.out.write(i);
             }
-            basicUtils.delID(id);
-            Logger.glog(ip + "'s request handled successfully!" + "  ; id = " + id,host);
+            Logger.glog(req.getIP() + "'s request handled successfully!" + "  ; debug_id = " + req.getID(),req.getHost());
         }catch(Exception ex){
             Logger.logException(ex);
         }
     }
 
-    public void sendFCGIData(String data, DataOutputStream out, String ip, int id, String host){
+    public void sendFCGIData(String data, Request req){
         Pattern ptn = Pattern.compile("Status: .*");
         Matcher mc = ptn.matcher(data);
         if(mc.find()) status = mc.group().replace("Status: ","");
         data = data.replace("Status: " + status,"");
         try{
-            out.writeBytes(generateResponse());
-            if (data.startsWith("\n")) out.writeBytes(data);
-            else out.writeBytes("\n" + data);
-            basicUtils.delID(id);
-            Logger.glog(ip + "'s request handled successfully!" + "  ; id = " + id,host);
+            req.out.writeBytes(generateResponse());
+            if (data.startsWith("\n")) req.out.writeBytes(data);
+            else req.out.writeBytes("\n" + data);
+            Logger.glog(req.getIP() + "'s request handled successfully!" + "  ; debug_id = " + req.getID(),req.getHost());
         }catch(Exception ex){
             Logger.logException(ex);
         }
     }
-    public void sendFCGIData(byte[] data, DataOutputStream out, String ip, int id, String host){
+    public void sendFCGIData(byte[] data, Request req){
         String res = new String(data);
         Pattern ptn = Pattern.compile("Status: .*");
         Matcher mc = ptn.matcher(res);
         if(mc.find()) status = mc.group().replace("Status: ","");
         try{
-            out.writeBytes(generateResponse());
-            if (data[0] != 10) out.writeBytes("\n");
-            out.write(data);
-            basicUtils.delID(id);
-            Logger.glog(ip + "'s request handled successfully!" + "  ; id = " + id,host);
+            req.out.writeBytes(generateResponse());
+            if (data[0] != 10) req.out.writeBytes("\n");
+            req.out.write(data);
+            Logger.glog(req.getIP() + "'s request handled successfully!" + "  ; debug_id = " + req.getID(),req.getHost());
         }catch(Exception ex){
             Logger.logException(ex);
         }

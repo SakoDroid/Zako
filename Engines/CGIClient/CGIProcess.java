@@ -61,13 +61,13 @@ public class CGIProcess extends CGI {
                 Logger.CGILog("Process created => Extracting result ...  ; id = " + req.getID()+ "  ; PID = " + p.pid(),file.getName(), req.getHost());
                 CGIDataSender ds = new CGIDataSender(req.getProt(),200,p.getInputStream());
                 ds.setKeepAlive(ka);
-                ds.send(req.out,req.getIP(),req.getID(),req.getHost());
+                ds.send(req);
                 Logger.CGILog("Process Finished => All done! OK ; id = " + req.getID()+ "  ; PID = " + p.pid(),file.getName(),req.getHost());
             }else{
                 FileSender fs = new FileSender(req.getProt(),200);
                 fs.setContentType("text/plain");
                 fs.setKeepAlive(ka);
-                fs.send(err,req.out,req.getIP(),req.getID(),req.getHost());
+                fs.send(err,req);
                 Logger.CGIError(err + " ; id = " + req.getID()+ "  ; PID = " + p.pid(),file.getName(),req.getHost());
                 Logger.CGILog("Process Finished => Error. (Check CGI-Logs for error info) ; id = " + req.getID()+ "  ; PID = " + p.pid(),file.getName(),req.getHost());
             }

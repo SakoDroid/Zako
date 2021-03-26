@@ -116,7 +116,7 @@ public class Core {
         Server.Reqandres.Senders.Sender snd = new Sender(req.getProt(),401);
         snd.setKeepAlive(true);
         snd.addHeader(getHeader(req));
-        snd.send(null,req.out,req.getIP(),req.getID(),req.getHost());
+        snd.send(null,req);
     }
 
     private String getHeader(Request req){
