@@ -1,4 +1,4 @@
-import Server.Utils.Configs;
+import Server.Utils.Configs.Configs;
 import Server.Utils.JSON.JSONBuilder;
 import Server.Utils.Logger;
 import java.io.File;

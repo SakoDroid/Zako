@@ -1,23 +1,20 @@
 import Server.Utils.*;
 import java.io.*;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import Engines.DDOS.Interface;
-import Server.Utils.JSON.JSONBuilder;
-import Server.Utils.JSON.JSONDocument;
+import Server.Utils.Configs.*;
+import Server.Utils.JSON.*;
 
 public class Loader {
 
     public static void load(){
         Logger.ilog("Loading hosts configurations ...");
         System.out.println("Loading hosts configurations ...");
-        for (String li : Objects.requireNonNull(new File(Server.Utils.Configs.baseAddress).list())){
-            File fl = new File(Server.Utils.Configs.baseAddress + "/" + li);
+        for (String li : Objects.requireNonNull(new File(Configs.baseAddress).list())){
+            File fl = new File(Configs.baseAddress + "/" + li);
             if (fl.isDirectory()){
-                Server.Utils.Configs.loadAHost(fl);
+                Configs.loadAHost(fl);
                 SSLConfigs.load(fl);
                 FileTypes.load(fl);
                 CaptchaConfigs.load(fl);
@@ -27,7 +24,7 @@ public class Loader {
                 HTAccess.getInstance().load(fl);
             }
         }
-        Server.Utils.Configs.loadMain();
+        Configs.loadMain();
         Logger.ilog("Loading ip blacklist ...");
         System.out.println("Loading ip blacklist ...");
         Perms.loadBlackList();
