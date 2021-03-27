@@ -41,7 +41,7 @@ public class RequestProcessor {
             new Proxy(ProxyConfigs.getAddress(),null,req);
             this.stat = 0;
         }else{
-            rp.readHeaders();
+            //rp.readHeaders();
             this.processRequest();
             if (KA)
                 new HttpListener(req.getSocket(),req.getHost(),false);
@@ -82,6 +82,7 @@ public class RequestProcessor {
             if (i == -1) return null;
             while (i != 13){
                 if (i != 10) sb.append((char)i);
+                else break;
                 i = in.read();
                 if (i == -1) break;
             }
@@ -180,7 +181,9 @@ public class RequestProcessor {
                 }
             }else{
                 this.stat = 0;
-                KA = false;
+                new QuickSender(req).sendBadReq("Empty request");
+                if (Configs.BRS)
+                    Interface.addWarning(req.getIP(),req.getHost());
             }
         }catch(Exception ex){
             Logger.logException(ex);

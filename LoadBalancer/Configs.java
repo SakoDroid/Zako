@@ -22,6 +22,7 @@ public class Configs {
         ArrayList servs = (ArrayList) data.get("Servers");
         for (Object s : servs)
             addAServers(String.valueOf(s));
+        Tracker.start();
     }
 
     private static void addAServers(String server){

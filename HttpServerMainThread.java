@@ -17,8 +17,8 @@ public class HttpServerMainThread extends Thread{
     public void run(){
         try{
             ServerSocket server = new ServerSocket(port);
-            Logger.ilog("Http server thread is now running on port " + port + " ...");
-            System.out.println("Http server thread is now running on port " + port + " ...");
+            Logger.ilog("Http server thread is now running on port " + port + " ..." + (lb ? "(Load balancer)" : ""));
+            System.out.println("Http server thread is now running on port " + port + " ..." + (lb ? "(Load balancer)" : ""));
             while(true) new HttpListener(server.accept(),"default",lb);
         }catch (Exception ex) {
             Logger.logException(ex);
