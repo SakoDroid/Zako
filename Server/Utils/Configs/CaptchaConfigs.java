@@ -51,7 +51,7 @@ public class CaptchaConfigs {
 
         private void load(File fl){
             JSONBuilder bld = JSONBuilder.newInstance();
-            JSONDocument doc = bld.parse(new File(fl.getAbsolutePath() + "/Main.cfg"));
+            JSONDocument doc = bld.parse(new File(fl.getAbsolutePath() + "/Main.conf"));
             HashMap data = (HashMap) doc.toJava();
             HashMap cap = (HashMap) data.get("CAPTCHA");
             ON = (Boolean) cap.get("ON");

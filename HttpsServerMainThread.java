@@ -1,11 +1,11 @@
 import Engines.DDOS.Interface;
+import LoadBalancer.Configs;
 import Server.HttpListener;
 import Server.Reqandres.Request.Request;
 import Server.Reqandres.Senders.QuickSender;
 import Server.Utils.*;
 import Server.Utils.Configs.Perms;
 import Server.Utils.Configs.SSLConfigs;
-
 import javax.net.ssl.*;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -19,8 +19,10 @@ import java.util.regex.*;
 public class HttpsServerMainThread{
 
     private final String host;
+    public final boolean lb;
 
-    public HttpsServerMainThread(int port,String host){
+    public HttpsServerMainThread(int port,String host,boolean lb){
+        this.lb = lb;
         this.host = host;
         new HTTPS();
         new HTTP();
@@ -161,13 +163,13 @@ public class HttpsServerMainThread{
         @Override
         public void run () {
             try {
-                System.setProperty("javax.net.ssl.keyStore", SSLConfigs.getJKS(host));
-                System.setProperty("javax.net.ssl.keyStorePassword", SSLConfigs.getPass(host));
+                System.setProperty("javax.net.ssl.keyStore",lb ? Configs.ssl.jks : SSLConfigs.getJKS(host));
+                System.setProperty("javax.net.ssl.keyStorePassword",lb ? Configs.ssl.pss : SSLConfigs.getPass(host));
                 SSLServerSocketFactory sslServerSocketfactory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
                 SSLServerSocket sslServerSocket = (SSLServerSocket) sslServerSocketfactory.createServerSocket(443);
-                Logger.ilog("Https server thread is now running (jks : " + SSLConfigs.getJKS(host) + " ,, jks pass : " + SSLConfigs.getPass(host) + ") ...");
-                System.out.println("Https server thread is now running (jks : " + SSLConfigs.getJKS(host) + " ,, jks pass : " + SSLConfigs.getPass(host) + ") ...");
-                while (true) new HttpListener((SSLSocket) sslServerSocket.accept(),host,false);
+                Logger.ilog("Https server thread is now running (jks : " + (lb ? Configs.ssl.jks : SSLConfigs.getJKS(host)) + " ,, jks pass : " + (lb ? Configs.ssl.pss : SSLConfigs.getPass(host)) + ") ..." + (lb ? "(Load balancer)" : ""));
+                System.out.println("Https server thread is now running (jks : " + (lb ? Configs.ssl.jks : SSLConfigs.getJKS(host)) + " ,, jks pass : " + (lb ? Configs.ssl.pss : SSLConfigs.getPass(host)) + ") ..." + (lb ? "(Load balancer)" : ""));
+                while (true) new HttpListener((SSLSocket) sslServerSocket.accept(),host,lb);
             } catch (Exception ex) {
                 Logger.logException(ex);
             }

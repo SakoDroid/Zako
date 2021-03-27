@@ -10,6 +10,8 @@ import Server.Reqandres.Senders.QuickSender;
 import Server.Utils.Reader.BodyParser;
 import Server.Utils.Proxy;
 import Server.Utils.*;
+import Server.Utils.Reader.RequestReader;
+
 import java.io.*;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -20,6 +22,7 @@ import java.util.regex.*;
 public class RequestProcessor {
 
     private final Request req;
+    private final RequestReader rp;
     public Methods method;
     public ArrayList<Byte> Body = new ArrayList<>();
     public int sit = 200;
@@ -28,6 +31,7 @@ public class RequestProcessor {
 
     public RequestProcessor(Request rq){
         this.req = rq;
+        this.rp = new RequestReader(req);
         this.startProcessing();
     }
 
@@ -37,6 +41,7 @@ public class RequestProcessor {
             new Proxy(ProxyConfigs.getAddress(),null,req);
             this.stat = 0;
         }else{
+            rp.readHeaders();
             this.processRequest();
             if (KA)
                 new HttpListener(req.getSocket(),req.getHost(),false);

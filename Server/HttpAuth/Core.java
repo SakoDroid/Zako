@@ -30,7 +30,7 @@ public class Core {
         loadPasswd();
         HashMap data = (HashMap) JSONBuilder
                 .newInstance()
-                .parse(new File(fl.getAbsolutePath() + "/Main.cfg"))
+                .parse(new File(fl.getAbsolutePath() + "/Main.conf"))
                 .toJava();
         HashMap authCfg = (HashMap) data.get("HTTP AUTH");
         String mech = String.valueOf(authCfg.get("Auth mechanism"));
@@ -114,7 +114,7 @@ public class Core {
 
     public void askForAuth(Request req){
         Server.Reqandres.Senders.Sender snd = new Sender(req.getProt(),401);
-        snd.setKeepAlive(true);
+        snd.setKeepAlive(false);
         snd.addHeader(getHeader(req));
         snd.send(null,req);
     }

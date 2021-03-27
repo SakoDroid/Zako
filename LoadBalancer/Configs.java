@@ -1,38 +1,54 @@
 package LoadBalancer;
 
-import Server.Utils.Logger;
-
+import Server.Utils.JSON.JSONBuilder;
 import java.io.File;
 import java.util.*;
-import org.w3c.dom.*;
-import javax.xml.parsers.*;
 
 public class Configs {
 
     public static List<String[]> servers = new ArrayList<>();
+    public static boolean on;
+    public static int port;
+    public static String host;
+    public static SSLConfiguration ssl;
 
     public static void load(){
-        try{
-            File fl = null;
-            if (System.getProperty("os.name")
-                    .toLowerCase().contains("windows"))
-                fl = new File(System.getProperty("user.dir") + "/Configs/Load_Balancer.cfg");
-            else if (System.getProperty("os.name")
-                    .toLowerCase().contains("linux"))
-                fl = new File("/etc/zako-web/Load_Balancer.cfg");
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            Document d = db.parse("/etc/zako-web/Load_Balancer.cfg");
-            NodeList nl = d.getElementsByTagName("Zako");
-            for (int i = 0 ; i < nl.getLength() ; i++){
-                Element el = (Element) nl.item(i);
-                String host = el.getElementsByTagName("Host").item(0).getTextContent();
-                String port = el.getElementsByTagName("Port").item(0).getTextContent();
-                if (!host.isEmpty()) servers.add(new String[]{host,((port.isEmpty())?"80":port)});
+        HashMap data = (HashMap) JSONBuilder.newInstance().parse(new File(Server.Utils.Configs.Configs.baseAddress + "/Load_Balancer.conf")).toJava();
+        on = (Boolean) data.get("ON");
+        port = (int)(long) data.get("Port");
+        host = String.valueOf(data.get("Host"));
+        HashMap sslc = (HashMap) data.get("SSL");
+        ssl = new SSLConfiguration((boolean) sslc.get("ON"), String.valueOf(data.get("jks path")), String.valueOf(data.get("jks pass")));
+        ArrayList servs = (ArrayList) data.get("Servers");
+        for (Object s : servs)
+            addAServers(String.valueOf(s));
+    }
+
+    private static void addAServers(String server){
+        if (!server.isEmpty()){
+            if (server.contains("]") && server.contains("[")) {
+                String[] temp = server.split("]", 2);
+                servers.add(new String[]{temp[0].replace("[",""),(temp.length > 1) ? temp[1].trim() : "80"});
+            } else {
+                String[] temp = server.split(":", 2);
+                if (temp.length > 1)
+                    servers.add(temp);
+                else
+                    servers.add(new String[]{temp[0],"80"});
             }
-            Tracker.start();
-        }catch(Exception ex){
-            Logger.logException(ex);
+        }
+    }
+
+    public static class SSLConfiguration{
+
+        public final boolean SSL;
+        public final String jks;
+        public final String pss;
+
+        public SSLConfiguration(boolean ss, String jk, String ps){
+            SSL = ss;
+            jks = jk;
+            pss = ps;
         }
     }
 }

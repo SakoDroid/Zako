@@ -25,6 +25,9 @@ public class Loader {
             }
         }
         Configs.loadMain();
+        Logger.ilog("Loading load balancer configurations ...");
+        System.out.println("Loading load balancer configurations ...");
+        LoadBalancer.Configs.load();
         Logger.ilog("Loading ip blacklist ...");
         System.out.println("Loading ip blacklist ...");
         Perms.loadBlackList();
@@ -32,7 +35,7 @@ public class Loader {
         System.out.println("Loading proxy configurations ...");
         ProxyConfigs.load();
         JSONBuilder bld = JSONBuilder.newInstance();
-        JSONDocument doc = bld.parse(new File(Configs.baseAddress + "/Zako.cfg"));
+        JSONDocument doc = bld.parse(new File(Configs.baseAddress + "/Zako.conf"));
         HashMap data = (HashMap) doc.toJava();
         Interface.load((Boolean) data.get("DDOS Protection"));
         Logger.ilog("Loading basic utilities ...");

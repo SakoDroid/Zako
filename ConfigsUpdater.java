@@ -15,7 +15,7 @@ public class ConfigsUpdater extends Thread{
     @Override
     public void run(){
         HashMap data = (HashMap) JSONBuilder.newInstance()
-                .parse(new File(Configs.baseAddress + "/Zako.cfg"))
+                .parse(new File(Configs.baseAddress + "/Zako.conf"))
                 .toJava();
         long time = (Long) data.get("CFG Update period");
         while (true){

@@ -109,19 +109,6 @@ public class basicUtils {
         ArrayList<String> commands;
         String platform = System.getProperty("os.name");
         try{
-            if (Configs.isLBOn()){
-                commands = getCheckCmd(Configs.getLBPort());
-                ProcessBuilder pb = new ProcessBuilder(commands);
-                Process p = pb.start();
-                InputStream in = p.getInputStream();
-                String prcs = new String(in.readAllBytes());
-                if (!prcs.isEmpty()){
-                    if (platform.toLowerCase().contains("linux"))
-                        killLinux(Configs.getLBPort());
-                    else if (platform.toLowerCase().contains("windows"))
-                        killWindows(prcs);
-                }
-            }
             if (Configs.isWSOn()){
                 commands = getCheckCmd(Configs.getPorts().get(host));
                 ProcessBuilder pb = new ProcessBuilder(commands);
@@ -145,6 +132,19 @@ public class basicUtils {
                     killLinux(8560);
                 else if (platform.toLowerCase().contains("windows"))
                     killWindows(prcs);
+            }
+            if (LoadBalancer.Configs.on){
+                commands = getCheckCmd(LoadBalancer.Configs.port);
+                ProcessBuilder pbl = new ProcessBuilder(commands);
+                Process pl = pbl.start();
+                InputStream inl = pl.getInputStream();
+                String prcsl = new String(inl.readAllBytes());
+                if (!prcsl.isEmpty()){
+                    if (platform.toLowerCase().contains("linux"))
+                        killLinux(LoadBalancer.Configs.port);
+                    else if (platform.toLowerCase().contains("windows"))
+                        killWindows(prcsl);
+                }
             }
         }catch(Exception ex){
             Logger.logException(ex);

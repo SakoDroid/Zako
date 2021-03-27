@@ -29,7 +29,7 @@ public class APIConfigs {
         }
 
         private void load(File fl){
-            try(BufferedReader bf = new BufferedReader(new FileReader(fl.getAbsolutePath() + "/API.cfg"))){
+            try(BufferedReader bf = new BufferedReader(new FileReader(fl.getAbsolutePath() + "/API.conf"))){
                 String line;
                 while((line = bf.readLine()) != null){
                     if (!line.startsWith("#")) addAPI(line);

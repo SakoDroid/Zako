@@ -11,7 +11,7 @@ public class ProxyConfigs {
 
     public static void load(){
         JSONBuilder bld = JSONBuilder.newInstance();
-        JSONDocument doc = bld.parse(new File(Configs.baseAddress + "/Zako.cfg"));
+        JSONDocument doc = bld.parse(new File(Configs.baseAddress + "/Zako.conf"));
         HashMap data = (HashMap) doc.toJava();
         HashMap proxy = (HashMap) data.get("Proxy");
         isOn = (Boolean) proxy.get("ON");

@@ -17,11 +17,9 @@ public class Configs {
     private static final HashMap<String,Config> configs = new HashMap<>();
     private static final HashMap<String,Integer> ports = new HashMap<>();
     private static final HashSet<String> availableHosts = new HashSet<>();
-    private static int LBPort;
     public static final String baseAddress = (System.getProperty("os.name").toLowerCase().contains("linux") ?
             "/etc/zako-web" :
             "CFGS");
-    private static boolean loadBalancer;
     private static boolean webServer;
     public static boolean autoUpdate;
     public static boolean BRS = true;
@@ -30,15 +28,13 @@ public class Configs {
 
     public static void loadMain(){
         Logger.ilog("Loading main configs ...");
-        File fl = new File(baseAddress + "/Zako.cfg");
+        File fl = new File(baseAddress + "/Zako.conf");
         JSONBuilder bld = JSONBuilder.newInstance();
         JSONDocument doc = bld.parse(fl);
         HashMap data = (HashMap) doc.toJava();
         autoUpdate = (Boolean) data.get("CFG Update");
-        loadBalancer = (Boolean) data.get("Load Balancer");
         webServer = (Boolean) data.get("Web Server");
         BRS = (Boolean) data.get("BR Sensitivity");
-        LBPort = (int)(long) data.get("Load Balancer Port");
         Server.Utils.ViewCounter.Controller.load(availableHosts,(Long) data.get("View update frequency"));
     }
 
@@ -78,10 +74,6 @@ public class Configs {
         return System.getProperty("user.dir");
     }
 
-    public static boolean isLBOn(){
-        return loadBalancer;
-    }
-
     public static boolean isWSOn(){return webServer;}
 
     public static HashMap<String,Integer> getPorts() {
@@ -118,10 +110,6 @@ public class Configs {
         return availableHosts.contains(host);
     }
 
-    public static int getLBPort(){
-        return LBPort;
-    }
-
     public static boolean isVCOn(String host){
         return configs.get(host).vc;
     }
@@ -143,7 +131,7 @@ public class Configs {
         }
 
         private void load(File fl){
-            HashMap mainData = (HashMap) JSONBuilder.newInstance().parse(new File(fl.getAbsolutePath() + "/Main.cfg")).toJava();
+            HashMap mainData = (HashMap) JSONBuilder.newInstance().parse(new File(fl.getAbsolutePath() + "/Main.conf")).toJava();
             String name = String.valueOf(mainData.get("Name"));
             loadHandle((HashMap) mainData.get("Reaction"));
             KA = (Boolean) mainData.get("Keep Alive");

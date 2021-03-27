@@ -5,8 +5,10 @@ import java.net.ServerSocket;
 public class HttpServerMainThread extends Thread{
 
     private final int port;
+    public final boolean lb;
 
-    public HttpServerMainThread(int port){
+    public HttpServerMainThread(int port,boolean lb){
+        this.lb = lb;
         this.port = port;
         this.start();
     }
@@ -17,7 +19,7 @@ public class HttpServerMainThread extends Thread{
             ServerSocket server = new ServerSocket(port);
             Logger.ilog("Http server thread is now running on port " + port + " ...");
             System.out.println("Http server thread is now running on port " + port + " ...");
-            while(true) new HttpListener(server.accept(),"default",false);
+            while(true) new HttpListener(server.accept(),"default",lb);
         }catch (Exception ex) {
             Logger.logException(ex);
         }

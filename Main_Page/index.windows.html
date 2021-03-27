@@ -177,19 +177,19 @@
             const text = "<div style='background-color: #581b1b' class='hd'>How to use Zako</div></br>Hi! First of all, thank you for choosing Zako. We are honored that you chose Zako to server your website." +
                 " You can learn more about Zako by clicking the button at the end of this page. </br>" +
                 "This page which you are seeing right now is located at <u>/var/www/html</u> and you can replace this page by replacing index.html file. This " +
-                "page is basically default setback for the server, which means if no host has been defined in the Hosts.cfg " +
+                "page is basically default setback for the server, which means if no host has been defined in the Hosts.conf " +
                 "this page is sent back. Now let's dive right into configurations : </br>" +
-                "There are 6 configuration files (.cfg) : " +
-                "<ol><li>API.cfg</li><li>Headers.cfg</li><li>Hosts.cfg</li><li>Load_Balancer.cfg</li><li>MIME.cfg</li><li>Zako.cfg</li></ol>" +
+                "There are 6 configuration files (.conf) : " +
+                "<ol><li>API.conf</li><li>Headers.conf</li><li>Hosts.conf</li><li>Load_Balancer.conf</li><li>MIME.conf</li><li>Zako.conf</li></ol>" +
                 "And there are 3 other files which contain some information : " +
                 "<ol><li>IP-Blacklist</li><li>ILPD</li><li>passwd</li></ol></br>" +
                 "Now that you know the configuration files, let's talk about them. keep in mind that these files are located at <u>/etc/zako-web</u></br><ol style='list-style-type: decimal'>" +
-                "<li><b style='font-size: 15px'>Zako.cfg :</b></br>This file contains most of the configurations of the server such as ports, sockets timeout, SSL/TLS, scripts, Http authentication " +
-                "and ... . Zako.cfg contains comment for each configuration so we won't talk about it anymore.</li>" +
-                "</br><li><b style='font-size: 15px'>Load_Balancer.cfg :</b></br>This file contains servers which will be used by the Zako load balancer. You can enable load balancer in Zako.cfg</li>" +
-                "</br><li><b style='font-size: 15px'>MIME.cfg :</b></br>This files contains MIME types which server uses for Content-Type header. " +
+                "<li><b style='font-size: 15px'>Zako.conf :</b></br>This file contains most of the configurations of the server such as ports, sockets timeout, SSL/TLS, scripts, Http authentication " +
+                "and ... . Zako.conf contains comment for each configuration so we won't talk about it anymore.</li>" +
+                "</br><li><b style='font-size: 15px'>Load_Balancer.conf :</b></br>This file contains servers which will be used by the Zako load balancer. You can enable load balancer in Zako.conf</li>" +
+                "</br><li><b style='font-size: 15px'>MIME.conf :</b></br>This files contains MIME types which server uses for Content-Type header. " +
                 "This file is based on extensions and can be modified.</li>" +
-                "</br><li><b style='font-size: 15px'>Hosts.cfg :</b></br>This file contains every host name that will be served by Zako. Host name is included in every Http request as " +
+                "</br><li><b style='font-size: 15px'>Hosts.conf :</b></br>This file contains every host name that will be served by Zako. Host name is included in every Http request as " +
                 "Host header. This file uses xml format and tags are defined as below : <br/>" +
                 "<b style='font-size: 14px'>Name :</b> the name of the host. For example : example.com, example.com:3000</br>" +
                 "<b style='font-size: 14px'>Mode :</b> this tag indicates how server should react to this host name. This tag can have three values : " +
@@ -202,10 +202,10 @@
                 "<b style='font-size: 14px'>...Dir :</b> Tags that end with 'Dir' are directories that server will use for this host name. If directories do not " +
                 "exist, server will create them automatically. Pay attention to the fact that entire RootDir and CGIDir will be visible to the client, so avoid putting" +
                 " files that should be hidden from client in those directories.</br>" +
-                "</br><li><b style='font-size: 15px'>API.cfg :</b></br> API.cfg contains configurations for forwarding a request to a specified path or assigning it to a file." +
+                "</br><li><b style='font-size: 15px'>API.conf :</b></br> API.conf contains configurations for forwarding a request to a specified path or assigning it to a file." +
                 "This file is based on regex so the syntax is : <blockquote>regex -> address or file</blockquote>" +
-                "For example we can forward request for example.com/blah to localhost:3000 by writing <blockquote>example.com/blah -> localhost:3000</blockquote> in API.cfg .</li>" +
-                "</br><li><b style='font-size: 15px'>Headers.cfg :</b></br> You can add custom headers based on extensions in this file. Server will add these custom headers to the default headers." +
+                "For example we can forward request for example.com/blah to localhost:3000 by writing <blockquote>example.com/blah -> localhost:3000</blockquote> in API.conf .</li>" +
+                "</br><li><b style='font-size: 15px'>Headers.conf :</b></br> You can add custom headers based on extensions in this file. Server will add these custom headers to the default headers." +
                 "This file uses xml format as below :</br>" +
                 "<blockquote>&lt;Headers&gt;</br>" +
                 "&lt;rule ext=\".jpg , .png , .jpeg\"&gt;</br>" +
@@ -223,7 +223,7 @@
                 "</br><li><b style='font-size: 15px'>passwd :</b></br> This file contains user names and password that will be used for HTTP authentication. User names and their " +
                 "passwords are saved as key value pairs (username:pass). Example : Michael:12345</li></ol>" +
                 "<b>How does Zako view counter work?</b><blockquote>All the statistics related to views of a host name are saved in a file named " +
-                "\"views.json\". This file is located at every host names root directory. View counter can be configured in Zako.cfg .</blockquote></br>" +
+                "\"views.json\". This file is located at every host names root directory. View counter can be configured in Zako.conf .</blockquote></br>" +
                 "Hoooray! It's done and now you should be able to config Zako properly. If you have any question you can visit " +
                 "<a target='_blank' href='http://xako.ir'>our website</a>, we will be happy to see you there ;) .</br><p>Thanks again for choosing Zako! Good luck.</p>" +
                 "<button style='margin-top:25px;background-color: lightblue;color: darkblue;width: inherit;border-style: unset;border-radius: 10px' onclick='showAbout()'>Learn more about Zako</button>";

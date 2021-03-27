@@ -38,7 +38,7 @@ public class FileTypes {
             try{
                 DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
                 DocumentBuilder db = dbf.newDocumentBuilder();
-                Document doc = db.parse(fl.getAbsolutePath() + "/MIME.cfg");
+                Document doc = db.parse(fl.getAbsolutePath() + "/MIME.conf");
                 NodeList mms = doc.getElementsByTagName("MIME");
                 for (int i = 0 ; i < mms.getLength() ; i++){
                     Element mm = (Element) mms.item(i);
@@ -53,7 +53,7 @@ public class FileTypes {
             try{
                 DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
                 DocumentBuilder db = dbf.newDocumentBuilder();
-                Document d = db.parse(fl.getAbsolutePath() + "/Headers.cfg");
+                Document d = db.parse(fl.getAbsolutePath() + "/Headers.conf");
                 NodeList rules = d.getElementsByTagName("rule");
                 for (int i = 0 ; i < rules.getLength() ; i++){
                     Element rule = (Element) rules.item(i);

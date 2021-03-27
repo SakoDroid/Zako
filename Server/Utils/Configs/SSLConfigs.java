@@ -11,7 +11,7 @@ public class SSLConfigs {
 
     public static void load(File fl){
         JSONBuilder bld = JSONBuilder.newInstance();
-        JSONDocument doc = bld.parse(new File(fl.getAbsolutePath() + "/Main.cfg"));
+        JSONDocument doc = bld.parse(new File(fl.getAbsolutePath() + "/Main.conf"));
         HashMap data = (HashMap) doc.toJava();
         HashMap ssl = (HashMap) data.get("SSL");
         configs.put(String.valueOf(data.get("Name")),new SSLConfiguration((Boolean) ssl.get("ON"),(String) ssl.get("jks path"),(String) ssl.get("jks pass")));
