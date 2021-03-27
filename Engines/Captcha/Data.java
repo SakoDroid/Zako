@@ -14,6 +14,7 @@ public class Data {
     }
 
     public static String checkAnswer(String ip,String postBody,String host){
+        System.out.println("body : " + postBody);
         String temp = "FLS";
         if(!postBody.isEmpty()){
             Pattern ptn = Pattern.compile("Ans=[^&]+");
@@ -34,5 +35,9 @@ public class Data {
             }
         }
         return temp;
+    }
+
+    public static void fixTheRecords(String host){
+        ipAns.put(host,new HashMap<>());
     }
 }

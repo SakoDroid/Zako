@@ -55,11 +55,14 @@ public class CaptchaConfigs {
             HashMap data = (HashMap) doc.toJava();
             HashMap cap = (HashMap) data.get("CAPTCHA");
             ON = (Boolean) cap.get("ON");
-            length = Integer.parseInt(String.valueOf(cap.get("CAPTCHA length")));
-            hardness =  Integer.parseInt(String.valueOf(cap.get("CAPTCHA hardness")));
-            CGA = String.valueOf(cap.get("CGA"));
-            CPA = String.valueOf(cap.get("CPA"));
-            UCS = (Boolean) cap.get("UCS");
+            if (ON){
+                length = Integer.parseInt(String.valueOf(cap.get("CAPTCHA length")));
+                hardness =  Integer.parseInt(String.valueOf(cap.get("CAPTCHA hardness")));
+                CGA = String.valueOf(cap.get("CGA"));
+                CPA = String.valueOf(cap.get("CPA"));
+                UCS = (Boolean) cap.get("UCS");
+                Engines.Captcha.Data.fixTheRecords(fl.getName());
+            }
         }
     }
 }

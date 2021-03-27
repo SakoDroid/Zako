@@ -137,12 +137,16 @@ public class Configs {
             else
                 timeOut = (int)(long) mainData.get("Sockets-Timeout");
             HashMap szs = (HashMap) mainData.get("Sizes");
-            Long p = (Long) szs.get("Post body");
-            Long f = (Long) szs.get("File size");
-            if (p != null)
+            Object p = szs.get("Post body");
+            Object f = szs.get("File size");
+            if (p == null)
                 pb = Long.MAX_VALUE;
-            if (f != null)
+            else
+                pb = (long) p;
+            if (f == null)
                 fs = Long.MAX_VALUE;
+            else
+                fs = (long) f;
             vc = (Boolean) mainData.get("View counter");
             availableHosts.add(name);
         }

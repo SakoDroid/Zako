@@ -2,21 +2,21 @@ package Server.Utils.Reader;
 
 import Server.Reqandres.Request.Request;
 import Server.Utils.Logger;
-
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 
 public class RequestReader {
 
     private boolean hasBody;
+    private int bodyLength;
     private final Request req;
     private String firstLine;
-    private FileWriter fw;
+    private FileOutputStream fw;
 
     public RequestReader(Request req){
         this.req = req;
         try {
-            fw = new FileWriter(req.getCacheFile());
+            fw = new FileOutputStream(req.getCacheFile());
         }catch (Exception ex){
             Logger.logException(ex);
         }
@@ -25,19 +25,27 @@ public class RequestReader {
     public void readHeaders(){
         try{
             firstLine = this.readLine(req.is);
-            if (firstLine != null){
-                fw.write(firstLine);
-                fw.write( "\r\n");
+            if (firstLine != null && firstLine.length() > 5){
+                fw.write(firstLine.getBytes());
+                fw.write( "\r\n".getBytes());
                 String line;
                 while ((line = this.readLine(req.is)) != null){
                     if (line.isEmpty())
                         break;
-                    fw.write(line);
-                    fw.write(line);
+                    fw.write(line.getBytes());
+                    fw.write("\r\n".getBytes());
                     String[] temp = line.split(":",2);
                     if (temp.length != 2)
                         break;
                     req.addHeader(temp[0].trim(),temp[1].trim());
+                }
+                this.hasBody = req.getHeaders().containsKey("Content-Type");
+                if (this.hasBody){
+                    String cntLen = req.getHeaders().get("Content-Length");
+                    if (cntLen != null)
+                        this.bodyLength = Integer.parseInt(cntLen);
+                    else
+                        this.bodyLength = -1;
                 }
             }
         }catch (Exception ex){
@@ -46,11 +54,28 @@ public class RequestReader {
     }
 
     public void readBody(){
+        try {
+            fw.write(req.is.readNBytes(bodyLength + 1));
+        } catch (Exception ex) {
+            Logger.logException(ex);
+        }
+    }
 
+    public void finishReading(){
+        try {
+            fw.flush();
+            fw.close();
+        }catch (Exception ex){
+            Logger.logException(ex);
+        }
     }
 
     public boolean hasBody(){
         return this.hasBody;
+    }
+
+    public int getBodyLength(){
+        return this.bodyLength;
     }
 
     public String getFirstLine(){

@@ -14,6 +14,6 @@ public class LBRequestProcessor {
 
     private void startProcessing(){
         req.setTimeout(60000);
-        new Proxy(Tracker.firstServer,null,req);
+        new Proxy(Tracker.firstServer,false,req);
     }
 }

@@ -19,7 +19,7 @@ public class Request {
     private Socket sck;
     private File TempFile;
     private String Host;
-    private String Prot;
+    private String Prot = "HTTP/1.1";
     private URL url;
     private Methods method;
     private HashMap<String,String> headers = new HashMap<>();

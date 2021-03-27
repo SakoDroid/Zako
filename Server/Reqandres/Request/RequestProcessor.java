@@ -11,8 +11,6 @@ import Server.Utils.Reader.BodyParser;
 import Server.Utils.Proxy;
 import Server.Utils.*;
 import Server.Utils.Reader.RequestReader;
-
-import java.io.*;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -38,10 +36,10 @@ public class RequestProcessor {
     private void startProcessing(){
         if (ProxyConfigs.isOn){
             Logger.glog("Proxy is on, request is being forwarded.",req.getHost());
-            new Proxy(ProxyConfigs.getAddress(),null,req);
+            new Proxy(ProxyConfigs.getAddress(),false,req);
             this.stat = 0;
         }else{
-            //rp.readHeaders();
+            rp.readHeaders();
             this.processRequest();
             if (KA)
                 new HttpListener(req.getSocket(),req.getHost(),false);
@@ -72,36 +70,10 @@ public class RequestProcessor {
         }
     }
 
-    private String readLine(InputStream in){
-        StringBuilder sb = new StringBuilder();
-        int i;
-        if (req.getSocket().isClosed())
-            return null;
-        try{
-            i = in.read();
-            if (i == -1) return null;
-            while (i != 13){
-                if (i != 10) sb.append((char)i);
-                else break;
-                i = in.read();
-                if (i == -1) break;
-            }
-        }catch(Exception ex){
-            try {
-                req.getSocket().close();
-            }catch (Exception ex2){
-                Logger.logException(ex2);
-            }
-            Logger.logException(ex);
-            return null;
-        }
-        return sb.toString();
-    }
-
     private void processRequest(){
         try{
-            String line = this.readLine(req.is);
-            if (line != null && line.length() > 5){
+            String line = rp.getFirstLine();
+            if (!req.getHeaders().isEmpty()){
                 Pattern pathPattern = Pattern.compile(" /[^ ]*");
                 Matcher pathMatcher = pathPattern.matcher(line);
                 Pattern protPattern = Pattern.compile("HTTP/\\d[.]?\\d?");
@@ -113,59 +85,40 @@ public class RequestProcessor {
                     if (mch.find())
                         req.setPath(mch.group());
                     req.setProt(protMatcher.group());
-                    StringBuilder sb = new StringBuilder();
-                    sb.append(line);
-                    boolean hostFound = false;
-                    while (true) {
-                        line = this.readLine(req.is);
-                        if (line != null) {
-                            if (!line.startsWith("Host"))
-                                sb.append("\r\n").append(line);
-                            else {
-                                hostFound = true;
-                                break;
-                            }
-                        } else
-                            break;
-                    }
-                    sb.append("\r\n").append(line).append("\r\n");
-                    if (hostFound) {
-                        String hostName = URLDecoder.decode(line.split(":", 2)[1].trim()
-                                .replace("www.",""),StandardCharsets.UTF_8);
+                    String host = req.getHeaders().get("Host");
+                    if (host != null) {
+                        String hostName = URLDecoder.decode(host.trim().replace("www.",""),StandardCharsets.UTF_8);
+                        req.setHost(hostName);
                         int status = Configs.getHostStatus(hostName);
                         if (status == 0) {
                             String[] api = APIConfigs.getAPIAddress(hostName + req.getPath(),hostName);
                             if (api == null) {
-                                req.setHost(hostName);
-                                this.readRequest(sb.toString());
-                                if (this.method == Methods.POST && this.sit == 200) {
+                                this.readRequest();
+                                if (this.method == Methods.POST && this.sit == 200)
                                     new BodyParser(this.req).parseBody();
-                                }
                             } else {
                                 if (api.length > 1) {
-                                    req.getSocket().setSoTimeout(0);
-                                    req.setHost(hostName);
+                                    req.setTimeout(0);
+                                    rp.finishReading();
                                     Logger.glog("request for API " + hostName + req.getPath() + " received from " + req.getIP() + " .", hostName);
-                                    new Proxy(api, sb.substring(0, sb.length() - 2), req);
+                                    new Proxy(api, true, req);
                                     this.stat = 0;
                                 } else {
-                                    req.setHost(hostName);
                                     req.setPath(api[0]);
-                                    this.readRequest(sb.toString());
+                                    this.readRequest();
                                 }
                             }
                         } else if (status == 1) {
-                            req.getSocket().setSoTimeout(0);
-                            req.setHost(hostName);
+                            req.setTimeout(0);
+                            rp.finishReading();
                             Logger.glog("request for " + hostName + " received from " + req.getIP() + " .", hostName);
-                            new Proxy(Configs.getForwardAddress(hostName), sb.substring(0, sb.length() - 2), req);
+                            new Proxy(Configs.getForwardAddress(hostName), true, req);
                             this.stat = 0;
                         } else if (status == 2) {
                             basicUtils.redirect(307, Configs.getForwardAddress(hostName)[0], req);
                             this.stat = 0;
                         } else {
-                            req.setHost(hostName);
-                            this.readRequest(sb.toString());
+                            this.readRequest();
                         }
                     } else{
                         this.stat = 0;
@@ -205,12 +158,13 @@ public class RequestProcessor {
         if (cnc != null) {
             KA = Configs.getKeepAlive(req.getHost()) && cnc.trim().equals("keep-alive");
         } else KA = false;
+        req.setKeepAlive(Configs.getKeepAlive(req.getHost()) && this.KA);
     }
 
     private void fixTheHeaders(){
         try{
             if (this.method != Methods.CONNECT && this.method != Methods.OPTIONS) {
-                String prt = req.getHeaders().get("Protocol");
+                String prt = req.getProt();
                 String url = prt.split("/")[0] + "://" + req.getHost() + req.getOrgPath();
                 req.setURL(new URL(url));
                 Logger.glog(req.getIP() + " is requesting " + req.getPath() + "   ;; debug_id = " + req.getID(), req.getHost());
@@ -220,12 +174,9 @@ public class RequestProcessor {
         }
     }
 
-    private void readRequest(String redReq){
-        try(FileOutputStream fw = new FileOutputStream(req.getCacheFile(),true)){
-            String[] currentRead = redReq.split("\n");
-            fw.write(redReq.getBytes());
-            String[] p = currentRead[0].split(" ", 3);
-            this.method = switch (p[0]) {
+    private void readRequest(){
+        try{
+            this.method = switch (rp.getFirstLine().split(" ", 3)[0]) {
                 case "GET" -> Methods.GET;
                 case "POST" -> Methods.POST;
                 case "PUT" -> Methods.PUT;
@@ -238,37 +189,20 @@ public class RequestProcessor {
             };
             req.setMethod(this.method);
             if (this.method != Methods.UNKNOWN) {
-                req.setProt(p[2].trim());
-                req.getHeaders().put("Protocol", p[2]);
-                for (int i = 1; i < currentRead.length; i++) {
-                    String[] tmp = currentRead[i].split(":", 2);
-                    if (tmp.length != 1) req.getHeaders().put(tmp[0].trim(), tmp[1].trim());
-                }
-                String line;
-                while ((line = this.readLine(req.is)) != null) {
-                    if (!line.isEmpty()) {
-                        fw.write((line + "\r\n").getBytes());
-                        String[] tmp = line.split(":", 2);
-                        if (tmp.length != 1) req.getHeaders().put(tmp[0].trim(), tmp[1].trim());
-                    } else break;
-                }
-                fw.write((line + "\r\n").getBytes());
                 this.determineKeepAlive();
                 this.authenticate();
                 if (this.sit < 300) {
                     this.fixTheHeaders();
                     if (this.method == Methods.POST || this.method == Methods.PUT) {
-                        if (req.getHeaders().get("Content-Length") != null) {
-                            int length = Integer.parseInt((String) req.getHeaders().get("Content-Length"));
-                            if (length < Configs.getPostBodySize(req.getHost())) {
-                                try {
-                                    //Reads the body
-                                    fw.write(req.is.readNBytes(length + 1));
-                                } catch (Exception ex) {
-                                    Logger.logException(ex);
-                                }
-                            } else this.sit = 413;
-                        } else this.sit = 411;
+                        if (rp.hasBody()) {
+                            if (rp.getBodyLength() != -1){
+                                if (rp.getBodyLength() < Configs.getPostBodySize(req.getHost())) {
+                                    rp.readBody();
+                                } else
+                                    this.sit = 413;
+                            } else
+                                this.sit = 411;
+                        }
                     }
                 }
             } else{
@@ -276,7 +210,7 @@ public class RequestProcessor {
                 new QuickSender(req).sendBadReq("Invalid method.");
                 Interface.addWarning(req.getIP(),req.getHost());
             }
-            fw.flush();
+            rp.finishReading();
         }catch(Exception ex){
             Logger.logException(ex);
         }
