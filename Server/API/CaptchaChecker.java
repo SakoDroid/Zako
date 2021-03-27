@@ -9,8 +9,8 @@ import Server.Utils.basicUtils;
 public class CaptchaChecker implements API{
     @Override
     public void init(Request req, RequestProcessor reqp) {
-        String ans = new String(basicUtils.toByteArray(reqp.Body));
-        System.out.println("ans" + ans);
+        req.convertBody();
+        String ans = new String(req.getConvertedBody());
         FileSender fs = new FileSender(req.getProt(),200);
         fs.setContentType("text/plain");
         fs.setKeepAlive(false);

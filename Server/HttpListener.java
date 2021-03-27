@@ -57,7 +57,7 @@ public class HttpListener extends Thread{
                         if (Runtime.getRuntime().freeMemory() > 1000) {
                             RequestProcessor rq = new RequestProcessor(req);
                             if (rq.stat == 1) new Response(rq, req);
-                            //req.clearRequest();
+                            req.clearRequest();
                         } else {
                             Logger.glog(req.getFullip() + " request rejected due to server overload." + "  ; id = " + req.getID(), hostName);
                             req.out.writeBytes(HTMLGen.genOverLoad());

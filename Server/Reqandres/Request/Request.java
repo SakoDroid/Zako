@@ -28,7 +28,8 @@ public class Request {
     private String Path;
     private String orgPath;
     private ArrayList<Byte> body = new ArrayList<>();
-    private boolean keepAlive;
+    private byte[] convertedBody = null;
+    private boolean keepAlive = false;
 
     public Request(Socket client){
         this.id = java.util.UUID.randomUUID().toString();
@@ -145,7 +146,6 @@ public class Request {
         return this.out;
     }
 
-
     public InputStream getInStream() {
         return this.is;
     }
@@ -170,11 +170,28 @@ public class Request {
         return this.body;
     }
 
+    public byte[] getConvertedBody(){
+        return this.convertedBody;
+    }
+
+    public void convertBody(){
+        if (convertedBody == null){
+            convertedBody = new byte[body.size()];
+            int i = 0;
+            for (Byte b : body)
+                convertedBody[i++] = b;
+            body.clear();
+            body = null;
+        }
+    }
+
     public void clearRequest(){
         boolean bl = this.TempFile.delete();
         this.Path = null;
-        this.body.clear();
-        this.body = null;
+        if (body != null){
+            this.body.clear();
+            this.body = null;
+        }
         this.url = null;
         this.Host = null;
         this.Prot = null;

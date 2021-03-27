@@ -32,8 +32,13 @@ public class FCGI extends CGI {
         Logger.CGILog("FCGI response received : " + FCGIConstants.getStatus(response.status) + ";;; FCGI request id : " + client.reqID, file.getName(),req.getHost());
         CGIDataSender ds = new CGIDataSender(req.getProt(),200);
         ds.setKeepAlive(KA);
-        if (response.status == 0 && response.getErrorContent().isEmpty())
-            ds.sendFCGIData(basicUtils.toByteArray(response.getContent()),req);
+        if (response.status == 0 && response.getErrorContent().isEmpty()){
+            byte[] temp = new byte[response.getContent().size()];
+            int i = 0;
+            for (Byte b : response.getContent())
+                temp[i++] = b;
+            ds.sendFCGIData(temp,req);
+        }
         else{
             Logger.CGIError(response.getErrorContent() + ";;; FCGI request id : " + client.reqID,file.getName(),req.getHost());
             ds.sendFCGIData(response.getErrorContent(),req);

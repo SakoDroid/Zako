@@ -64,7 +64,6 @@ public class BodyParser {
                     }
                 }
             }else {
-                bf.read();
                 byte[] temp = new byte[(int)(bf.length() - bf.getFilePointer())];
                 bf.read(temp);
                 this.req.addToBody(temp);

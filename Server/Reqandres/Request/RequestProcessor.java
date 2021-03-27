@@ -14,7 +14,6 @@ import Server.Utils.Reader.RequestReader;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.regex.*;
 
 public class RequestProcessor {
@@ -22,10 +21,8 @@ public class RequestProcessor {
     private final Request req;
     private final RequestReader rp;
     public Methods method;
-    public ArrayList<Byte> Body = new ArrayList<>();
     public int sit = 200;
     public int stat = 1;
-    public boolean KA = false;
 
     public RequestProcessor(Request rq){
         this.req = rq;
@@ -41,7 +38,7 @@ public class RequestProcessor {
         }else{
             rp.readHeaders();
             this.processRequest();
-            if (KA)
+            if (req.getKeepAlive())
                 new HttpListener(req.getSocket(),req.getHost(),false);
             if (stat != 0)
                 this.continueProcess();
@@ -156,9 +153,8 @@ public class RequestProcessor {
     private void determineKeepAlive(){
         String cnc = req.getHeaders().get("Connection");
         if (cnc != null) {
-            KA = Configs.getKeepAlive(req.getHost()) && cnc.trim().equals("keep-alive");
-        } else KA = false;
-        req.setKeepAlive(Configs.getKeepAlive(req.getHost()) && this.KA);
+            req.setKeepAlive(Configs.getKeepAlive(req.getHost()) && cnc.trim().equals("keep-alive"));
+        }
     }
 
     private void fixTheHeaders(){

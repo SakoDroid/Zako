@@ -24,28 +24,31 @@ public class Def implements API{
                 String tempCntc = FileTypes.getContentType(ext,req.getHost());
                 if (tempCntc != null) {
                     if (tempCntc.equals("CGI")) {
-                        new ScriptHandler(req, ext).process(basicUtils.toByteArray(reqp.Body),reqp.KA);
+                        req.convertBody();
+                        new ScriptHandler(req, ext).process(req.getConvertedBody(),req.getKeepAlive());
                     } else {
                         fl = new File(Configs.getMainDir(req.getHost()) + req.getPath());
-                        sendFile(fl, ext, req, reqp.KA);
+                        sendFile(fl, ext, req, req.getKeepAlive());
                     }
                 } else {
                     fl = new File(Configs.getMainDir(req.getHost()) + req.getPath());
-                    sendFile(fl, ".bin", req, reqp.KA);
+                    sendFile(fl, ".bin", req, req.getKeepAlive());
                 }
             } else {
                 fl = new File(Configs.getCGIDir(req.getHost()) + req.getPath());
-                if (fl.exists())
-                    new CGIProcess(ext, fl, req).exec(basicUtils.toByteArray(reqp.Body), reqp.KA);
+                if (fl.exists()){
+                    req.convertBody();
+                    new ScriptHandler(req, ext).process(req.getConvertedBody(),req.getKeepAlive());
+                }
                 else {
                     fl = new File(Configs.getMainDir(req.getHost()) + req.getPath());
-                    sendFile(fl, ext, req, reqp.KA);
+                    sendFile(fl, ext, req, req.getKeepAlive());
                 }
             }
         }else {
             fl = new File(Configs.getMainDir(req.getHost()) + req.getPath());
             if (fl.isFile())
-                this.sendFile(fl,ext,req, reqp.KA);
+                this.sendFile(fl,ext,req, req.getKeepAlive());
             else
                 new QuickSender(req).sendCode(404);
         }

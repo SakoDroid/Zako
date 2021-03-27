@@ -14,7 +14,6 @@ public class Data {
     }
 
     public static String checkAnswer(String ip,String postBody,String host){
-        System.out.println("body : " + postBody);
         String temp = "FLS";
         if(!postBody.isEmpty()){
             Pattern ptn = Pattern.compile("Ans=[^&]+");
