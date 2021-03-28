@@ -8,7 +8,7 @@ import Server.Utils.JSON.*;
 
 public class Loader {
 
-    public static void load(){
+    public static void load(boolean firstTime){
         Logger.ilog("Loading hosts configurations ...");
         System.out.println("Loading hosts configurations ...");
         for (String li : Objects.requireNonNull(new File(Configs.baseAddress).list())){
@@ -26,8 +26,10 @@ public class Loader {
         }
         Configs.loadMain();
         Logger.ilog("Loading load balancer configurations ...");
-        System.out.println("Loading load balancer configurations ...");
-        LoadBalancer.Configs.load();
+        if (firstTime){
+            System.out.println("Loading load balancer configurations ...");
+            LoadBalancer.Configs.load();
+        }
         Logger.ilog("Loading ip blacklist ...");
         System.out.println("Loading ip blacklist ...");
         Perms.loadBlackList();

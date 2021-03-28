@@ -21,7 +21,6 @@ public class RequestProcessor {
 
     private final Request req;
     private final RequestReader rp;
-    public Methods method;
     public int sit = 200;
     public int stat = 1;
 
@@ -48,7 +47,7 @@ public class RequestProcessor {
             if (req.getCacheFile().length() > 5) {
                 Interface.addReqVol(req.getIP(), req.getCacheFile().length());
                 if (this.sit < 400) {
-                    this.stat = Factory.getMt(this.method).run(req, this);
+                    this.stat = Factory.getMt(req.getMethod()).run(req, this);
                 } else {
                     new QuickSender(this.req).sendCode(this.sit);
                     this.stat = 0;
@@ -83,7 +82,7 @@ public class RequestProcessor {
                                             String[] api = APIConfigs.getAPIAddress(hostName + req.getPath(), hostName);
                                             if (api == null) {
                                                 this.readRequest();
-                                                if (this.method == Methods.POST && this.sit == 200)
+                                                if (req.getMethod() == Methods.POST && this.sit == 200)
                                                     new BodyParser(this.req).parseBody();
                                             } else {
                                                 if (api.length > 1) {
@@ -167,7 +166,7 @@ public class RequestProcessor {
 
     private void fixTheHeaders(){
         try{
-            if (this.method != Methods.CONNECT && this.method != Methods.OPTIONS) {
+            if (req.getMethod() != Methods.CONNECT && req.getMethod() != Methods.OPTIONS) {
                 String prt = req.getProt();
                 String url = prt.split("/")[0] + "://" + req.getHost() + req.getOrgPath();
                 req.setURL(new URL(url));
@@ -184,7 +183,7 @@ public class RequestProcessor {
             this.authenticate();
             if (this.sit < 300) {
                 this.fixTheHeaders();
-                if (this.method == Methods.POST || this.method == Methods.PUT) {
+                if (req.getMethod() == Methods.POST || req.getMethod() == Methods.PUT) {
                     if (rp.hasBody()) {
                         if (rp.getBodyLength() != -1){
                             if (rp.getBodyLength() < Configs.getPostBodySize(req.getHost())) {

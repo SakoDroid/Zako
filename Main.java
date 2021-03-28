@@ -21,7 +21,7 @@ public class Main extends Thread{
             try {
                 basicUtils.killPrcs();
                 Logger.ilog("Loading requirements ...");
-                Loader.load();
+                Loader.load(true);
                 if (Configs.autoUpdate)
                     new ConfigsUpdater();
                 new Reporter();

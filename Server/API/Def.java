@@ -67,7 +67,7 @@ public class Def implements API{
                 fs.addHeader("ETag: \"" + new HashComputer(fl).computeHash() + "\"");
                 fs.sendFile(fl,req);
             }else
-                new QuickSender(req).sendCode(200);
+                new QuickSender(req).sendCode(cc.getStatus());
         } else
             new QuickSender(req).sendCode(404);
     }
