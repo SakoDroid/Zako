@@ -2,6 +2,7 @@ package Server.Reqandres.Senders;
 
 import Server.Reqandres.Request.Request;
 import Server.Utils.*;
+import Server.Utils.Configs.FileTypes;
 import Server.Utils.Enums.Methods;
 
 import java.io.*;
@@ -15,15 +16,13 @@ public class FileSender extends Sender {
         super(prot, status);
     }
 
-    private String generateHeaders(long contentLength,String host){
+    private String generateHeaders(long contentLength,String host,Request req){
         String out = prot + " " + status + "\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako +
                 "\nContent-Length: " + contentLength + "\nContent-Type: " + contentType + "\nStatus: " + this.status;
         if (ext != null)
             out += FileTypes.getHeaders(ext,host);
-        if (Double.parseDouble(prot.replace("HTTP/","")) < 2){
-            if (keepAlive) out += "\nConnection: keep-alive";
-            else out += "\nConnection: close";
-        }
+        if (!req.getHost().equals("HTTP/2"))
+            out += this.getConnectionHeader(req);
         if (cookie != null)
             out += "\nSet-Cookie: " + cookie;
         if (!customHeaders.isEmpty())
@@ -39,7 +38,7 @@ public class FileSender extends Sender {
     public void sendFile(File file, Request req){
         Logger.glog("Sending requested file to " + req.getIP() + "   ; file name : " + file.getName() + "  ; debug_id = " + req.getID(),req.getHost());
         try{
-            req.out.writeBytes(generateHeaders(file.length(),req.getHost()));
+            req.out.writeBytes(generateHeaders(file.length(),req.getHost(),req));
             if(req.getMethod() != Methods.HEAD){
                 FileInputStream in = new FileInputStream(file);
                 in.transferTo(req.out);
@@ -58,7 +57,7 @@ public class FileSender extends Sender {
     public void sendFile(byte[] file, Request req){
         Logger.glog("Sending a file (byte[]) to " + req.getIP() + "  ; debug_id = " + req.getID(), req.getHost());
         try{
-            req.out.writeBytes(generateHeaders(file.length,req.getHost()));
+            req.out.writeBytes(generateHeaders(file.length,req.getHost(),req));
             if(req.getMethod() != Methods.HEAD)
                 req.out.write(file);
             if (!this.keepAlive) {

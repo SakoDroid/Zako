@@ -12,17 +12,18 @@ import java.net.Socket;
 
 public class HttpListener extends Thread{
 
-    private Request req;
-    private String hostName;
-    private boolean lb;
+    private final Request req;
+    private final String hostName;
+    private final boolean lb;
 
     public HttpListener(Socket client,String host,boolean loadBalancer){
-        if (!SocketsData.getInstance().maxReached(client)){
-            this.lb = loadBalancer;
-            this.hostName = host;
-            this.req = new Request(client);
+        this.lb = loadBalancer;
+        this.hostName = host;
+        this.req = new Request(client);
+        //this.start();
+        if (!SocketsData.getInstance().maxReached(client))
             this.start();
-        }else{
+        else{
             try {
                 client.close();
             }catch (Exception ex){
@@ -32,27 +33,28 @@ public class HttpListener extends Thread{
     }
 
     public HttpListener(SSLSocket client,String host,boolean loadBalancer){
-        if (!SocketsData.getInstance().maxReached(client)){
-            this.lb = loadBalancer;
-            this.hostName = host;
-            this.req = new Request(client);
+        this.lb = loadBalancer;
+        this.hostName = host;
+        this.req = new Request(client);
+        try {
+            SSLParameters sslp = client.getSSLParameters();
+            //sslp.setApplicationProtocols(new String[]{"TLS/1.3","TLS/1.2","TLS/1.1","TLS/1","http/1.1","h2c","h2"});
+            sslp.setApplicationProtocols(new String[]{"TLS/1.3", "TLS/1.2", "TLS/1.1", "TLS/1", "http/1.1"});
+            client.setSSLParameters(sslp);
+            client.startHandshake();
+            req.setProt(client.getApplicationProtocol());
+            //this.start();
+        } catch (Exception ex) {
+            Logger.logException(ex);
             try {
-                SSLParameters sslp = client.getSSLParameters();
-                //sslp.setApplicationProtocols(new String[]{"TLS/1.3","TLS/1.2","TLS/1.1","TLS/1","http/1.1","h2c","h2"});
-                sslp.setApplicationProtocols(new String[]{"TLS/1.3", "TLS/1.2", "TLS/1.1", "TLS/1", "http/1.1"});
-                client.setSSLParameters(sslp);
-                client.startHandshake();
-                req.setProt(client.getApplicationProtocol());
-                this.start();
-            } catch (Exception ex) {
-                Logger.logException(ex);
-                try {
-                    client.close();
-                } catch (Exception exc) {
-                    Logger.logException(exc);
-                }
+                client.close();
+            } catch (Exception exc) {
+                Logger.logException(exc);
             }
-        }else{
+        }
+        if (!SocketsData.getInstance().maxReached(client))
+            this.start();
+        else{
             try {
                 client.close();
             }catch (Exception ex){

@@ -1,12 +1,13 @@
 package Server.API;
 
-import Engines.CGIClient.CGIProcess;
+import Server.Reqandres.HeaderCheck.CacheControl;
 import Server.Reqandres.Request.Request;
 import Server.Reqandres.Request.RequestProcessor;
 import Server.Reqandres.Senders.FileSender;
 import Server.Reqandres.Senders.QuickSender;
-import Server.Utils.*;
 import Server.Utils.Configs.Configs;
+import Server.Utils.Configs.FileTypes;
+import Server.Utils.HashComputer;
 
 import java.io.File;
 import java.util.regex.*;
@@ -56,11 +57,17 @@ public class Def implements API{
 
     private void sendFile(File fl, String ext, Request req, boolean ka){
         if (fl.isFile()) {
-            FileSender fs = new FileSender(req.getProt(), 200);
-            fs.setContentType(FileTypes.getContentType(ext,req.getHost()));
-            fs.setExtension(ext);
-            fs.setKeepAlive(ka);
-            fs.sendFile(fl,req);
+            CacheControl cc = new CacheControl();
+            cc.decide(req.getHeaders(),fl);
+            if (cc.getStatus() == 200){
+                FileSender fs = new FileSender(req.getProt(), 200);
+                fs.setContentType(FileTypes.getContentType(ext,req.getHost()));
+                fs.setExtension(ext);
+                fs.setKeepAlive(ka);
+                fs.addHeader("ETag: \"" + new HashComputer(fl).computeHash() + "\"");
+                fs.sendFile(fl,req);
+            }else
+                new QuickSender(req).sendCode(200);
         } else
             new QuickSender(req).sendCode(404);
     }

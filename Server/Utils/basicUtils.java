@@ -16,7 +16,7 @@ public class basicUtils {
     private static final File cmds = new File (Configs.getCWD() + "/Data/cmds.sak");
     private static HashMap<Integer,String> codes;
     private static HashMap<String,String> execCmds;
-    public static String LocalHostIP = "", Zako = "Zako 1.4.2";
+    public static String LocalHostIP = "", Zako = "Zako 1.6.0";
 
     private basicUtils(){}
 

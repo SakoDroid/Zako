@@ -1,9 +1,11 @@
 package Server.Reqandres.Senders;
 
 import Server.Reqandres.Request.Request;
+import Server.Utils.Configs.HTAccess;
 import Server.Utils.Logger;
 import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.Objects;
 
 import Server.Utils.basicUtils;
 
@@ -22,7 +24,18 @@ public class Sender {
         this.setStatus(status);
     }
 
-    private String generateResponse(String body){
+    protected String getConnectionHeader(Request req){
+        String out = "";
+        if (keepAlive){
+            out += "\nConnection: keep-alive\nKeep-Alive: ";
+            String kah = req.getHeaders().get("Keep-Alive");
+            out += Objects.requireNonNullElseGet(kah, () -> "timeout=" + HTAccess.getInstance().getKeepAliveTimeout(req.getHost()) + ", max=" + HTAccess.getInstance().getMNORPC(req.getHost()));
+        }
+        else out += "\nConnection: close";
+        return out;
+    }
+
+    private String generateResponse(String body,Request req){
         String out = prot + " " + status + "\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako + "\nStatus: " + this.status;
         if (body != null)
             out += "\nContent-Length: " + body.length();
@@ -30,10 +43,8 @@ public class Sender {
             out += "\nContent-Type: " + contentType;
         if (cookie != null)
             out += "\nSet-Cookie: " + cookie;
-        if (Double.parseDouble(prot.replace("HTTP/","")) < 2){
-            if (keepAlive) out += "\nConnection: keep-alive";
-            else out += "\nConnection: close";
-        }
+        if (Double.parseDouble(prot.replace("HTTP/","")) < 2)
+            out += this.getConnectionHeader(req);
         if (!customHeaders.isEmpty())
             out += "\n" + customHeaders;
         if (body != null)
@@ -97,7 +108,7 @@ public class Sender {
     public void send(String data, Request req){
         Logger.glog("Sending response to " + req.getID() + "  ; debug_id = " + req.getID(),req.getHost());
         try{
-            req.getOutStream().writeBytes(generateResponse(data));
+            req.getOutStream().writeBytes(generateResponse(data,req));
             if (!this.keepAlive) {
                 req.getOutStream().flush();
                 req.getOutStream().close();

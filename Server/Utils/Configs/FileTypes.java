@@ -1,7 +1,9 @@
-package Server.Utils;
+package Server.Utils.Configs;
 
 import java.io.File;
 import java.util.HashMap;
+
+import Server.Utils.Logger;
 import org.w3c.dom.*;
 import javax.xml.parsers.*;
 

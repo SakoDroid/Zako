@@ -39,9 +39,9 @@ public class Request {
         this.ip = client.getInetAddress().getHostAddress();
         this.fullip = client.getRemoteSocketAddress().toString();
         this.TempFile = new File(Configs.getCWD() + "/Temp/temp" + id + ".tmp");
-        SocketsData.getInstance().setMaxReqsPerSock(this.sck,HTAccess.getInstance().getMNORPC(this.Host));
         SocketsData.getInstance().addRequest(client);
         this.setHost("default");
+        SocketsData.getInstance().setMaxReqsPerSock(this.sck,HTAccess.getInstance().getMNORPC(this.Host));
         try{
             this.is = client.getInputStream();
             this.out = new DataOutputStream(client.getOutputStream());
