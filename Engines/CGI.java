@@ -3,7 +3,7 @@ package Engines;
 import Engines.FCGI.Client.Utils.Utils;
 import Server.Reqandres.Request.Request;
 import Server.Utils.Configs.Configs;
-import Server.Utils.Methods;
+import Server.Utils.Enums.Methods;
 import Server.Utils.basicUtils;
 import java.io.File;
 import java.util.*;

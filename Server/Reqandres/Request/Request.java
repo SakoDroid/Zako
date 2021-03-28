@@ -2,7 +2,8 @@ package Server.Reqandres.Request;
 
 import Server.Utils.*;
 import Server.Utils.Configs.Configs;
-
+import Server.Utils.Configs.HTAccess;
+import Server.Utils.Enums.Methods;
 import java.io.*;
 import java.net.Socket;
 import java.net.URL;
@@ -10,6 +11,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.regex.*;
 
 public class Request {
 
@@ -37,6 +39,8 @@ public class Request {
         this.ip = client.getInetAddress().getHostAddress();
         this.fullip = client.getRemoteSocketAddress().toString();
         this.TempFile = new File(Configs.getCWD() + "/Temp/temp" + id + ".tmp");
+        SocketsData.getInstance().setMaxReqsPerSock(this.sck,HTAccess.getInstance().getMNORPC(this.Host));
+        SocketsData.getInstance().addRequest(client);
         this.setHost("default");
         try{
             this.is = client.getInputStream();
@@ -83,12 +87,11 @@ public class Request {
     }
 
     public void setProt(String prot){
-        if (this.Prot == null){
-            if (prot.equalsIgnoreCase("http/1.1"))
-                this.Prot = "HTTP/1.1";
-            else if (prot.equals("h2c") || prot.equals("h2"))
-                this.Prot = "HTTP/2";
-        }
+        if (prot.equalsIgnoreCase("http/1.1"))
+            this.Prot = "HTTP/1.1";
+        else if (prot.equals("h2c") || prot.equals("h2"))
+            this.Prot = "HTTP/2";
+
     }
 
     public String getProt(){
@@ -97,7 +100,8 @@ public class Request {
 
     public void setHost(String host){
         this.Host = URLDecoder.decode(host,StandardCharsets.UTF_8);
-        this.setTimeout(Configs.getTimeOut(this.Host));
+        SocketsData.getInstance().setMaxReqsPerSock(this.sck,HTAccess.getInstance().getMNORPC(this.Host));
+        this.decideSocketsTimeout();
     }
 
     public void setPath(String path){
@@ -185,8 +189,34 @@ public class Request {
         }
     }
 
+    private void decideSocketsTimeout(){
+        if (this.keepAlive){
+            Object kaHeader = this.headers.get("Keep-Alive");
+            if (kaHeader != null){
+                String header = String.valueOf(kaHeader);
+                Pattern timeoutPtn = Pattern.compile("timeout=\\d+");
+                Matcher timeoutMc = timeoutPtn.matcher(header);
+                Pattern maxPtn = Pattern.compile("maxx=\\d+");
+                Matcher maxMc = maxPtn.matcher(header);
+                if (timeoutMc.find())
+                    this.setTimeout(Integer.parseInt(timeoutMc.group().replace("timeout=","").trim()));
+                if(maxMc.find())
+                    SocketsData.getInstance().setMaxReqsPerSock(this.sck,Integer.parseInt(maxMc.group().replace("max=","").trim()));
+            }else
+                this.setTimeout(HTAccess.getInstance().getKeepAliveTimeout(this.Host));
+        }else
+            this.setTimeout(Configs.getTimeOut(this.Host));
+    }
+
     public void clearRequest(){
         boolean bl = this.TempFile.delete();
+        if (SocketsData.getInstance().maxReached(this.sck)){
+            try{
+                this.sck.close();
+            }catch (Exception ex){
+                Logger.logException(ex);
+            }
+        }
         this.Path = null;
         if (body != null){
             this.body.clear();

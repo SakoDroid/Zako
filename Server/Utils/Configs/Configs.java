@@ -86,10 +86,6 @@ public class Configs {
         return configs.get(host).target;
     }
 
-    public static boolean getKeepAlive(String host){
-        return configs.get(host).KA;
-    }
-
     public static int getTimeOut(String host){
         return configs.get(host).timeOut;
     }
@@ -116,7 +112,6 @@ public class Configs {
         private final HashMap<String,String> dirs = new HashMap<>();
         private int hostStatus;
         private String[] target;
-        private boolean KA;
         private int timeOut;
         private long pb;
         private long fs;
@@ -130,12 +125,8 @@ public class Configs {
             HashMap mainData = (HashMap) JSONBuilder.newInstance().parse(new File(fl.getAbsolutePath() + "/Main.conf")).toJava();
             String name = String.valueOf(mainData.get("Name"));
             loadHandle((HashMap) mainData.get("Reaction"));
-            KA = (Boolean) mainData.get("Keep Alive");
             ports.put(name,(int)(long) mainData.get("Port"));
-            if (KA)
-                timeOut = 0;
-            else
-                timeOut = (int)(long) mainData.get("Sockets-Timeout");
+            timeOut = (int)(long) mainData.get("Sockets-Timeout");
             HashMap szs = (HashMap) mainData.get("Sizes");
             Object p = szs.get("Post body");
             Object f = szs.get("File size");

@@ -5,6 +5,7 @@ import Server.Reqandres.Request.RequestProcessor;
 import Server.Reqandres.Senders.FileSender;
 import Server.Reqandres.Senders.QuickSender;
 import Server.Utils.Configs.Configs;
+import Server.Utils.Configs.HTAccess;
 
 import java.io.File;
 
@@ -18,7 +19,7 @@ public class index implements API{
         }
         if (ind.exists()){
             FileSender fs = new FileSender(req.getProt(),200);
-            fs.setKeepAlive(Configs.getKeepAlive(req.getHost()) && req.getKeepAlive());
+            fs.setKeepAlive(HTAccess.getInstance().isKeepAliveAllowed(req.getHost()) && req.getKeepAlive());
             fs.setContentType("text/html");
             fs.setExtension(".html");
             fs.sendFile(ind, req);

@@ -9,14 +9,12 @@ public class Proxy {
 
     private final Request req;
 
-    public Proxy(String[] address, boolean read, Request req){
+    public Proxy(String[] address, Request req){
         this.req = req;
-        String readReq = null;
+        String readReq;
         try{
-            if (read){
-                FileInputStream fis = new FileInputStream(req.getCacheFile());
-                readReq = new String(fis.readAllBytes());
-            }
+            FileInputStream fis = new FileInputStream(req.getCacheFile());
+            readReq = new String(fis.readAllBytes());
             Socket s = new Socket(address[0], Integer.parseInt(address[1]));
             new Piper(readReq, req.getInStream(), s.getOutputStream(), s);
             new Piper(s.getInputStream(), req.getOutStream(), s);
@@ -51,8 +49,10 @@ public class Proxy {
         @Override
         public void run(){
             try{
-                if (readReq != null)
+                if (readReq != null){
                     out.write(readReq.getBytes());
+                    out.write(("Forwarded: by=" + basicUtils.LocalHostIP + ";for=" + req.getIP() + ";host=" + req.getHost() + ";proto=" + req.getProt() + "\r\n").getBytes());
+                }
                 in.transferTo(out);
             }catch(Exception ex){
                 Logger.logException(ex);

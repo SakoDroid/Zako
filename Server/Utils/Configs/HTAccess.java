@@ -28,6 +28,14 @@ public class HTAccess {
         return this.configs.get(host).keepAliveTimeOut;
     }
 
+    public int getMNORPC(String host){
+        return this.configs.get(host).MNORPC;
+    }
+
+    public boolean isKeepAliveAllowed(String host){
+        return this.configs.get(host).KA;
+    }
+
     public boolean isUpgradePermitted(String upgrade, String host){
         return this.configs.get(host).allowableUpgrades.contains(upgrade.trim());
     }
@@ -35,14 +43,18 @@ public class HTAccess {
     private static class HTAccessConfig {
 
         private final boolean upgradeIsAllowed;
+        private final boolean KA;
         private final int keepAliveTimeOut;
+        private final int MNORPC;
         private final HashSet<String> allowableUpgrades = new HashSet<>();
 
         public HTAccessConfig(File fl){
             HashMap mainData = (HashMap) JSONBuilder.newInstance().parse(new File(fl.getAbsolutePath() + "/htaccess.conf")).toJava();
             upgradeIsAllowed = (Boolean) mainData.get("allow upgrades");
             keepAliveTimeOut = (int)(long) mainData.get("keep alive default timeout");
-            String allowableUpgradesList = String.valueOf(mainData.get("Allowable upgrades"));
+            KA = (Boolean) mainData.get("Keep Alive");
+            MNORPC = (int)(long) mainData.get("MNORPC");
+            String allowableUpgradesList = String.valueOf(mainData.get("Allowable protocols"));
             for (String prot : allowableUpgradesList.split(" "))
                 allowableUpgrades.add(prot.trim());
             this.fixTheUpgradeList();

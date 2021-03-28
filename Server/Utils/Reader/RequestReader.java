@@ -2,12 +2,17 @@ package Server.Utils.Reader;
 
 import Server.Reqandres.Request.Request;
 import Server.Utils.Logger;
+import Server.Utils.Enums.Methods;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.util.regex.*;
 
 public class RequestReader {
 
-    private boolean hasBody;
+    private boolean hasBody = false;
+    private boolean protoFound = false;
+    private boolean pathFound = false;
+    private boolean hostFound = false;
     private int bodyLength;
     private final Request req;
     private String firstLine;
@@ -26,6 +31,7 @@ public class RequestReader {
         try{
             firstLine = this.readLine(req.is);
             if (firstLine != null && firstLine.length() > 5){
+                this.processFirstLine();
                 fw.write(firstLine.getBytes());
                 fw.write( "\r\n".getBytes());
                 String line;
@@ -39,6 +45,9 @@ public class RequestReader {
                         break;
                     req.addHeader(temp[0].trim(),temp[1].trim());
                 }
+                this.hostFound = req.getHeaders().containsKey("Host");
+                if (hostFound)
+                    req.setHost(req.getHeaders().get("Host"));
                 this.hasBody = req.getHeaders().containsKey("Content-Type");
                 if (this.hasBody){
                     String cntLen = req.getHeaders().get("Content-Length");
@@ -50,6 +59,36 @@ public class RequestReader {
             }
         }catch (Exception ex){
             Logger.logException(ex);
+        }
+    }
+
+    private void processFirstLine(){
+        Pattern pathPattern = Pattern.compile(" /[^ ]*");
+        Matcher pathMatcher = pathPattern.matcher(firstLine);
+        if (pathMatcher.find()) {
+            pathFound = true;
+            Pattern protoPattern = Pattern.compile("HTTP/\\d[.]?\\d?");
+            Matcher protoMatcher = protoPattern.matcher(firstLine);
+            if (protoMatcher.find()){
+                protoFound = true;
+                req.setOrgPath(pathMatcher.group());
+                req.setPath(req.getOrgPath());
+                Matcher mch = Pattern.compile("/[^?]+").matcher(req.getOrgPath());
+                if (mch.find())
+                    req.setPath(mch.group());
+                req.setProt(protoMatcher.group());
+                req.setMethod(switch (this.firstLine.split(" ", 3)[0]) {
+                    case "GET" -> Methods.GET;
+                    case "POST" -> Methods.POST;
+                    case "PUT" -> Methods.PUT;
+                    case "HEAD" -> Methods.HEAD;
+                    case "DELETE" -> Methods.DELETE;
+                    case "CONNECT" -> Methods.CONNECT;
+                    case "OPTIONS" -> Methods.OPTIONS;
+                    case "TRACE" -> Methods.TRACE;
+                    default -> Methods.UNKNOWN;
+                });
+            }
         }
     }
 
@@ -74,11 +113,23 @@ public class RequestReader {
         return this.hasBody;
     }
 
+    public boolean isProtoFound(){
+        return this.protoFound;
+    }
+
+    public boolean isPathFound(){
+        return this.pathFound;
+    }
+
+    public boolean isHostFound() {
+        return this.hostFound;
+    }
+
     public int getBodyLength(){
         return this.bodyLength;
     }
 
-    public String getFirstLine(){
+    public String getFirstLine() {
         return this.firstLine;
     }
 

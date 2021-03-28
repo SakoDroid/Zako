@@ -5,8 +5,10 @@ import Server.HttpListener;
 import Server.Method.Factory;
 import Server.Utils.Configs.APIConfigs;
 import Server.Utils.Configs.Configs;
+import Server.Utils.Configs.HTAccess;
 import Server.Utils.Configs.ProxyConfigs;
 import Server.Reqandres.Senders.QuickSender;
+import Server.Utils.Enums.Methods;
 import Server.Utils.Reader.BodyParser;
 import Server.Utils.Proxy;
 import Server.Utils.*;
@@ -14,7 +16,6 @@ import Server.Utils.Reader.RequestReader;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.regex.*;
 
 public class RequestProcessor {
 
@@ -31,20 +32,15 @@ public class RequestProcessor {
     }
 
     private void startProcessing(){
-        if (ProxyConfigs.isOn){
-            Logger.glog("Proxy is on, request is being forwarded.",req.getHost());
-            new Proxy(ProxyConfigs.getAddress(),false,req);
-            this.stat = 0;
-        }else{
-            rp.readHeaders();
-            this.processRequest();
-            if (req.getKeepAlive())
-                new HttpListener(req.getSocket(),req.getHost(),false);
-            if (stat != 0)
-                this.continueProcess();
-            else
-                req.getCacheFile().delete();
-        }
+        rp.readHeaders();
+        this.processRequest();
+        if (req.getKeepAlive() && !ProxyConfigs.isOn)
+            new HttpListener(req.getSocket(),req.getHost(),false);
+        if (stat != 0)
+            this.continueProcess();
+        else
+            req.getCacheFile().delete();
+
     }
 
     private void continueProcess(){
@@ -69,63 +65,75 @@ public class RequestProcessor {
 
     private void processRequest(){
         try{
-            String line = rp.getFirstLine();
             if (!req.getHeaders().isEmpty()){
-                Pattern pathPattern = Pattern.compile(" /[^ ]*");
-                Matcher pathMatcher = pathPattern.matcher(line);
-                Pattern protPattern = Pattern.compile("HTTP/\\d[.]?\\d?");
-                Matcher protMatcher = protPattern.matcher(line);
-                if (pathMatcher.find() && protMatcher.find()){
-                    req.setOrgPath(pathMatcher.group());
-                    req.setPath(req.getOrgPath());
-                    Matcher mch = Pattern.compile("/[^?]+").matcher(req.getOrgPath());
-                    if (mch.find())
-                        req.setPath(mch.group());
-                    req.setProt(protMatcher.group());
-                    String host = req.getHeaders().get("Host");
-                    if (host != null) {
-                        String hostName = URLDecoder.decode(host.trim().replace("www.",""),StandardCharsets.UTF_8);
-                        req.setHost(hostName);
-                        int status = Configs.getHostStatus(hostName);
-                        if (status == 0) {
-                            String[] api = APIConfigs.getAPIAddress(hostName + req.getPath(),hostName);
-                            if (api == null) {
-                                this.readRequest();
-                                if (this.method == Methods.POST && this.sit == 200)
-                                    new BodyParser(this.req).parseBody();
-                            } else {
-                                if (api.length > 1) {
-                                    req.setTimeout(0);
-                                    rp.finishReading();
-                                    Logger.glog("request for API " + hostName + req.getPath() + " received from " + req.getIP() + " .", hostName);
-                                    new Proxy(api, true, req);
-                                    this.stat = 0;
+                if (rp.isPathFound()){
+                    if (rp.isProtoFound()){
+                        if (this.isProtoValid(req.getProt())) {
+                            if (rp.isHostFound()) {
+                                if (req.getMethod() != Methods.UNKNOWN) {
+                                    if (ProxyConfigs.isOn) {
+                                        rp.finishReading();
+                                        Logger.glog("Proxy is on, request is being forwarded.", req.getHost());
+                                        new Proxy(ProxyConfigs.getAddress(), req);
+                                        this.stat = 0;
+                                    } else {
+                                        String hostName = URLDecoder.decode(req.getHost().trim().replace("www.", ""), StandardCharsets.UTF_8);
+                                        int status = Configs.getHostStatus(hostName);
+                                        if (status == 0) {
+                                            String[] api = APIConfigs.getAPIAddress(hostName + req.getPath(), hostName);
+                                            if (api == null) {
+                                                this.readRequest();
+                                                if (this.method == Methods.POST && this.sit == 200)
+                                                    new BodyParser(this.req).parseBody();
+                                            } else {
+                                                if (api.length > 1) {
+                                                    req.setTimeout(0);
+                                                    rp.finishReading();
+                                                    Logger.glog("request for API " + hostName + req.getPath() + " received from " + req.getIP() + " .", hostName);
+                                                    new Proxy(api, req);
+                                                    this.stat = 0;
+                                                } else {
+                                                    req.setPath(api[0]);
+                                                    this.readRequest();
+                                                }
+                                            }
+                                        } else if (status == 1) {
+                                            req.setTimeout(0);
+                                            rp.finishReading();
+                                            Logger.glog("request for " + hostName + " received from " + req.getIP() + " .", hostName);
+                                            new Proxy(Configs.getForwardAddress(hostName), req);
+                                            this.stat = 0;
+                                        } else if (status == 2) {
+                                            basicUtils.redirect(307, Configs.getForwardAddress(hostName)[0], req);
+                                            this.stat = 0;
+                                        } else {
+                                            this.readRequest();
+                                        }
+                                    }
                                 } else {
-                                    req.setPath(api[0]);
-                                    this.readRequest();
+                                    this.stat = 0;
+                                    new QuickSender(req).sendBadReq("Invalid method.");
+                                    Interface.addWarning(req.getIP(), req.getHost());
                                 }
+                            } else {
+                                this.stat = 0;
+                                new QuickSender(req).sendBadReq("\"Host\" header not found.");
+                                if (Configs.BRS)
+                                    Interface.addWarning(req.getIP(), req.getHost());
                             }
-                        } else if (status == 1) {
-                            req.setTimeout(0);
-                            rp.finishReading();
-                            Logger.glog("request for " + hostName + " received from " + req.getIP() + " .", hostName);
-                            new Proxy(Configs.getForwardAddress(hostName), true, req);
+                        }else{
                             this.stat = 0;
-                        } else if (status == 2) {
-                            basicUtils.redirect(307, Configs.getForwardAddress(hostName)[0], req);
-                            this.stat = 0;
-                        } else {
-                            this.readRequest();
+                            new QuickSender(req).sendCode(505);
                         }
-                    } else{
+                    }else{
                         this.stat = 0;
-                        new QuickSender(req).sendBadReq("\"Host\" header not found.");
+                        new QuickSender(req).sendBadReq("No protocol found.");
                         if (Configs.BRS)
                             Interface.addWarning(req.getIP(),req.getHost());
                     }
                 }else{
                     this.stat = 0;
-                    new QuickSender(req).sendBadReq("Invalid headers.");
+                    new QuickSender(req).sendBadReq("No path found.");
                     if (Configs.BRS)
                         Interface.addWarning(req.getIP(),req.getHost());
                 }
@@ -153,7 +161,7 @@ public class RequestProcessor {
     private void determineKeepAlive(){
         String cnc = req.getHeaders().get("Connection");
         if (cnc != null) {
-            req.setKeepAlive(Configs.getKeepAlive(req.getHost()) && cnc.trim().equals("keep-alive"));
+            req.setKeepAlive(HTAccess.getInstance().isKeepAliveAllowed(req.getHost()) && cnc.trim().equals("keep-alive"));
         }
     }
 
@@ -172,43 +180,35 @@ public class RequestProcessor {
 
     private void readRequest(){
         try{
-            this.method = switch (rp.getFirstLine().split(" ", 3)[0]) {
-                case "GET" -> Methods.GET;
-                case "POST" -> Methods.POST;
-                case "PUT" -> Methods.PUT;
-                case "HEAD" -> Methods.HEAD;
-                case "DELETE" -> Methods.DELETE;
-                case "CONNECT" -> Methods.CONNECT;
-                case "OPTIONS" -> Methods.OPTIONS;
-                case "TRACE" -> Methods.TRACE;
-                default -> Methods.UNKNOWN;
-            };
-            req.setMethod(this.method);
-            if (this.method != Methods.UNKNOWN) {
-                this.determineKeepAlive();
-                this.authenticate();
-                if (this.sit < 300) {
-                    this.fixTheHeaders();
-                    if (this.method == Methods.POST || this.method == Methods.PUT) {
-                        if (rp.hasBody()) {
-                            if (rp.getBodyLength() != -1){
-                                if (rp.getBodyLength() < Configs.getPostBodySize(req.getHost())) {
-                                    rp.readBody();
-                                } else
-                                    this.sit = 413;
+            this.determineKeepAlive();
+            this.authenticate();
+            if (this.sit < 300) {
+                this.fixTheHeaders();
+                if (this.method == Methods.POST || this.method == Methods.PUT) {
+                    if (rp.hasBody()) {
+                        if (rp.getBodyLength() != -1){
+                            if (rp.getBodyLength() < Configs.getPostBodySize(req.getHost())) {
+                                rp.readBody();
                             } else
-                                this.sit = 411;
-                        }
+                                this.sit = 413;
+                        } else
+                            this.sit = 411;
                     }
                 }
-            } else{
-                this.stat = 0;
-                new QuickSender(req).sendBadReq("Invalid method.");
-                Interface.addWarning(req.getIP(),req.getHost());
             }
             rp.finishReading();
         }catch(Exception ex){
             Logger.logException(ex);
         }
+    }
+
+    private boolean isProtoValid(String proto){
+        if (proto.startsWith("HTTP/")){
+            if (proto.equals("HTTP/1.1"))
+                return true;
+            else
+                return false;
+        }
+        return false;
     }
 }

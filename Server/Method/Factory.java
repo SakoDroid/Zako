@@ -1,6 +1,6 @@
 package Server.Method;
 
-import Server.Utils.Methods;
+import Server.Utils.Enums.Methods;
 
 public class Factory {
 

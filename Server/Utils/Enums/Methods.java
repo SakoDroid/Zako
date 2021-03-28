@@ -1,4 +1,4 @@
-package Server.Utils;
+package Server.Utils.Enums;
 
 public enum Methods {
     GET,

@@ -2,6 +2,8 @@ package Server.Reqandres.Senders;
 
 import Server.Reqandres.Request.Request;
 import Server.Utils.*;
+import Server.Utils.Enums.Methods;
+
 import java.io.*;
 import java.util.Date;
 

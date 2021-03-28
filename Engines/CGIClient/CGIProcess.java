@@ -4,6 +4,8 @@ import Engines.CGI;
 import Server.Reqandres.Request.Request;
 import Server.Reqandres.Senders.FileSender;
 import Server.Utils.*;
+import Server.Utils.Enums.Methods;
+
 import java.io.*;
 import java.util.*;
 
