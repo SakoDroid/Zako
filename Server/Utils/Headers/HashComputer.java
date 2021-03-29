@@ -1,4 +1,6 @@
-package Server.Utils;
+package Server.Utils.Headers;
+
+import Server.Utils.Logger;
 
 import java.io.File;
 import java.io.FileInputStream;

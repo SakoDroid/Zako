@@ -1,14 +1,11 @@
 package Server.API;
 
-import Server.Reqandres.HeaderCheck.CacheControl;
-import Server.Reqandres.Request.Request;
-import Server.Reqandres.Request.RequestProcessor;
-import Server.Reqandres.Senders.FileSender;
-import Server.Reqandres.Senders.QuickSender;
+import Server.Reqandres.Request.*;
+import Server.Reqandres.Senders.*;
 import Server.Utils.Configs.Configs;
 import Server.Utils.Configs.FileTypes;
-import Server.Utils.HashComputer;
-
+import Server.Utils.Configs.HTAccess;
+import Server.Utils.Headers.*;
 import java.io.File;
 import java.util.regex.*;
 
@@ -57,17 +54,15 @@ public class Def implements API{
 
     private void sendFile(File fl, String ext, Request req, boolean ka){
         if (fl.isFile()) {
-            CacheControl cc = new CacheControl();
-            cc.decide(req.getHeaders(),fl);
-            if (cc.getStatus() == 200){
-                FileSender fs = new FileSender(req.getProt(), 200);
-                fs.setContentType(FileTypes.getContentType(ext,req.getHost()));
-                fs.setExtension(ext);
-                fs.setKeepAlive(ka);
+            FileSender fs = new FileSender(req.getProt(), 200);
+            fs.setContentType(FileTypes.getContentType(ext,req.getHost()));
+            fs.setExtension(ext);
+            fs.setKeepAlive(ka);
+            if (HTAccess.getInstance().shouldETagBeSent(fl.getAbsolutePath(),req.getHost()))
                 fs.addHeader("ETag: \"" + new HashComputer(fl).computeHash() + "\"");
-                fs.sendFile(fl,req);
-            }else
-                new QuickSender(req).sendCode(cc.getStatus());
+            if (HTAccess.getInstance().shouldLMBeSent(fl.getAbsolutePath(),req.getHost()))
+                fs.addHeader("Last-Modified: " + new LMGenerator(fl).generate());
+            fs.sendFile(fl,req);
         } else
             new QuickSender(req).sendCode(404);
     }

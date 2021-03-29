@@ -20,14 +20,17 @@ public class ConfigsUpdater extends Thread{
         long time = (Long) data.get("CFG Update period");
         while (true){
             Logger.ilog("Configurations will be updated in " + time + " milli seconds.");
+            System.out.println("Configurations will be updated in " + time + " milli seconds.");
             synchronized (lock){
                 try{
                     lock.wait(time);
                 }catch (Exception ignored){}
             }
             Logger.ilog("Updating configurations ...");
-            Loader.load();
+            System.out.println("Updating configurations ...");
+            Loader.load(false);
             Logger.ilog("Update done!");
+            System.out.println("Update done!");
         }
     }
 }

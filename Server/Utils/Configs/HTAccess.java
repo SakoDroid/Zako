@@ -2,6 +2,7 @@ package Server.Utils.Configs;
 
 import Server.Utils.JSON.JSONBuilder;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -40,6 +41,14 @@ public class HTAccess {
         return this.configs.get(host).allowableUpgrades.contains(upgrade.trim());
     }
 
+    public boolean shouldLMBeSent(String path, String host){
+        return this.configs.get(host).lastModifiedToBeSent.contains(path);
+    }
+
+    public boolean shouldETagBeSent(String path, String host){
+        return this.configs.get(host).ETagToBeSent.contains(path);
+    }
+
     private static class HTAccessConfig {
 
         private final boolean upgradeIsAllowed;
@@ -47,6 +56,8 @@ public class HTAccess {
         private final int keepAliveTimeOut;
         private final int MNORPC;
         private final HashSet<String> allowableUpgrades = new HashSet<>();
+        private ArrayList<String> lastModifiedToBeSent;
+        private ArrayList<String> ETagToBeSent;
 
         public HTAccessConfig(File fl){
             HashMap mainData = (HashMap) JSONBuilder.newInstance().parse(new File(fl.getAbsolutePath() + "/htaccess.conf")).toJava();
@@ -58,6 +69,10 @@ public class HTAccess {
             for (String prot : allowableUpgradesList.split(" "))
                 allowableUpgrades.add(prot.trim());
             this.fixTheUpgradeList();
+            HashMap cond = (HashMap) mainData.get("Conditionals");
+            lastModifiedToBeSent = (ArrayList<String>)cond.get("Last-Modified");
+            ETagToBeSent = (ArrayList<String>) cond.get("ETag");
+
         }
 
         private void fixTheUpgradeList(){

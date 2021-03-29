@@ -17,9 +17,9 @@ public class PUT implements Method{
     public int run(Request req, RequestProcessor reqp){
         try{
             if(Perms.isIPAllowedForPUTAndDelete(req.getIP(),req.getHost())){
+                File fl = new File(Configs.getMainDir(req.getHost()) + req.getPath());
                 RandomAccessFile bf = new RandomAccessFile(req.getCacheFile(),"r");
                 while(!bf.readLine().isEmpty()){}
-                File fl = new File(Configs.getMainDir(req.getHost()) + req.getPath());
                 FileOutputStream fos = new FileOutputStream(fl);
                 int i;
                 while ((i = bf.read()) != -1) {
@@ -30,7 +30,8 @@ public class PUT implements Method{
                 bf.close();
                 Sender snd = new Sender(req.getProt(),201);
                 snd.send(null,req);
-            }else new QuickSender(req).sendCode(405);
+            }else
+                new QuickSender(req).sendCode(405);
         }catch(Exception ex){
             Logger.logException(ex);
         }

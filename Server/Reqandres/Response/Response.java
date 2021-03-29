@@ -1,6 +1,5 @@
 package Server.Reqandres.Response;
 
-import Server.Reqandres.HeaderCheck.CacheControl;
 import Server.Reqandres.Request.Request;
 import Server.Reqandres.Request.RequestProcessor;
 import Server.Reqandres.Senders.QuickSender;

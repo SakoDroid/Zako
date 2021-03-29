@@ -3,6 +3,7 @@ package Server.Reqandres.Request;
 import Engines.DDOS.Interface;
 import Server.HttpListener;
 import Server.Method.Factory;
+import Server.Reqandres.HeaderCheck.HeadersChecker;
 import Server.Utils.Configs.APIConfigs;
 import Server.Utils.Configs.Configs;
 import Server.Utils.Configs.HTAccess;
@@ -46,10 +47,16 @@ public class RequestProcessor {
         try{
             if (req.getCacheFile().length() > 5) {
                 Interface.addReqVol(req.getIP(), req.getCacheFile().length());
-                if (this.sit < 400) {
+                HeadersChecker hc = new HeadersChecker(req);
+                this.sit = hc.getStatus();
+                if (this.sit < 300) {
                     this.stat = Factory.getMt(req.getMethod()).run(req, this);
                 } else {
-                    new QuickSender(this.req).sendCode(this.sit);
+                    QuickSender qs = new QuickSender(this.req);
+                    if (this.sit != 400)
+                        qs.sendCode(this.sit);
+                    else
+                        qs.sendBadReq("Invalid headers");
                     this.stat = 0;
                     req.getCacheFile().delete();
                 }
