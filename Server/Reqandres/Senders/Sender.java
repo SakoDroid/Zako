@@ -83,11 +83,14 @@ public class Sender {
 
     public void sendOptionsMethod(Request req){
         try{
-            Logger.glog("Sending back options method response to " + req.getIP() + "  ; debug_id = " + req.getID(),req.getHost());
-            req.getOutStream().writeBytes(prot + " 200 OK\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako + "\nConnection: close\nAllow: GET,HEAD,POST,OPTIONS,TRACE,CONNECT,PUT,DELETE");
-            req.getOutStream().flush();
-            req.getOutStream().close();
-            Logger.glog(req.getIP() + "'s request handled successfully!" + "  ; debug_id = " + req.getID(),req.getHost());
+            if (!req.getSocket().isClosed()){
+                Logger.glog("Sending back options method response to " + req.getIP() + "  ; debug_id = " + req.getID(), req.getHost());
+                req.getOutStream().writeBytes(prot + " 200 OK\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako + "\nConnection: close\nAllow: GET,HEAD,POST,OPTIONS,TRACE,CONNECT,PUT,DELETE");
+                req.getOutStream().flush();
+                req.getOutStream().close();
+                Logger.glog(req.getIP() + "'s request handled successfully!" + "  ; debug_id = " + req.getID(), req.getHost());
+            }else
+                Logger.glog("Connection closed with " + req.getIP() + " without sending response.; debug_id = " + req.getID(),req.getHost());
         }catch (Exception ex){
             Logger.logException(ex);
         }
@@ -95,25 +98,31 @@ public class Sender {
 
     public void sendConnectMethod(Request req){
         try{
-            Logger.glog("Sending back connect method response to " + req.getIP() + "  ; debug_id = " + req.getID(),req.getHost());
-            req.getOutStream().writeBytes(prot + " 200 Connection established\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako);
-            req.getOutStream().flush();
-            req.getOutStream().close();
-            Logger.glog(req.getIP() + "'s request handled successfully!" + "  ; debug_id = " + req.getID(),req.getHost());
+            if (!req.getSocket().isClosed()){
+                Logger.glog("Sending back connect method response to " + req.getIP() + "  ; debug_id = " + req.getID(), req.getHost());
+                req.getOutStream().writeBytes(prot + " 200 Connection established\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako);
+                req.getOutStream().flush();
+                req.getOutStream().close();
+                Logger.glog(req.getIP() + "'s request handled successfully!" + "  ; debug_id = " + req.getID(), req.getHost());
+            }else
+                Logger.glog("Connection closed with " + req.getIP() + " without sending response.; debug_id = " + req.getID(),req.getHost());
         }catch (Exception ex){
             Logger.logException(ex);
         }
     }
 
     public void send(String data, Request req){
-        Logger.glog("Sending response to " + req.getID() + "  ; debug_id = " + req.getID(),req.getHost());
         try{
-            req.getOutStream().writeBytes(generateResponse(data,req));
-            if (!this.keepAlive) {
-                req.getOutStream().flush();
-                req.getOutStream().close();
-            }
-            Logger.glog(req.getID() + "'s request handled successfully!" + "  ; debug_id = " + req.getID(),req.getHost());
+            if (!req.getSocket().isClosed()){
+                Logger.glog("Sending response to " + req.getID() + "  ; debug_id = " + req.getID(),req.getHost());
+                req.getOutStream().writeBytes(generateResponse(data, req));
+                if (!this.keepAlive) {
+                    req.getOutStream().flush();
+                    req.getOutStream().close();
+                }
+                Logger.glog(req.getIP() + "'s request handled successfully!  ; debug_id = " + req.getID(), req.getHost());
+            }else
+                Logger.glog("Connection closed with " + req.getIP() + " without sending response.; debug_id = " + req.getID(),req.getHost());
         }catch(Exception ex){
             Logger.logException(ex);
         }
