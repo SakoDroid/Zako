@@ -38,7 +38,7 @@ public class Request {
         this.sck = client;
         this.ip = client.getInetAddress().getHostAddress();
         this.fullip = client.getRemoteSocketAddress().toString();
-        this.TempFile = new File(Configs.getCWD() + "/Temp/temp" + id + ".tmp");
+        this.TempFile = new File(Configs.getCWD() + "/Cache/Temp/temp" + id + ".tmp");
         SocketsData.getInstance().addRequest(client);
         this.setHost("default");
         SocketsData.getInstance().setMaxReqsPerSock(this.sck,HTAccess.getInstance().getMNORPC(this.Host));

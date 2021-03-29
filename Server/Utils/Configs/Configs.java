@@ -170,9 +170,15 @@ public class Configs {
         }
 
         private void checkDirs(){
-            File temp = new File(getCWD() + "/Temp");
+            File cache = new File(getCWD() + "/Cache");
+            if (!cache.isDirectory())
+                cache.mkdirs();
+            File temp = new File(getCWD() + "/Cache/Temp");
             if (!temp.isDirectory())
                 temp.mkdirs();
+            File comp = new File(getCWD() + "/Cache/Compressed");
+            if (!comp.isDirectory())
+                comp.mkdirs();
             for (String key : dirs.keySet()){
                 File fl = new File(dirs.get(key));
                 if (!fl.isDirectory())
