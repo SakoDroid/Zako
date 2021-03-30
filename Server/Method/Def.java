@@ -1,12 +1,19 @@
 package Server.Method;
 
 import Server.Reqandres.Request.Request;
-import Server.Reqandres.Request.RequestProcessor;
+import Server.Utils.Logger;
+import Server.Utils.ViewCounter.View;
 
 public class Def implements Method{
 
     @Override
-    public int run(Request req, RequestProcessor reqp){
-        return 1;
+    public void run(Request request){
+        try{
+            Logger.glog("Preparing response to " + request.getIP() + "  ; debug_id = " + request.getID(), request.getHost());
+            new View(request.getHost(),request.getIP());
+            new Server.API.Factory().getAPI(request.getPath(), request.getHost()).init(request);
+        }catch (Exception ex) {
+            Logger.logException(ex);
+        }
     }
 }

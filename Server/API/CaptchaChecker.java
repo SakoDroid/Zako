@@ -2,13 +2,11 @@ package Server.API;
 
 import Engines.Captcha.Data;
 import Server.Reqandres.Request.Request;
-import Server.Reqandres.Request.RequestProcessor;
 import Server.Reqandres.Senders.FileSender;
-import Server.Utils.basicUtils;
 
 public class CaptchaChecker implements API{
     @Override
-    public void init(Request req, RequestProcessor reqp) {
+    public void init(Request req) {
         req.convertBody();
         String ans = new String(req.getConvertedBody());
         FileSender fs = new FileSender(req.getProt(),200);

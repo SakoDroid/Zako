@@ -11,7 +11,7 @@ import java.util.regex.*;
 
 public class Def implements API{
     @Override
-    public void init(Request req, RequestProcessor reqp) {
+    public void init(Request req) {
         Pattern pt = Pattern.compile("\\.\\w+");
         Matcher mc = pt.matcher(req.getPath());
         String ext = "";

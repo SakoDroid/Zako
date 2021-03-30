@@ -4,7 +4,7 @@ import Server.Utils.Configs.CaptchaConfigs;
 
 public class Factory {
 
-    public static API getAPI(String api, String host){
+    public API getAPI(String api, String host){
         if (api.equals("/"))
             return new index();
         else if (api.equals(CaptchaConfigs.getCGA(host)))

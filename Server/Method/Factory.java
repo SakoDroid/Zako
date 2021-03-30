@@ -4,7 +4,7 @@ import Server.Utils.Enums.Methods;
 
 public class Factory {
 
-    public static Method getMt(Methods mtd){
+    public Method getMt(Methods mtd){
         switch (mtd){
             case CONNECT -> {
                 return new CONNECT();

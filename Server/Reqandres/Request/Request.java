@@ -18,20 +18,22 @@ public class Request {
     private String id;
     private String ip;
     private String fullip;
-    private Socket sck;
-    private File TempFile;
     private String Host;
     private String Prot = "HTTP/1.1";
+    private String Path;
+    private String orgPath;
+    private String errorReason;
+    private Socket sck;
+    private File TempFile;
     private URL url;
     private Methods method;
     private HashMap<String,String> headers = new HashMap<>();
     public DataOutputStream out;
     public InputStream is;
-    private String Path;
-    private String orgPath;
     private ArrayList<Byte> body = new ArrayList<>();
     private byte[] convertedBody = null;
     private boolean keepAlive = false;
+    private int responseCode;
 
     public Request(Socket client){
         this.id = java.util.UUID.randomUUID().toString();
@@ -86,16 +88,20 @@ public class Request {
         }
     }
 
+    public void setErrorReason(String errorReason){
+        this.errorReason = errorReason;
+    }
+
+    public String getErrorReason() {
+        return this.errorReason;
+    }
+
     public void setProt(String prot){
         if (prot.equalsIgnoreCase("http/1.1"))
             this.Prot = "HTTP/1.1";
         else if (prot.equals("h2c") || prot.equals("h2"))
             this.Prot = "HTTP/2";
 
-    }
-
-    public String getProt(){
-        return this.Prot;
     }
 
     public void setHost(String host){
@@ -114,6 +120,10 @@ public class Request {
 
     public void setKeepAlive(boolean ka){
         this.keepAlive = ka;
+    }
+
+    public void setResponseCode(int code){
+        this.responseCode = code;
     }
 
     public void addToBody(byte[] bt){
@@ -172,6 +182,14 @@ public class Request {
 
     public ArrayList<Byte> getBody(){
         return this.body;
+    }
+
+    public String getProt(){
+        return this.Prot;
+    }
+
+    public int getResponseCode(){
+        return this.responseCode;
     }
 
     public byte[] getConvertedBody(){

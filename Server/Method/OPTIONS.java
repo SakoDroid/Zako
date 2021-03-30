@@ -6,9 +6,8 @@ import Server.Reqandres.Senders.Sender;
 
 public class OPTIONS implements Method{
     @Override
-    public int run(Request req, RequestProcessor reqp) {
+    public void run(Request req) {
         Sender snd = new Sender(req.getProt(),200);
         snd.sendOptionsMethod(req);
-        return 0;
     }
 }

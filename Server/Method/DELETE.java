@@ -1,7 +1,6 @@
 package Server.Method;
 
 import Server.Reqandres.Request.Request;
-import Server.Reqandres.Request.RequestProcessor;
 import Server.Reqandres.Senders.QuickSender;
 import Server.Reqandres.Senders.Sender;
 import Server.Utils.Configs.Configs;
@@ -12,7 +11,7 @@ import java.io.File;
 
 public class DELETE implements Method{
     @Override
-    public int run(Request req, RequestProcessor reqp) {
+    public void run(Request req) {
         try{
             if(Perms.isIPAllowedForPUTAndDelete(req.getIP(), req.getHost())){
                 File fl = new File(Configs.getMainDir(req.getHost()) + req.getPath());
@@ -25,6 +24,5 @@ public class DELETE implements Method{
         }catch(Exception ex){
             Logger.logException(ex);
         }
-        return 0;
     }
 }

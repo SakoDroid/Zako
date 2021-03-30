@@ -2,7 +2,7 @@ package Server.Reqandres.Request;
 
 import Engines.DDOS.Interface;
 import Server.HttpListener;
-import Server.Method.Factory;
+import Server.Reqandres.Responses.Factory;
 import Server.Reqandres.HeaderCheck.HeadersChecker;
 import Server.Utils.Configs.APIConfigs;
 import Server.Utils.Configs.Configs;
@@ -22,7 +22,6 @@ public class RequestProcessor {
 
     private final Request req;
     private final RequestReader rp;
-    public int sit = 200;
     public int stat = 1;
 
     public RequestProcessor(Request rq){
@@ -47,19 +46,8 @@ public class RequestProcessor {
         try{
             if (req.getCacheFile().length() > 5) {
                 Interface.addReqVol(req.getIP(), req.getCacheFile().length());
-                HeadersChecker hc = new HeadersChecker(req);
-                this.sit = hc.getStatus();
-                if (this.sit < 300) {
-                    this.stat = Factory.getMt(req.getMethod()).run(req, this);
-                } else {
-                    QuickSender qs = new QuickSender(this.req);
-                    if (this.sit != 400)
-                        qs.sendCode(this.sit);
-                    else
-                        qs.sendBadReq("Invalid headers");
-                    this.stat = 0;
-                    req.getCacheFile().delete();
-                }
+                new HeadersChecker(req);
+                new Factory().getResponse(req.getResponseCode()).init(req);
             } else {
                 req.getCacheFile().delete();
                 this.stat = 0;
@@ -89,7 +77,7 @@ public class RequestProcessor {
                                             String[] api = APIConfigs.getAPIAddress(hostName + req.getPath(), hostName);
                                             if (api == null) {
                                                 this.readRequest();
-                                                if (req.getMethod() == Methods.POST && this.sit == 200)
+                                                if (req.getMethod() == Methods.POST && req.getResponseCode() == 200)
                                                     new BodyParser(this.req).parseBody();
                                             } else {
                                                 if (api.length > 1) {
@@ -155,13 +143,8 @@ public class RequestProcessor {
     }
 
     private void authenticate(){
-        if (Server.HttpAuth.Interface.getInstance().needAuth(req.getHost() + req.getPath(),req.getHost())){
-            this.sit = Server.HttpAuth.Interface.getInstance().evaluate(req.getHeaders(),req.getIP(), req.getHost());
-            if (this.sit == 401){
-                this.stat = 0;
-                Server.HttpAuth.Interface.getInstance().send401(req);
-            }
-        }
+        if (Server.HttpAuth.Interface.getInstance().needAuth(req.getHost() + req.getPath(),req.getHost()))
+            req.setResponseCode(Server.HttpAuth.Interface.getInstance().evaluate(req.getHeaders(),req.getIP(), req.getHost()));
     }
 
     private void determineKeepAlive(){
@@ -188,7 +171,7 @@ public class RequestProcessor {
         try{
             this.determineKeepAlive();
             this.authenticate();
-            if (this.sit < 300) {
+            if (req.getResponseCode() < 300) {
                 this.fixTheHeaders();
                 if (req.getMethod() == Methods.POST || req.getMethod() == Methods.PUT) {
                     if (rp.hasBody()) {
@@ -196,9 +179,9 @@ public class RequestProcessor {
                             if (rp.getBodyLength() < Configs.getPostBodySize(req.getHost())) {
                                 rp.readBody();
                             } else
-                                this.sit = 413;
+                                req.setResponseCode(413);
                         } else
-                            this.sit = 411;
+                           req.setResponseCode(411);
                     }
                 }
             }

@@ -7,7 +7,6 @@ import java.io.File;
 public class HeadersChecker {
 
     private final Request req;
-    private int status = 200;
 
     public HeadersChecker(Request req){
         this.req = req;
@@ -15,15 +14,14 @@ public class HeadersChecker {
     }
 
     private void startChecking(){
-        Conditionals cc = new Conditionals();
-        cc.decide(req.getHeaders(),new File(Configs.getMainDir(req.getHost()) + req.getPath()),req.getMethod());
-        this.status = cc.getStatus();
-        if (this.status == 200){
+        new ProtocolSwitch(this.req);
+        if (req.getResponseCode() == 200){
+            Conditionals cc = new Conditionals();
+            cc.decide(req.getHeaders(), new File(Configs.getMainDir(req.getHost()) + req.getPath()), req.getMethod());
+            req.setResponseCode(cc.getStatus());
+            if (req.getResponseCode() == 200) {
 
+            }
         }
-    }
-
-    public int getStatus(){
-        return this.status;
     }
 }
