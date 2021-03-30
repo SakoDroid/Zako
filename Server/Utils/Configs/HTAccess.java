@@ -49,15 +49,20 @@ public class HTAccess {
         return this.configs.get(host).ETagToBeSent.contains(path);
     }
 
+    public boolean isCompressionAllowed(String host){
+        return this.configs.get(host).allowCompression;
+    }
+
     private static class HTAccessConfig {
 
         private final boolean upgradeIsAllowed;
         private final boolean KA;
+        private final boolean allowCompression;
         private final int keepAliveTimeOut;
         private final int MNORPC;
         private final HashSet<String> allowableUpgrades = new HashSet<>();
-        private ArrayList<String> lastModifiedToBeSent;
-        private ArrayList<String> ETagToBeSent;
+        private final ArrayList<String> lastModifiedToBeSent;
+        private final ArrayList<String> ETagToBeSent;
 
         public HTAccessConfig(File fl){
             HashMap mainData = (HashMap) JSONBuilder.newInstance().parse(new File(fl.getAbsolutePath() + "/htaccess.conf")).toJava();
@@ -65,6 +70,7 @@ public class HTAccess {
             keepAliveTimeOut = (int)(long) mainData.get("keep alive default timeout");
             KA = (Boolean) mainData.get("Keep Alive");
             MNORPC = (int)(long) mainData.get("MNORPC");
+            allowCompression = (Boolean) mainData.get("Allow compression");
             String allowableUpgradesList = String.valueOf(mainData.get("Allowable protocols"));
             for (String prot : allowableUpgradesList.split(" "))
                 allowableUpgrades.add(prot.trim());

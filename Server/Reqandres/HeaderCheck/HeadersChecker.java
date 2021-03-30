@@ -20,7 +20,7 @@ public class HeadersChecker {
             cc.decide(req.getHeaders(), new File(Configs.getMainDir(req.getHost()) + req.getPath()), req.getMethod());
             req.setResponseCode(cc.getStatus());
             if (req.getResponseCode() == 200) {
-
+                new ContentNegotiation(this.req);
             }
         }
     }

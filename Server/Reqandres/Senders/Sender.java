@@ -1,12 +1,14 @@
 package Server.Reqandres.Senders;
 
 import Server.Reqandres.Request.Request;
+import Server.Utils.Compression.CompressorFactory;
 import Server.Utils.Configs.HTAccess;
+import Server.Utils.Enums.Methods;
 import Server.Utils.Logger;
+import java.io.FileInputStream;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.util.Objects;
-
 import Server.Utils.basicUtils;
 
 public class Sender {
@@ -36,21 +38,18 @@ public class Sender {
     }
 
     private String generateResponse(String body,Request req){
-        String out = prot + " " + status + "\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako + "\nStatus: " + this.status;
-        if (body != null)
-            out += "\nContent-Length: " + body.length();
-        if (contentType != null)
-            out += "\nContent-Type: " + contentType;
+        String out = prot + " " + status + "\r\nDate: " + df.format(new Date()) + "\r\nServer: " + basicUtils.Zako + "\r\nStatus: " + this.status;
+        if (req.getMethod() != Methods.HEAD &&  body != null)
+            out += "\r\nContent-Length: " + body.length() + "\r\nContent-Type: " + contentType;
         if (cookie != null)
-            out += "\nSet-Cookie: " + cookie;
+            out += "\r\nSet-Cookie: " + cookie;
+        if (req.shouldBeCompressed())
+            out += "\r\nContent-Encoding: " + req.getCompressionAlg();
         if (Double.parseDouble(prot.replace("HTTP/","")) < 2)
             out += this.getConnectionHeader(req);
         if (!customHeaders.isEmpty())
-            out += "\n" + customHeaders;
-        if (body != null)
-            out += "\n\n" + body;
-        else out += "\n\n";
-        return out;
+            out += "\r\n" + customHeaders;
+        return out + "\r\n\r\n";
     }
 
     public void setKeepAlive(boolean ka){
@@ -71,7 +70,7 @@ public class Sender {
         else {
             if (customHeaders.endsWith("\n"))
                 customHeaders += header;
-            else customHeaders += "\n" + header;
+            else customHeaders += "\r\n" + header;
         }
     }
 
@@ -85,7 +84,7 @@ public class Sender {
         try{
             if (!req.getSocket().isClosed()){
                 Logger.glog("Sending back options method response to " + req.getIP() + "  ; debug_id = " + req.getID(), req.getHost());
-                req.getOutStream().writeBytes(prot + " 200 OK\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako + "\nConnection: close\nAllow: GET,HEAD,POST,OPTIONS,TRACE,CONNECT,PUT,DELETE");
+                req.getOutStream().writeBytes(prot + " 200 OK\r\nDate: " + df.format(new Date()) + "\r\nServer: " + basicUtils.Zako + "\r\nConnection: close\r\nAllow: GET,HEAD,POST,OPTIONS,TRACE,CONNECT,PUT,DELETE");
                 req.getOutStream().flush();
                 req.getOutStream().close();
                 Logger.glog(req.getIP() + "'s request handled successfully!" + "  ; debug_id = " + req.getID(), req.getHost());
@@ -100,7 +99,7 @@ public class Sender {
         try{
             if (!req.getSocket().isClosed()){
                 Logger.glog("Sending back connect method response to " + req.getIP() + "  ; debug_id = " + req.getID(), req.getHost());
-                req.getOutStream().writeBytes(prot + " 200 Connection established\nDate: " + df.format(new Date()) + "\nServer: " + basicUtils.Zako);
+                req.getOutStream().writeBytes(prot + " 200 Connection established\r\nDate: " + df.format(new Date()) + "\r\nServer: " + basicUtils.Zako);
                 req.getOutStream().flush();
                 req.getOutStream().close();
                 Logger.glog(req.getIP() + "'s request handled successfully!" + "  ; debug_id = " + req.getID(), req.getHost());
@@ -116,6 +115,18 @@ public class Sender {
             if (!req.getSocket().isClosed()){
                 Logger.glog("Sending response to " + req.getID() + "  ; debug_id = " + req.getID(),req.getHost());
                 req.getOutStream().writeBytes(generateResponse(data, req));
+                if (req.getMethod() != Methods.HEAD && data != null){
+                    if (req.shouldBeCompressed() && HTAccess.getInstance().isCompressionAllowed(req.getHost())){
+                        Logger.glog("Client requested compression by " + req.getCompressionAlg() + " algorithm. Response data will be compressed."
+                                + "  ; debug_id = " + req.getID(), req.getHost());
+                        FileInputStream in = new FileInputStream(
+                                new CompressorFactory().getCompressor(req.getCompressionAlg()).compress(data.getBytes(), req.getID())
+                        );
+                        in.transferTo(req.out);
+                        in.close();
+                    }else
+                        req.getOutStream().writeBytes(data);
+                }
                 if (!this.keepAlive) {
                     req.getOutStream().flush();
                     req.getOutStream().close();

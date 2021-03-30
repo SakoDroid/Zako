@@ -1,6 +1,7 @@
 package Server.Reqandres.Request;
 
 import Server.Utils.*;
+import Server.Utils.Compression.Algorithm;
 import Server.Utils.Configs.Configs;
 import Server.Utils.Configs.HTAccess;
 import Server.Utils.Enums.Methods;
@@ -33,6 +34,8 @@ public class Request {
     private ArrayList<Byte> body = new ArrayList<>();
     private byte[] convertedBody = null;
     private boolean keepAlive = false;
+    private boolean compression;
+    private Algorithm compressionAlg;
     private int responseCode;
 
     public Request(Socket client){
@@ -122,6 +125,14 @@ public class Request {
         this.keepAlive = ka;
     }
 
+    public void setCompression(boolean cmp){
+        this.compression = cmp;
+    }
+
+    public void setCompressionAlg(Algorithm alg){
+        this.compressionAlg = alg;
+    }
+
     public void setResponseCode(int code){
         this.responseCode = code;
     }
@@ -190,6 +201,14 @@ public class Request {
 
     public int getResponseCode(){
         return this.responseCode;
+    }
+
+    public boolean shouldBeCompressed(){
+        return this.compression;
+    }
+
+    public Algorithm getCompressionAlg(){
+        return this.compressionAlg;
     }
 
     public byte[] getConvertedBody(){
