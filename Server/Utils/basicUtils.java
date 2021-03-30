@@ -75,12 +75,16 @@ public class basicUtils {
         return execCmds.get(ext);
     }
 
-    public static byte[] toByteArray(ArrayList<Byte> bytes){
-        byte[] temp = new byte[bytes.size()];
-        int i = 0;
-        for (Byte b : bytes)
-            temp[i++] = b;
-        return temp;
+    public static boolean runTest(){
+        try{
+            ProcessBuilder pb = new ProcessBuilder("zako","test","-a");
+            Process p = pb.start();
+            String res = new String(p.getInputStream().readAllBytes());
+            return res.trim().equals("true");
+        }catch (Exception ex){
+            Logger.logException(ex);
+            return false;
+        }
     }
 
     public static void redirect(int code,String location, Request req){
@@ -93,11 +97,6 @@ public class basicUtils {
         }catch(Exception ex){
             Logger.logException(ex);
         }
-    }
-
-    public static boolean isProtAllowed(String prot){
-        return prot.equalsIgnoreCase("http/1.1") || prot.equalsIgnoreCase("h2c") || prot.equalsIgnoreCase("h2")
-                || prot.equalsIgnoreCase("http/2");
     }
 
     public static void killPrcs(){

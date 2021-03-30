@@ -10,10 +10,6 @@ public class SocketsData {
     private final HashMap<Socket,int[]> requestPerSocket = new HashMap<>();
     private static final SocketsData sd = new SocketsData();
 
-    private SocketsData(){
-        new CheckerThread();
-    }
-
     public static SocketsData getInstance(){
         return sd;
     }
@@ -28,6 +24,7 @@ public class SocketsData {
 
     public void removeEntry(Socket s){
         this.requestPerSocket.remove(s);
+        this.maxReqsPerSock.remove(s);
     }
 
     public boolean maxReached(Socket s){
@@ -38,31 +35,5 @@ public class SocketsData {
 
     public void setMaxReqsPerSock(Socket s , int max){
         this.maxReqsPerSock.put(s,max);
-    }
-
-    private class CheckerThread extends Thread{
-
-        public CheckerThread(){
-            this.start();
-        }
-
-        @Override
-        public void run(){
-            javax.swing.Timer writeTimer = new javax.swing.Timer(10000,e -> {
-                for (Socket s : maxReqsPerSock.keySet()){
-                    if (s.isClosed()){
-                        maxReqsPerSock.remove(s);
-                        requestPerSocket.remove(s);
-                    }
-                }
-            });
-            java.util.Timer writeTtimer = new java.util.Timer(false);
-            writeTtimer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    writeTimer.start();
-                }
-            },0);
-        }
     }
 }

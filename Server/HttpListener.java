@@ -19,10 +19,10 @@ public class HttpListener extends Thread{
         this.lb = loadBalancer;
         this.hostName = host;
         this.req = new Request(client);
-        //this.start();
         if (!SocketsData.getInstance().maxReached(client))
             this.start();
         else{
+            SocketsData.getInstance().removeEntry(client);
             try {
                 client.close();
             }catch (Exception ex){
@@ -42,7 +42,6 @@ public class HttpListener extends Thread{
             client.setSSLParameters(sslp);
             client.startHandshake();
             req.setProt(client.getApplicationProtocol());
-            //this.start();
         } catch (Exception ex) {
             Logger.logException(ex);
             try {
@@ -54,6 +53,7 @@ public class HttpListener extends Thread{
         if (!SocketsData.getInstance().maxReached(client))
             this.start();
         else{
+            SocketsData.getInstance().removeEntry(client);
             try {
                 client.close();
             }catch (Exception ex){

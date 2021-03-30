@@ -23,7 +23,7 @@ public class ConfigsUpdater extends Thread{
             System.out.println("Configurations will be updated in " + time + " milli seconds.");
             synchronized (lock){
                 try{
-                    lock.wait(time);
+                    lock.wait((time < 60000 ? 60000 : time));
                 }catch (Exception ignored){}
             }
             Logger.ilog("Updating configurations ...");
