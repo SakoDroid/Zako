@@ -87,18 +87,6 @@ public class basicUtils {
         }
     }
 
-    public static void redirect(int code,String location, Request req){
-        Logger.glog("Redirecting " + req.getIP() + " to " + location + "  ; id = " + req.getID(),req.getHost());
-        try{
-            req.out.writeBytes("HTTP/1.1 " + getStatusCodeComp(code) + "\nServer: " + basicUtils.Zako + "\nLocation: " + location + "\nConnection: close\n\n");
-            req.out.flush();
-            req.out.close();
-            Logger.glog(req.getIP() + "'s request redirected to " + location + "!" + "  ; id = " + req.getID(),req.getHost());
-        }catch(Exception ex){
-            Logger.logException(ex);
-        }
-    }
-
     public static void killPrcs(){
         for (String host : Configs.getPorts().keySet())
             killPrc(host);

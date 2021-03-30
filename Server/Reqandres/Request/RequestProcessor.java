@@ -98,7 +98,7 @@ public class RequestProcessor {
                                             new Proxy(Configs.getForwardAddress(hostName), req);
                                             this.stat = 0;
                                         } else if (status == 2) {
-                                            basicUtils.redirect(307, Configs.getForwardAddress(hostName)[0], req);
+                                            new QuickSender(this.req).redirect(307, Configs.getForwardAddress(hostName)[0]);
                                             this.stat = 0;
                                         } else {
                                             this.readRequest();
