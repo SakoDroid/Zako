@@ -1,14 +1,11 @@
 package Server.Utils;
 
-import Server.Reqandres.Request.Request;
 import Server.Utils.Configs.Configs;
-
 import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.regex.*;
 
 public class basicUtils {
 
@@ -16,7 +13,7 @@ public class basicUtils {
     private static final File cmds = new File (Configs.getCWD() + "/Data/cmds.sak");
     private static HashMap<Integer,String> codes;
     private static HashMap<String,String> execCmds;
-    public static String LocalHostIP = "", Zako = "Zako 1.6.0";
+    public static String LocalHostIP = "", Zako = "Zako 1.6.3";
 
     private basicUtils(){}
 
