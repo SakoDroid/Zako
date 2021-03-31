@@ -36,7 +36,7 @@ public class Request {
     private boolean keepAlive = false;
     private boolean compression;
     private Algorithm compressionAlg;
-    private int responseCode;
+    private int responseCode = 200;
 
     public Request(Socket client){
         this.id = java.util.UUID.randomUUID().toString();

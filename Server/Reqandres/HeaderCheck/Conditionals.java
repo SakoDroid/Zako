@@ -1,8 +1,8 @@
 package Server.Reqandres.HeaderCheck;
 
 import Server.Utils.Enums.Methods;
-import Server.Utils.Headers.HashComputer;
-import Server.Utils.Headers.LMGenerator;
+import Server.Utils.HeaderRelatedTools.HashComputer;
+import Server.Utils.HeaderRelatedTools.LMGenerator;
 import java.io.File;
 import java.util.HashMap;
 

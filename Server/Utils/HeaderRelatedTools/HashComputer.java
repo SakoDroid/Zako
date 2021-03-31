@@ -1,4 +1,4 @@
-package Server.Utils.Headers;
+package Server.Utils.HeaderRelatedTools;
 
 import Server.Utils.Logger;
 

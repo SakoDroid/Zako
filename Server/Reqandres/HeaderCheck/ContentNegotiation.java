@@ -2,6 +2,8 @@ package Server.Reqandres.HeaderCheck;
 
 import Server.Reqandres.Request.Request;
 import Server.Utils.Compression.Algorithm;
+
+import java.util.HashMap;
 import java.util.TreeMap;
 
 class ContentNegotiation {
@@ -20,22 +22,32 @@ class ContentNegotiation {
     }
 
     private void processAcceptEncoding(String header){
-        TreeMap<Double,String> encodings = new TreeMap<>();
+        HashMap<String,Double> encodings = new HashMap<>();
+        double highest = 0.0;
+        String high = "";
         for (String encoding : header.split(",")){
             String[] temp = encoding.split(";");
             if (temp.length > 1){
-                encodings.put(Double.parseDouble(temp[1].replace("q=","")),temp[0].trim());
+                encodings.put(temp[0].trim(),Double.parseDouble(temp[1].replace("q=","")));
             }else
-                encodings.put(0.0,encoding.trim());
+                encodings.put(encoding.trim(), 1.0);
         }
-        for (double db : encodings.keySet()){
-            switch (encodings.get(db)){
-                case "gzip","*" -> {
-                    req.setCompression(true);
-                    req.setCompressionAlg(Algorithm.gzip);
-                }
+        if (encodings.containsKey("gzip")){
+            highest = 2.0;
+            high = "gzip";
+        }
+        for (String db : encodings.keySet()){
+            double q = encodings.get(db);
+            if (q >= highest){
+                high = db;
+                highest = q;
             }
-            break;
+        }
+        switch (high){
+            case "gzip","*" -> {
+                req.setCompression(true);
+                req.setCompressionAlg(Algorithm.gzip);
+            }
         }
     }
 }

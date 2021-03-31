@@ -43,8 +43,6 @@ public class Sender {
             out += "\r\nContent-Length: " + body.length() + "\r\nContent-Type: " + contentType;
         if (cookie != null)
             out += "\r\nSet-Cookie: " + cookie;
-        if (req.shouldBeCompressed())
-            out += "\r\nContent-Encoding: " + req.getCompressionAlg();
         if (Double.parseDouble(prot.replace("HTTP/","")) < 2)
             out += this.getConnectionHeader(req);
         if (!customHeaders.isEmpty())
@@ -115,18 +113,8 @@ public class Sender {
             if (!req.getSocket().isClosed()){
                 Logger.glog("Sending response to " + req.getID() + "  ; debug_id = " + req.getID(),req.getHost());
                 req.getOutStream().writeBytes(generateResponse(data, req));
-                if (req.getMethod() != Methods.HEAD && data != null){
-                    if (req.shouldBeCompressed() && HTAccess.getInstance().isCompressionAllowed(req.getHost())){
-                        Logger.glog("Client requested compression by " + req.getCompressionAlg() + " algorithm. Response data will be compressed."
-                                + "  ; debug_id = " + req.getID(), req.getHost());
-                        FileInputStream in = new FileInputStream(
-                                new CompressorFactory().getCompressor(req.getCompressionAlg()).compress(data.getBytes(), req.getID())
-                        );
-                        in.transferTo(req.out);
-                        in.close();
-                    }else
+                if (req.getMethod() != Methods.HEAD && data != null)
                         req.getOutStream().writeBytes(data);
-                }
                 if (!this.keepAlive) {
                     req.getOutStream().flush();
                     req.getOutStream().close();

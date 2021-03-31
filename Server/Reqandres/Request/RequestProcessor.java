@@ -33,7 +33,7 @@ public class RequestProcessor {
     private void startProcessing(){
         rp.readHeaders();
         this.processRequest();
-        if (req.getKeepAlive() && !ProxyConfigs.isOn)
+        if (req.getKeepAlive() && !ProxyConfigs.isOn && !req.getSocket().isClosed())
             new HttpListener(req.getSocket(),req.getHost(),false);
         if (stat != 0)
             this.continueProcess();
