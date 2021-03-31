@@ -14,9 +14,17 @@ class ContentNegotiation {
     }
 
     private void process(){
+        String accept = req.getHeaders().get("Accept");
+        if (accept != null)
+            this.processAccept(accept);
         String acceptEncoding = req.getHeaders().get("Accept-Encoding");
         if (acceptEncoding != null)
             this.processAcceptEncoding(acceptEncoding);
+    }
+
+    private void processAccept(String header){
+        for (String MIME : header.split(","))
+            req.getAccepts().add(MIME.split(";",2)[0].trim());
     }
 
     private void processAcceptEncoding(String header){

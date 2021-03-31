@@ -65,7 +65,7 @@ public class HttpListener extends Thread{
     @Override
     public void run(){
         try{
-            Logger.glog(req.getFullip() + " Connected." + "  ; id = " + req.getID(), hostName);
+            Logger.glog(req.getFullIp() + " Connected." + "  ; id = " + req.getID(), hostName);
             if (Perms.isIPAllowed(req.getIP())) {
                 if (Interface.checkIP(req.getIP(),req.getHost())) {
                     if (this.lb){
@@ -75,20 +75,20 @@ public class HttpListener extends Thread{
                             new RequestProcessor(req);
                             req.clearRequest();
                         } else {
-                            Logger.glog(req.getFullip() + " request rejected due to server overload." + "  ; id = " + req.getID(), hostName);
+                            Logger.glog(req.getFullIp() + " request rejected due to server overload." + "  ; id = " + req.getID(), hostName);
                             req.out.writeBytes(HTMLGen.genOverLoad());
                             req.out.flush();
                             req.out.close();
                         }
                     }
                 } else {
-                    Logger.glog(req.getFullip() + " request rejected due to DDOS protection." + "  ; id = " + req.getID(), hostName);
+                    Logger.glog(req.getFullIp() + " request rejected due to DDOS protection." + "  ; id = " + req.getID(), hostName);
                     req.out.writeBytes(HTMLGen.genTooManyRequests(req.getIP()));
                     req.out.flush();
                     req.out.close();
                 }
             } else {
-                Logger.glog(req.getFullip() + " request rejected due to ip ban." + "  ; id = " + req.getID(), hostName);
+                Logger.glog(req.getFullIp() + " request rejected due to ip ban." + "  ; id = " + req.getID(), hostName);
                 req.out.writeBytes(HTMLGen.genIPBan(req.getIP()));
                 req.out.flush();
                 req.out.close();

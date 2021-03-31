@@ -16,16 +16,23 @@ public class QuickSender {
     }
 
     public void sendCode(int code){
-        FileSender fs = new FileSender(req.getProt(),code);
-        fs.setContentType("text/html");
-        fs.setExtension(".html");
-        fs.sendFile(new File(Configs.getCWD() + "/default_pages/" + code + ".html"),req);
+        if (code > 400){
+            FileSender fs = new FileSender(req.getProt(), code);
+            fs.setKeepAlive(req.getKeepAlive());
+            fs.setContentType("text/html");
+            fs.setExtension(".html");
+            fs.sendFile(new File(Configs.getCWD() + "/default_pages/" + code + ".html"), req);
+        }else{
+            Sender snd = new Sender(req.getProt(),code);
+            snd.setKeepAlive(req.getKeepAlive());
+            snd.send(null,req);
+        }
     }
 
     public void sendBadReq(String reason){
         Logger.glog("Sending back bad request (400) response to " + req.getIP() + ", reason : " + reason + "    ; debug_id = " + req.getID(),req.getHost());
         Sender snd = new Sender(req.getProt(),400);
-        snd.setKeepAlive(false);
+        snd.setKeepAlive(req.getKeepAlive());
         snd.setContentType("text/plain");
         snd.send(reason,req);
     }
@@ -44,21 +51,25 @@ public class QuickSender {
 
     public void sendFile(File fl,String ext){
         if (fl.isFile()) {
-            FileSender fs = new FileSender(req.getProt(), 200);
-            fs.setContentType(FileTypes.getContentType(ext,req.getHost()));
-            fs.setExtension(ext);
-            fs.setKeepAlive(req.getKeepAlive());
-            if (HTAccess.getInstance().shouldETagBeSent(fl.getAbsolutePath(),req.getHost()))
-                fs.addHeader("ETag: \"" + new HashComputer(fl).computeHash() + "\"");
-            if (HTAccess.getInstance().shouldLMBeSent(fl.getAbsolutePath(),req.getHost()))
-                fs.addHeader("Last-Modified: " + new LMGenerator(fl).generate());
-            if (req.shouldBeCompressed() && HTAccess.getInstance().isCompressionAllowed(req.getHost())){
-                Logger.glog("Client requested compression by " + req.getCompressionAlg() + " algorithm. Response data will be compressed."
-                        + "  ; debug_id = " + req.getID(), req.getHost());
-                fl = new CompressorFactory().getCompressor(req.getCompressionAlg()).compress(fl);
-                fs.addHeader("Content-Encoding: " + req.getCompressionAlg());
-            }
-            fs.sendFile(fl,req);
+            String MIMEType = FileTypes.getContentType(ext,req.getHost());
+            if (req.isMIMEAcceptable(MIMEType)) {
+                FileSender fs = new FileSender(req.getProt(), 200);
+                fs.setContentType(MIMEType);
+                fs.setExtension(ext);
+                fs.setKeepAlive(req.getKeepAlive());
+                if (HTAccess.getInstance().shouldETagBeSent(fl.getAbsolutePath(), req.getHost()))
+                    fs.addHeader("ETag: \"" + new HashComputer(fl).computeHash() + "\"");
+                if (HTAccess.getInstance().shouldLMBeSent(fl.getAbsolutePath(), req.getHost()))
+                    fs.addHeader("Last-Modified: " + new LMGenerator(fl).generate());
+                if (req.shouldBeCompressed() && HTAccess.getInstance().isCompressionAllowed(req.getHost())) {
+                    Logger.glog("Client requested compression by " + req.getCompressionAlg() + " algorithm. Response data will be compressed."
+                            + "  ; debug_id = " + req.getID(), req.getHost());
+                    fl = new CompressorFactory().getCompressor(req.getCompressionAlg()).compress(fl);
+                    fs.addHeader("Content-Encoding: " + req.getCompressionAlg());
+                }
+                fs.sendFile(fl, req);
+            }else
+                this.sendCode(406);
         } else
             this.sendCode(404);
     }

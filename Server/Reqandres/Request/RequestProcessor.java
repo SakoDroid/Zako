@@ -39,14 +39,12 @@ public class RequestProcessor {
             this.continueProcess();
         else
             req.getCacheFile().delete();
-
     }
 
     private void continueProcess(){
         try{
             if (req.getCacheFile().length() > 5) {
                 Interface.addReqVol(req.getIP(), req.getCacheFile().length());
-                new HeadersChecker(req);
                 new Factory().getResponse(req.getResponseCode()).init(req);
             } else {
                 req.getCacheFile().delete();
@@ -76,6 +74,7 @@ public class RequestProcessor {
                                         if (status == 0) {
                                             String[] api = APIConfigs.getAPIAddress(hostName + req.getPath(), hostName);
                                             if (api == null) {
+                                                new HeadersChecker(req);
                                                 this.readRequest();
                                                 if (req.getMethod() == Methods.POST && req.getResponseCode() == 200)
                                                     new BodyParser(this.req).parseBody();
@@ -88,6 +87,7 @@ public class RequestProcessor {
                                                     this.stat = 0;
                                                 } else {
                                                     req.setPath(api[0]);
+                                                    new HeadersChecker(req);
                                                     this.readRequest();
                                                 }
                                             }
@@ -101,6 +101,7 @@ public class RequestProcessor {
                                             new QuickSender(this.req).redirect(307, Configs.getForwardAddress(hostName)[0]);
                                             this.stat = 0;
                                         } else {
+                                            new HeadersChecker(req);
                                             this.readRequest();
                                         }
                                     }

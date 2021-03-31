@@ -16,11 +16,14 @@ public class HeadersChecker {
     private void startChecking(){
         new ProtocolSwitch(this.req);
         if (req.getResponseCode() == 200){
-            Conditionals cc = new Conditionals();
-            cc.decide(req.getHeaders(), new File(Configs.getMainDir(req.getHost()) + req.getPath()), req.getMethod());
-            req.setResponseCode(cc.getStatus());
-            if (req.getResponseCode() == 200) {
-                new ContentNegotiation(this.req);
+            new Controls(req);
+            if (req.getResponseCode() <= 200){
+                Conditionals cc = new Conditionals();
+                cc.decide(req.getHeaders(), new File(Configs.getMainDir(req.getHost()) + req.getPath()), req.getMethod());
+                req.setResponseCode(cc.getStatus());
+                if (req.getResponseCode() == 200) {
+                    new ContentNegotiation(this.req);
+                }
             }
         }
     }

@@ -32,6 +32,7 @@ public class Request {
     public DataOutputStream out;
     public InputStream is;
     private ArrayList<Byte> body = new ArrayList<>();
+    private ArrayList<String> accepts = new ArrayList<>();
     private byte[] convertedBody = null;
     private boolean keepAlive = false;
     private boolean compression;
@@ -175,7 +176,7 @@ public class Request {
         return this.is;
     }
 
-    public String getFullip(){
+    public String getFullIp(){
         return this.fullip;
     }
 
@@ -187,12 +188,23 @@ public class Request {
         return this.sck;
     }
 
-    public boolean getKeepAlive(){
-        return this.keepAlive;
-    }
-
     public ArrayList<Byte> getBody(){
         return this.body;
+    }
+
+    public ArrayList<String> getAccepts(){
+        return this.accepts;
+    }
+
+    public boolean isMIMEAcceptable(String MIME){
+        if (this.accepts.contains("*/*"))
+            return true;
+        else{
+            if (this.accepts.contains(MIME.split("/")[0] + "/*"))
+                return true;
+            else
+                return this.accepts.contains(MIME);
+        }
     }
 
     public String getProt(){
@@ -205,6 +217,10 @@ public class Request {
 
     public boolean shouldBeCompressed(){
         return this.compression;
+    }
+
+    public boolean getKeepAlive(){
+        return this.keepAlive;
     }
 
     public Algorithm getCompressionAlg(){
