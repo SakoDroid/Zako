@@ -5,6 +5,7 @@ import Server.Utils.Logger;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.Date;
 import java.util.zip.Deflater;
 
 public class DeflateCompressor implements Compressor{
@@ -12,6 +13,10 @@ public class DeflateCompressor implements Compressor{
     @Override
     public File compress(File fl) {
         File out = new File(Configs.getCWD() + "/Cache/Compressed/" + fl.getName() + ".df");
+        if (out.isFile()){
+            if (new Date().getTime() - out.lastModified() < 30000)
+                return out;
+        }
         try(FileOutputStream fos = new FileOutputStream(out)) {
             final Deflater df = new Deflater();
             final byte[] buff = new byte[1024];

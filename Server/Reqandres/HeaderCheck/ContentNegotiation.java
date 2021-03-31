@@ -35,6 +35,8 @@ class ContentNegotiation {
             high = "deflate";
         }
         for (String db : encodings.keySet()){
+            if (db.equals("compress") || db.equals("br"))
+                continue;
             double q = encodings.get(db);
             if (q >= highest){
                 high = db;

@@ -11,11 +11,9 @@ public class ScriptsConfigs {
 
     public static void load(File fl){
         configs.put(fl.getName(),new SCConfig(fl));
-        System.out.println(configs);
     }
 
     public static int getHandleMode(String ext,String host){
-        System.out.println(host);
         return configs.get(host).getHandleMode(ext);
     }
 

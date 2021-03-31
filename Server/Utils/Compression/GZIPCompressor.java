@@ -5,6 +5,7 @@ import Server.Utils.Logger;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.Date;
 import java.util.zip.GZIPOutputStream;
 
 public class GZIPCompressor implements Compressor{
@@ -12,6 +13,10 @@ public class GZIPCompressor implements Compressor{
     @Override
     public File compress(File fl) {
         File out = new File(Configs.getCWD() + "/Cache/Compressed/" + fl.getName() + ".gz");
+        if (out.isFile()){
+            if (new Date().getTime() - out.lastModified() < 30000)
+                return out;
+        }
         try (GZIPOutputStream gos = new GZIPOutputStream(new FileOutputStream(out))) {
             FileInputStream fis = new FileInputStream(fl);
             fis.transferTo(gos);
