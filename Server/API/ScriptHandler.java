@@ -23,7 +23,7 @@ public class ScriptHandler {
     public void process(byte[] body,boolean ka){
         File fl = new File(Configs.getCGIDir(req.getHost()) + req.getPath());
         if (fl.exists()){
-            int status = ScriptsConfigs.getHandleMode(req.getHost(),ext);
+            int status = ScriptsConfigs.getHandleMode(ext,req.getHost());
             CGI client = ((status == 0) ? new CGIProcess(ext,fl,req) : new FCGI(ext,fl,req));
             client.exec(body,ka);
         }
