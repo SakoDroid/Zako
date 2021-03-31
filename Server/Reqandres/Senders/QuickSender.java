@@ -2,13 +2,9 @@ package Server.Reqandres.Senders;
 
 import Server.Reqandres.Request.Request;
 import Server.Utils.Compression.CompressorFactory;
-import Server.Utils.Configs.Configs;
-import Server.Utils.Configs.FileTypes;
-import Server.Utils.Configs.HTAccess;
-import Server.Utils.HeaderRelatedTools.HashComputer;
-import Server.Utils.HeaderRelatedTools.LMGenerator;
+import Server.Utils.Configs.*;
+import Server.Utils.HeaderRelatedTools.*;
 import Server.Utils.Logger;
-
 import java.io.File;
 
 public class QuickSender {
@@ -65,13 +61,5 @@ public class QuickSender {
             fs.sendFile(fl,req);
         } else
             this.sendCode(404);
-    }
-
-    public void sendFile(byte[] fl,String ext,String contentType){
-        FileSender fs = new FileSender(req.getProt(), 200);
-        fs.setContentType(FileTypes.getContentType(ext,req.getHost()));
-        fs.setExtension(ext);
-        fs.setKeepAlive(req.getKeepAlive());
-
     }
 }

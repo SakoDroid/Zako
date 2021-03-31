@@ -2,9 +2,7 @@ package Server.Reqandres.HeaderCheck;
 
 import Server.Reqandres.Request.Request;
 import Server.Utils.Compression.Algorithm;
-
 import java.util.HashMap;
-import java.util.TreeMap;
 
 class ContentNegotiation {
 
@@ -32,9 +30,9 @@ class ContentNegotiation {
             }else
                 encodings.put(encoding.trim(), 1.0);
         }
-        if (encodings.containsKey("gzip")){
+        if (encodings.containsKey("deflate")){
             highest = 2.0;
-            high = "gzip";
+            high = "deflate";
         }
         for (String db : encodings.keySet()){
             double q = encodings.get(db);
@@ -47,6 +45,10 @@ class ContentNegotiation {
             case "gzip","*" -> {
                 req.setCompression(true);
                 req.setCompressionAlg(Algorithm.gzip);
+            }
+            case "deflate" -> {
+                req.setCompression(true);
+                req.setCompressionAlg(Algorithm.deflate);
             }
         }
     }
