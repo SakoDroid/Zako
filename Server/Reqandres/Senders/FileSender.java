@@ -3,6 +3,7 @@ package Server.Reqandres.Senders;
 import Server.Reqandres.Request.Request;
 import Server.Utils.*;
 import Server.Utils.Configs.FileTypes;
+import Server.Utils.Configs.HTAccess;
 import Server.Utils.Enums.Methods;
 import java.io.*;
 import java.util.Date;
@@ -24,6 +25,8 @@ public class FileSender extends Sender {
             out += this.getConnectionHeader(req);
         if (cookie != null)
             out += "\r\nSet-Cookie: " + cookie;
+        if (req.getHeaders().containsKey("Origin"))
+            out += "Access-Control-Allow-Credentials: " + HTAccess.getInstance().isCredentialsAllowed(req.getHost());
         if (!customHeaders.isEmpty())
             out += "\r\n" + customHeaders;
         out += "\r\n\r\n";

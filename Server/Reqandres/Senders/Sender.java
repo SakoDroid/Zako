@@ -45,6 +45,8 @@ public class Sender {
             out += "\r\nSet-Cookie: " + cookie;
         if (Double.parseDouble(prot.replace("HTTP/","")) < 2)
             out += this.getConnectionHeader(req);
+        if (req.getHeaders().containsKey("Origin"))
+            out += "Access-Control-Allow-Credentials: " + HTAccess.getInstance().isCredentialsAllowed(req.getHost());
         if (!customHeaders.isEmpty())
             out += "\r\n" + customHeaders;
         return out + "\r\n\r\n";
@@ -75,22 +77,6 @@ public class Sender {
     public void addCookie(String ck){
         if(cookie == null) cookie = ck;
         else cookie += ";" + ck;
-    }
-
-
-    public void sendOptionsMethod(Request req){
-        try{
-            if (!req.getSocket().isClosed()){
-                Logger.glog("Sending back options method response to " + req.getIP() + "  ; debug_id = " + req.getID(), req.getHost());
-                req.getOutStream().writeBytes(prot + " 200 OK\r\nDate: " + df.format(new Date()) + "\r\nServer: " + basicUtils.Zako + "\r\nConnection: close\r\nAllow: GET,HEAD,POST,OPTIONS,TRACE,CONNECT,PUT,DELETE");
-                req.getOutStream().flush();
-                req.getOutStream().close();
-                Logger.glog(req.getIP() + "'s request handled successfully!" + "  ; debug_id = " + req.getID(), req.getHost());
-            }else
-                Logger.glog("Connection closed with " + req.getIP() + " without sending response.; debug_id = " + req.getID(),req.getHost());
-        }catch (Exception ex){
-            Logger.logException(ex);
-        }
     }
 
     public void sendConnectMethod(Request req){

@@ -19,7 +19,7 @@ public class Request {
     private String id;
     private String ip;
     private String fullip;
-    private String Host;
+    private String Host = "default";
     private String Prot = "HTTP/1.1";
     private String Path;
     private String orgPath;
@@ -105,12 +105,13 @@ public class Request {
             this.Prot = "HTTP/1.1";
         else if (prot.equals("h2c") || prot.equals("h2"))
             this.Prot = "HTTP/2";
-
     }
 
     public void setHost(String host){
-        this.Host = URLDecoder.decode(host,StandardCharsets.UTF_8);
-        SocketsData.getInstance().setMaxReqsPerSock(this.sck,HTAccess.getInstance().getMNORPC(this.Host));
+        if (this.Host.equals("default") && Configs.isHostAvailable(host)) {
+            this.Host = URLDecoder.decode(host, StandardCharsets.UTF_8);
+            SocketsData.getInstance().setMaxReqsPerSock(this.sck, HTAccess.getInstance().getMNORPC(this.Host));
+        }
     }
 
     public void setPath(String path){

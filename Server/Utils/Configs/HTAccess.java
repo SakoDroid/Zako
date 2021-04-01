@@ -1,5 +1,6 @@
 package Server.Utils.Configs;
 
+import Server.Utils.Enums.Methods;
 import Server.Utils.JSON.JSONBuilder;
 import java.io.File;
 import java.util.ArrayList;
@@ -33,6 +34,10 @@ public class HTAccess {
         return this.configs.get(host).MNORPC;
     }
 
+    public long getAccessControlMaxAge(String host){
+        return this.configs.get(host).maxAge;
+    }
+
     public boolean isKeepAliveAllowed(String host){
         return this.configs.get(host).KA;
     }
@@ -53,16 +58,44 @@ public class HTAccess {
         return this.configs.get(host).allowCompression;
     }
 
+    public boolean isOriginAllowed(String origin,String host){
+        if (origin.equals(host))
+            return this.configs.get(host).permittedOrigins.contains("self");
+        else
+            return this.configs.get(host).permittedOrigins.contains(origin);
+    }
+
+    public boolean isMethodAllowed(Methods method, String host){
+        return this.configs.get(host).permittedMethods.contains(method);
+    }
+
+    public boolean isCredentialsAllowed(String host){
+        return this.configs.get(host).allowCredentials;
+    }
+
+    public ArrayList<Methods> getAllowableMethods(String host){
+        return this.configs.get(host).permittedMethods;
+    }
+
+    public ArrayList<String> getAllowableHeaders(String host){
+        return this.configs.get(host).permittedHeaders;
+    }
+
     private static class HTAccessConfig {
 
         private final boolean upgradeIsAllowed;
         private final boolean KA;
         private final boolean allowCompression;
+        private final boolean allowCredentials;
         private final int keepAliveTimeOut;
         private final int MNORPC;
+        private final long maxAge;
         private final HashSet<String> allowableUpgrades = new HashSet<>();
         private final ArrayList<String> lastModifiedToBeSent;
         private final ArrayList<String> ETagToBeSent;
+        private final ArrayList<Methods> permittedMethods = new ArrayList<>();
+        private final ArrayList<String> permittedOrigins;
+        private final ArrayList<String> permittedHeaders;
 
         public HTAccessConfig(File fl){
             HashMap mainData = (HashMap) JSONBuilder.newInstance().parse(new File(fl.getAbsolutePath() + "/htaccess.conf")).toJava();
@@ -78,7 +111,14 @@ public class HTAccess {
             HashMap cond = (HashMap) mainData.get("Conditionals");
             lastModifiedToBeSent = (ArrayList<String>)cond.get("Last-Modified");
             ETagToBeSent = (ArrayList<String>) cond.get("ETag");
-
+            HashMap cors = (HashMap) mainData.get("CORS");
+            allowCredentials = (Boolean) cors.get("Allow-Credentials");
+            ArrayList<String> pm = (ArrayList<String>) cors.get("Permitted methods");
+            permittedOrigins = (ArrayList<String>) cors.get("Permitted origins");
+            permittedHeaders = (ArrayList<String>) cors.get("Permitted headers");
+            maxAge = (long) cors.get("Access-Control-Max-Age");
+            for (String m : pm)
+                permittedMethods.add(Methods.valueOf(m));
         }
 
         private void fixTheUpgradeList(){
