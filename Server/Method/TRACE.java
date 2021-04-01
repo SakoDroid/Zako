@@ -7,7 +7,7 @@ public class TRACE implements Method{
     @Override
     public void run(Request req) {
         FileSender fs = new FileSender(req.getProt(),200);
-        fs.setContentType("message/http");
+        fs.setExtension(".msghtml");
         fs.sendFile(req.getCacheFile(),req);
     }
 }

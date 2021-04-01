@@ -118,7 +118,7 @@ public class HTAccess {
             permittedHeaders = (ArrayList<String>) cors.get("Permitted headers");
             maxAge = (long) cors.get("Access-Control-Max-Age");
             for (String m : pm)
-                permittedMethods.add(Methods.valueOf(m));
+                permittedMethods.add(Methods.valueOf(m.toUpperCase()));
         }
 
         private void fixTheUpgradeList(){

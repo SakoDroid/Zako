@@ -114,13 +114,13 @@ public class Core {
 
     public void askForAuth(Request req){
         Server.Reqandres.Senders.Sender snd = new Sender(req.getProt(),401);
-        snd.setKeepAlive(false);
-        snd.addHeader(getHeader(req));
+        snd.setKeepAlive(req.getKeepAlive());
+        snd.addHeader("WWW-Authenticate", getHeader(req));
         snd.send(null,req);
     }
 
     private String getHeader(Request req){
-        String header = "WWW-Authenticate: " + Mechanism + " realm=\"" + realm + "\"";
+        String header = Mechanism + " realm=\"" + realm + "\"";
         if (Mechanism == Mechanisms.Digest){
             header += ",algorithm=" + alg;
             header += ",nonce=\"" + this.genNonce(req.getIP()) + "\"";

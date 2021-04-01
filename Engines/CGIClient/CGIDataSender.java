@@ -5,6 +5,7 @@ import Server.Reqandres.Senders.Sender;
 import Server.Utils.Logger;
 import Server.Utils.basicUtils;
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -12,6 +13,7 @@ import java.util.regex.Pattern;
 public class CGIDataSender extends Sender {
 
     private InputStream in;
+    private final SimpleDateFormat df = new SimpleDateFormat("E, dd MM yyyy HH:mm:ss z");
 
     public CGIDataSender(String prot,int status,InputStream is){
         super(prot, status);

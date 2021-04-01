@@ -10,7 +10,7 @@ public class CaptchaChecker implements API{
         req.convertBody();
         String ans = new String(req.getConvertedBody());
         FileSender fs = new FileSender(req.getProt(),200);
-        fs.setContentType("text/plain");
+        fs.setExtension(".txt");
         fs.setKeepAlive(false);
         fs.send(Data.checkAnswer(req.getIP(),ans,req.getHost()),req);
     }

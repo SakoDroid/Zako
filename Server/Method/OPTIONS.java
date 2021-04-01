@@ -1,7 +1,6 @@
 package Server.Method;
 
 import Server.Reqandres.Request.Request;
-import Server.Reqandres.Request.RequestProcessor;
 import Server.Reqandres.Senders.Sender;
 import Server.Utils.Configs.HTAccess;
 import Server.Utils.Configs.Perms;
@@ -20,26 +19,26 @@ public class OPTIONS implements Method{
             }else
                 allowHeader.append(mt).append(", ");
         }
-        snd.addHeader("Allow: " + allowHeader.toString());
+        snd.addHeader("Allow",allowHeader.toString());
         if (req.getHeaders().containsKey("Access-Control-Request-Method"))
-            snd.addHeader("Access-Control-Allow-Methods: " + allowHeader.toString());
+            snd.addHeader("Access-Control-Allow-Methods",allowHeader.toString());
         if (req.getHeaders().containsKey("Access-Control-Request-Headers")){
             StringBuilder ah = new StringBuilder();
             for (String h : HTAccess.getInstance().getAllowableHeaders(req.getHost()))
                 ah.append(h);
-            snd.addHeader("Access-Control-Allow-Headers: " + ah);
+            snd.addHeader("Access-Control-Allow-Headers",String.valueOf(ah));
         }
-        String orgHeader = "Access-Control-Allow-Origin: ";
+        String orgHeader;
         if (req.getHeaders().containsKey("Origin")){
             String org = req.getHeaders().get("Origin");
             if(HTAccess.getInstance().isOriginAllowed(org,req.getHost()))
-                orgHeader += org;
+                orgHeader = org;
             else
-                orgHeader += req.getHost();
+                orgHeader = req.getHost();
         }else
-            orgHeader += req.getHost();
-        snd.addHeader(orgHeader);
-        snd.addHeader("Access-Control-Max-Age: " + HTAccess.getInstance().getAccessControlMaxAge(req.getHost()));
+            orgHeader = req.getHost();
+        snd.addHeader("Access-Control-Allow-Origin", orgHeader);
+        snd.addHeader("Access-Control-Max-Age", String.valueOf(HTAccess.getInstance().getAccessControlMaxAge(req.getHost())));
         snd.send(null,req);
     }
 }

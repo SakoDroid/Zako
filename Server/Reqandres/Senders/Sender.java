@@ -1,55 +1,44 @@
 package Server.Reqandres.Senders;
 
 import Server.Reqandres.Request.Request;
-import Server.Utils.Compression.CompressorFactory;
-import Server.Utils.Configs.HTAccess;
 import Server.Utils.Enums.Methods;
 import Server.Utils.Logger;
-import java.io.FileInputStream;
-import java.util.Date;
-import java.text.SimpleDateFormat;
-import java.util.Objects;
+import java.util.HashMap;
 import Server.Utils.basicUtils;
 
 public class Sender {
 
-    protected SimpleDateFormat df = new SimpleDateFormat("E, dd MM yyyy HH:mm:ss z");
     protected String prot;
     protected String status;
     protected String contentType;
     protected String cookie;
-    protected String customHeaders = "";
+    protected String ext;
     protected boolean keepAlive = false;
+    protected final HashMap<String,String> headers = new HashMap<>();
+
 
     public Sender (String prot, int status){
         this.prot = prot;
         this.setStatus(status);
     }
 
-    protected String getConnectionHeader(Request req){
-        String out = "";
-        if (keepAlive){
-            out += "\nConnection: keep-alive\nKeep-Alive: ";
-            String kah = req.getHeaders().get("Keep-Alive");
-            out += Objects.requireNonNullElseGet(kah, () -> "timeout=" + HTAccess.getInstance().getKeepAliveTimeout(req.getHost()) + ", max=" + HTAccess.getInstance().getMNORPC(req.getHost()));
-        }
-        else out += "\nConnection: close";
-        return out;
+    protected String generateHeaders(Request req){
+        new HeaderGenerator(null,null,req).generate(this.headers);
+        return this.turnHeadersIntoString(req.getProt());
     }
 
-    private String generateResponse(String body,Request req){
-        String out = prot + " " + status + "\r\nDate: " + df.format(new Date()) + "\r\nServer: " + basicUtils.Zako + "\r\nStatus: " + this.status;
-        if (req.getMethod() != Methods.HEAD &&  body != null)
-            out += "\r\nContent-Length: " + body.length() + "\r\nContent-Type: " + contentType;
+    protected String generateHeaders(Request req,int bodyLength){
+        new HeaderGenerator(null,null,req).generate(this.headers,bodyLength);
+        return this.turnHeadersIntoString(req.getProt());
+    }
+
+    protected String turnHeadersIntoString(String proto){
+        StringBuilder sb = new StringBuilder(proto + " " + this.status + "\r\n");
+        for (String key : headers.keySet())
+            sb.append(key).append(": ").append(headers.get(key)).append("\r\n");
         if (cookie != null)
-            out += "\r\nSet-Cookie: " + cookie;
-        if (Double.parseDouble(prot.replace("HTTP/","")) < 2)
-            out += this.getConnectionHeader(req);
-        if (req.getHeaders().containsKey("Origin"))
-            out += "Access-Control-Allow-Credentials: " + HTAccess.getInstance().isCredentialsAllowed(req.getHost());
-        if (!customHeaders.isEmpty())
-            out += "\r\n" + customHeaders;
-        return out + "\r\n\r\n";
+            sb.append("Set-Cookie: ").append(cookie).append("\r\n");
+        return sb.append("Status: ").append(this.status).append("\r\n\r\n").toString();
     }
 
     public void setKeepAlive(boolean ka){
@@ -60,18 +49,12 @@ public class Sender {
         this.status = basicUtils.getStatusCodeComp(statusCode);
     }
 
-    public void setContentType(String cnt){
-        contentType = cnt;
+    public void setExtension(String ext){
+        this.ext = ext;
     }
 
-    public void addHeader(String header){
-        if (customHeaders.isEmpty())
-            customHeaders += header;
-        else {
-            if (customHeaders.endsWith("\n"))
-                customHeaders += header;
-            else customHeaders += "\r\n" + header;
-        }
+    public void addHeader(String value, String key){
+        this.headers.put(value.trim(),key.trim());
     }
 
     public void addCookie(String ck){
@@ -83,7 +66,7 @@ public class Sender {
         try{
             if (!req.getSocket().isClosed()){
                 Logger.glog("Sending back connect method response to " + req.getIP() + "  ; debug_id = " + req.getID(), req.getHost());
-                req.getOutStream().writeBytes(prot + " 200 Connection established\r\nDate: " + df.format(new Date()) + "\r\nServer: " + basicUtils.Zako);
+                req.getOutStream().writeBytes(this.generateHeaders(req));
                 req.getOutStream().flush();
                 req.getOutStream().close();
                 Logger.glog(req.getIP() + "'s request handled successfully!" + "  ; debug_id = " + req.getID(), req.getHost());
@@ -98,7 +81,7 @@ public class Sender {
         try{
             if (!req.getSocket().isClosed()){
                 Logger.glog("Sending response to " + req.getID() + "  ; debug_id = " + req.getID(),req.getHost());
-                req.getOutStream().writeBytes(generateResponse(data, req));
+                req.getOutStream().writeBytes(data == null ? generateHeaders(req) : generateHeaders(req,data.getBytes().length));
                 if (req.getMethod() != Methods.HEAD && data != null)
                         req.getOutStream().writeBytes(data);
                 if (!this.keepAlive) {

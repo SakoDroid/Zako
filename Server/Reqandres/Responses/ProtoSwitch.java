@@ -8,7 +8,7 @@ class ProtoSwitch implements Response{
     public void init(Request req) {
         Sender snd = new Sender(req.getProt(),101);
         String up = String.valueOf(req.getHeaders().get("Upgrade"));
-        snd.addHeader("Upgrade: " + up.trim());
+        snd.addHeader("Upgrade", up.trim());
         snd.setKeepAlive(false);
         snd.send(null,req);
     }
