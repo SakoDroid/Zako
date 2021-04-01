@@ -4,16 +4,17 @@ import Server.Reqandres.Request.Request;
 import Server.Utils.Configs.Configs;
 import java.io.File;
 
-public class HeadersChecker {
+public class HeadersProcessor {
 
     private final Request req;
 
-    public HeadersChecker(Request req){
+    public HeadersProcessor(Request req){
         this.req = req;
         this.startChecking();
     }
 
     private void startChecking(){
+        new Connection(this.req);
         new ProtocolSwitch(this.req);
         if (req.getResponseCode() == 200){
             new Controls(req);

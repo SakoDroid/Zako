@@ -3,10 +3,9 @@ package Server.Reqandres.Request;
 import Engines.DDOS.Interface;
 import Server.HttpListener;
 import Server.Reqandres.Responses.Factory;
-import Server.Reqandres.HeaderCheck.HeadersChecker;
+import Server.Reqandres.HeaderCheck.HeadersProcessor;
 import Server.Utils.Configs.APIConfigs;
 import Server.Utils.Configs.Configs;
-import Server.Utils.Configs.HTAccess;
 import Server.Utils.Configs.ProxyConfigs;
 import Server.Reqandres.Senders.QuickSender;
 import Server.Utils.Enums.Methods;
@@ -74,7 +73,7 @@ public class RequestProcessor {
                                         if (status == 0) {
                                             String[] api = APIConfigs.getAPIAddress(hostName + req.getPath(), hostName);
                                             if (api == null) {
-                                                new HeadersChecker(req);
+                                                new HeadersProcessor(req);
                                                 this.readRequest();
                                                 if (req.getMethod() == Methods.POST && req.getResponseCode() == 200)
                                                     new BodyParser(this.req).parseBody();
@@ -87,7 +86,7 @@ public class RequestProcessor {
                                                     this.stat = 0;
                                                 } else {
                                                     req.setPath(api[0]);
-                                                    new HeadersChecker(req);
+                                                    new HeadersProcessor(req);
                                                     this.readRequest();
                                                 }
                                             }
@@ -101,7 +100,7 @@ public class RequestProcessor {
                                             new QuickSender(this.req).redirect(307, Configs.getForwardAddress(hostName)[0]);
                                             this.stat = 0;
                                         } else {
-                                            new HeadersChecker(req);
+                                            new HeadersProcessor(req);
                                             this.readRequest();
                                         }
                                     }
@@ -144,14 +143,9 @@ public class RequestProcessor {
     }
 
     private void authenticate(){
-        if (Server.HttpAuth.Interface.getInstance().needAuth(req.getHost() + req.getPath(),req.getHost()))
+        if (Server.HttpAuth.Interface.getInstance().needAuth(req.getHost() + req.getPath(),req.getHost())){
             req.setResponseCode(Server.HttpAuth.Interface.getInstance().evaluate(req.getHeaders(),req.getIP(), req.getHost()));
-    }
-
-    private void determineKeepAlive(){
-        String cnc = req.getHeaders().get("Connection");
-        if (cnc != null) {
-            req.setKeepAlive(HTAccess.getInstance().isKeepAliveAllowed(req.getHost()) && cnc.trim().equals("keep-alive"));
+            Logger.glog("Client " + req.getIP() + " should be authenticated for accessing" + req.getPath() + " ;    debug_id = " + req.getID(),req.getHost());
         }
     }
 
@@ -170,7 +164,6 @@ public class RequestProcessor {
 
     private void readRequest(){
         try{
-            this.determineKeepAlive();
             this.authenticate();
             if (req.getResponseCode() < 300) {
                 this.fixTheHeaders();

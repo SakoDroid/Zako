@@ -111,7 +111,6 @@ public class Request {
     public void setHost(String host){
         this.Host = URLDecoder.decode(host,StandardCharsets.UTF_8);
         SocketsData.getInstance().setMaxReqsPerSock(this.sck,HTAccess.getInstance().getMNORPC(this.Host));
-        this.decideSocketsTimeout();
     }
 
     public void setPath(String path){
@@ -240,25 +239,6 @@ public class Request {
             body.clear();
             body = null;
         }
-    }
-
-    private void decideSocketsTimeout(){
-        if (this.keepAlive){
-            Object kaHeader = this.headers.get("Keep-Alive");
-            if (kaHeader != null){
-                String header = String.valueOf(kaHeader);
-                Pattern timeoutPtn = Pattern.compile("timeout=\\d+");
-                Matcher timeoutMc = timeoutPtn.matcher(header);
-                Pattern maxPtn = Pattern.compile("maxx=\\d+");
-                Matcher maxMc = maxPtn.matcher(header);
-                if (timeoutMc.find())
-                    this.setTimeout(Integer.parseInt(timeoutMc.group().replace("timeout=","").trim()));
-                if(maxMc.find())
-                    SocketsData.getInstance().setMaxReqsPerSock(this.sck,Integer.parseInt(maxMc.group().replace("max=","").trim()));
-            }else
-                this.setTimeout(HTAccess.getInstance().getKeepAliveTimeout(this.Host));
-        }else
-            this.setTimeout(Configs.getTimeOut(this.Host));
     }
 
     public void clearRequest(){
