@@ -243,7 +243,9 @@ public class Request {
     }
 
     public void clearRequest(){
-        boolean bl = this.TempFile.delete();
+        if (this.TempFile.length() > 2000000) {
+            boolean bl = this.TempFile.delete();
+        }
         if (SocketsData.getInstance().maxReached(this.sck)){
             try{
                 this.sck.close();

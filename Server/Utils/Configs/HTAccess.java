@@ -73,6 +73,10 @@ public class HTAccess {
         return this.configs.get(host).allowCredentials;
     }
 
+    public boolean isRangesAccepted(String host){
+        return this.configs.get(host).acceptRanges;
+    }
+
     public ArrayList<Methods> getAllowableMethods(String host){
         return this.configs.get(host).permittedMethods;
     }
@@ -87,6 +91,7 @@ public class HTAccess {
         private final boolean KA;
         private final boolean allowCompression;
         private final boolean allowCredentials;
+        private final boolean acceptRanges;
         private final int keepAliveTimeOut;
         private final int MNORPC;
         private final long maxAge;
@@ -104,6 +109,7 @@ public class HTAccess {
             KA = (Boolean) mainData.get("Keep Alive");
             MNORPC = (int)(long) mainData.get("MNORPC");
             allowCompression = (Boolean) mainData.get("Allow compression");
+            acceptRanges = (Boolean) mainData.get("Accept-Ranges");
             String allowableUpgradesList = String.valueOf(mainData.get("Allowable protocols"));
             for (String prot : allowableUpgradesList.split(" "))
                 allowableUpgrades.add(prot.trim());
