@@ -27,6 +27,7 @@ public class HeaderGenerator {
         headers.put("Connection",(req.getKeepAlive()? "keep-live" : "close"));
         if (req.getHeaders().containsKey("Origin"))
             headers.put("Access-Control-Allow-Credentials", String.valueOf(HTAccess.getInstance().isCredentialsAllowed(req.getHost())));
+        this.addUserDefinedHeaders(headers);
     }
 
     public void generate(HashMap<String,String> headers, long bodyLength){
@@ -37,6 +38,20 @@ public class HeaderGenerator {
         if (req.getMethod() != Methods.HEAD){
             headers.put("Content-Length",String.valueOf(bodyLength));
             headers.put("Content-Type", (ext.equals(".msghtml") ? "message/html" : FileTypes.getContentType(ext,req.getHost())));
+        }
+        this.addUserDefinedHeaders(headers);
+    }
+
+    private void addUserDefinedHeaders(HashMap<String,String> headers){
+        if (ext != null) {
+            HashMap<String,String> hds = FileTypes.getHeaders(this.ext,req.getHost());
+            if (hds != null)
+                headers.putAll(hds);
+        }
+        if (filePath != null){
+            HashMap<String,String> hds = FileTypes.getHeaders(this.filePath,req.getHost());
+            if (hds != null)
+                headers.putAll(hds);
         }
     }
 }

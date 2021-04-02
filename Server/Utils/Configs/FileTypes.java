@@ -2,7 +2,7 @@ package Server.Utils.Configs;
 
 import java.io.File;
 import java.util.HashMap;
-
+import Server.Utils.JSON.JSONBuilder;
 import Server.Utils.Logger;
 import org.w3c.dom.*;
 import javax.xml.parsers.*;
@@ -21,15 +21,14 @@ public class FileTypes {
         return configs.get(host).getContentType(ext);
     }
 
-    public static String getHeaders(String extension,String host){
-        String ret = configs.get(host).getHeaders(extension);
-        return (ret != null) ? ret : "";
+    public static HashMap<String,String> getHeaders(String extension,String host){
+        return configs.get(host).headers.get(extension);
     }
 
     private static class FTConfig{
 
         private final HashMap<String,String> cnts = new HashMap<>();
-        private final HashMap<String,String> headers = new HashMap<>();
+        private final HashMap<String,HashMap<String,String>> headers = new HashMap<>();
 
         public FTConfig(File fl){
             this.loadCnts(fl);
@@ -52,39 +51,26 @@ public class FileTypes {
         }
 
         private void loadHeaders(File fl){
-            try{
-                DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-                DocumentBuilder db = dbf.newDocumentBuilder();
-                Document d = db.parse(fl.getAbsolutePath() + "/Headers.conf");
-                NodeList rules = d.getElementsByTagName("rule");
-                for (int i = 0 ; i < rules.getLength() ; i++){
-                    Element rule = (Element) rules.item(i);
-                    String ex = rule.getAttribute("ext");
-                    String[] exs = ex.split(",");
-                    StringBuilder header = new StringBuilder();
-                    header.append('\n');
-                    NodeList child = rule.getChildNodes();
-                    for (int j = 0 ; j < child.getLength() ; j++){
-                        Node hd = child.item(j);
-                        if (hd.getNodeName().equals("#text"))
-                            continue;
-                        header.append(hd.getNodeName()).append(": ").append(hd.getTextContent());
-                    }
-                    for (String ext : exs)
-                        headers.put(ext.trim(),header.toString());
-                }
-            }catch (Exception ex){
-                Logger.logException(ex);
+            HashMap mainData = (HashMap) JSONBuilder.newInstance().parse(new File(fl.getAbsolutePath() + "/Headers.conf")).toJava();
+            HashMap exts = (HashMap) mainData.get("Ext");
+            for (Object key : exts.keySet()){
+                HashMap<String,String> data = (HashMap<String, String>) exts.get(key);
+                for (String ext : String.valueOf(key).split(" "))
+                    headers.put(ext,data);
+            }
+            HashMap files = (HashMap) mainData.get("File");
+            for (Object key : files.keySet()){
+                HashMap<String,String> data = (HashMap<String, String>) files.get(key);
+                String keyv = key.toString();
+                File flkey = new File(keyv);
+                headers.put(keyv,data);
+                headers.put(Configs.getCWD() + "/Cache/Compressed/" + flkey.getName() + ".df",data);
+                headers.put(Configs.getCWD() + "/Cache/Compressed/" + flkey.getName() + ".gz",data);
             }
         }
 
         public String getContentType(String ext){
             return this.cnts.get(ext);
-        }
-
-        public String getHeaders(String extension){
-            String ret = this.headers.get(extension);
-            return (ret != null) ? ret : "";
         }
     }
 }

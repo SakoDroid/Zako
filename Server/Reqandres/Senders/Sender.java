@@ -16,7 +16,6 @@ public class Sender {
     protected boolean keepAlive = false;
     protected final HashMap<String,String> headers = new HashMap<>();
 
-
     public Sender (String prot, int status){
         this.prot = prot;
         this.setStatus(status);
