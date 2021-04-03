@@ -61,7 +61,7 @@ public class QuickSender {
                         fs.addHeader("ETag", "\"" + new HashComputer(fl).computeHash() + "\"");
                     if (HTAccess.getInstance().shouldLMBeSent(fl.getAbsolutePath(), req.getHost()))
                         fs.addHeader("Last-Modified", new LMGenerator(fl).generate());
-                    if (req.shouldBeCompressed() && HTAccess.getInstance().isCompressionAllowed(req.getHost())) {
+                    if (req.shouldBeCompressed() && HTAccess.getInstance().isCompressionAllowed(req.getHost()) && fl.length() < 50000000) {
                         Logger.glog("Client requested compression by " + req.getCompressionAlg() + " algorithm. Response data will be compressed."
                                 + "  ; debug_id = " + req.getID(), req.getHost());
                         fl = new CompressorFactory().getCompressor(req.getCompressionAlg()).compress(fl);
