@@ -36,8 +36,8 @@ public class RequestProcessor {
             new HttpListener(req.getSocket(),req.getHost(),false);
         if (stat != 0)
             this.continueProcess();
-        else
-            req.getCacheFile().delete();
+        //else
+        //    req.getCacheFile().delete();
     }
 
     private void continueProcess(){
@@ -106,11 +106,13 @@ public class RequestProcessor {
                                     }
                                 } else {
                                     this.stat = 0;
+                                    req.setKeepAlive(true);
                                     new QuickSender(req).sendBadReq("Invalid method.");
                                     Interface.addWarning(req.getIP(), req.getHost());
                                 }
                             } else {
                                 this.stat = 0;
+                                req.setKeepAlive(true);
                                 new QuickSender(req).sendBadReq("\"Host\" header not found.");
                                 if (Configs.BRS)
                                     Interface.addWarning(req.getIP(), req.getHost());
@@ -121,18 +123,21 @@ public class RequestProcessor {
                         }
                     }else{
                         this.stat = 0;
+                        req.setKeepAlive(true);
                         new QuickSender(req).sendBadReq("No protocol found.");
                         if (Configs.BRS)
                             Interface.addWarning(req.getIP(),req.getHost());
                     }
                 }else{
                     this.stat = 0;
+                    req.setKeepAlive(true);
                     new QuickSender(req).sendBadReq("No path found.");
                     if (Configs.BRS)
                         Interface.addWarning(req.getIP(),req.getHost());
                 }
             }else{
                 this.stat = 0;
+                req.setKeepAlive(true);
                 new QuickSender(req).sendBadReq("Empty request");
                 if (Configs.BRS)
                     Interface.addWarning(req.getIP(),req.getHost());

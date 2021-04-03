@@ -81,7 +81,7 @@ class Core {
         boolean perm = true;
         if (requests.get(ip) != null){
             requests.get(ip)[0]++;
-            if (requests.get(ip)[0] > 150){
+            if (requests.get(ip)[0] > 1000){
                 Logger.tlog("Possible DDOS or DOS attack detected from " + ip + ". Access has been disabled Temporarily . Tracking ip activity...",hostName);
                 perm = false;
                 new HandleWarnings(ip,hostName);

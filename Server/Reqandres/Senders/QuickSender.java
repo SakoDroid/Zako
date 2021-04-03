@@ -20,12 +20,9 @@ public class QuickSender {
             FileSender fs = new FileSender(req.getProt(), code);
             fs.setKeepAlive(req.getKeepAlive());
             fs.setExtension(".html");
-            fs.setExtension(".html");
             fs.sendFile(new File(Configs.getCWD() + "/default_pages/" + code + ".html"), req);
         }else{
-            Sender snd = new Sender(req.getProt(),code);
-            snd.setKeepAlive(req.getKeepAlive());
-            snd.send(null,req);
+            this.sendBadReq(req.getErrorReason());
         }
     }
 

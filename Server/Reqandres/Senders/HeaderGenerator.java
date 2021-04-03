@@ -37,7 +37,7 @@ public class HeaderGenerator {
             headers.put("Access-Control-Allow-Credentials", String.valueOf(HTAccess.getInstance().isCredentialsAllowed(req.getHost())));
         if (req.getMethod() != Methods.HEAD){
             headers.put("Content-Length",String.valueOf(bodyLength));
-            if (req.getRanges().isEmpty() && !mp)
+            if (req.getRanges().size() < 2)
                 headers.put("Content-Type", (ext.equals(".msghtml") ? "message/html" : FileTypes.getContentType(ext,req.getHost())));
             else
                 headers.put("Content-Type", "multipart/byteranges ; boundary=" + req.getBoundary());
