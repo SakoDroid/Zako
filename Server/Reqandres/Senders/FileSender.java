@@ -12,7 +12,7 @@ public class FileSender extends Sender {
     }
 
     private String generateHeaders(Request req,String filePath,long bodyLength) {
-        new HeaderGenerator(this.ext,filePath,req).generate(this.headers,bodyLength);
+        new HeaderGenerator(this.ext,filePath,req).generate(this.headers,bodyLength,false);
         return super.turnHeadersIntoString(req.getProt());
     }
 
@@ -20,7 +20,7 @@ public class FileSender extends Sender {
         try{
             if (!req.getSocket().isClosed()){
                 Logger.glog("Sending requested file to " + req.getIP() + "   ; file name : " + file.getName() + "  ; debug_id = " + req.getID(), req.getHost());
-                req.out.writeBytes(generateHeaders(req,file.getAbsolutePath(),file.length()));
+                req.out.writeBytes(generateHeaders(req, file.getAbsolutePath(), file.length()));
                 if (req.getMethod() != Methods.HEAD) {
                     FileInputStream in = new FileInputStream(file);
                     in.transferTo(req.out);
@@ -42,9 +42,9 @@ public class FileSender extends Sender {
         try{
             if (!req.getSocket().isClosed()){
                 Logger.glog("Sending a file (stored in RAM) to " + req.getIP() + "  ; debug_id = " + req.getID(), req.getHost());
-                req.out.writeBytes(generateHeaders(req,file.length));
+                req.out.writeBytes(generateHeaders(req, file.length));
                 if (req.getMethod() != Methods.HEAD)
-                        req.out.write(file);
+                    req.out.write(file);
                 if (!this.keepAlive) {
                     req.out.flush();
                     req.out.close();

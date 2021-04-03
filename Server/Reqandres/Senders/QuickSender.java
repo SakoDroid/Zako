@@ -53,21 +53,27 @@ public class QuickSender {
         if (fl.isFile()) {
             String MIMEType = FileTypes.getContentType(ext,req.getHost());
             if (req.isMIMEAcceptable(MIMEType)) {
-                FileSender fs = new FileSender(req.getProt(), 200);
-                fs.setExtension(ext);
-                fs.setExtension(ext);
-                fs.setKeepAlive(req.getKeepAlive());
-                if (HTAccess.getInstance().shouldETagBeSent(fl.getAbsolutePath(), req.getHost()))
-                    fs.addHeader("ETag", "\"" + new HashComputer(fl).computeHash() + "\"");
-                if (HTAccess.getInstance().shouldLMBeSent(fl.getAbsolutePath(), req.getHost()))
-                    fs.addHeader("Last-Modified", new LMGenerator(fl).generate());
-                if (req.shouldBeCompressed() && HTAccess.getInstance().isCompressionAllowed(req.getHost())) {
-                    Logger.glog("Client requested compression by " + req.getCompressionAlg() + " algorithm. Response data will be compressed."
-                            + "  ; debug_id = " + req.getID(), req.getHost());
-                    fl = new CompressorFactory().getCompressor(req.getCompressionAlg()).compress(fl);
-                    fs.addHeader("Content-Encoding", String.valueOf(req.getCompressionAlg()));
+                if (req.getRanges().isEmpty()){
+                    FileSender fs = new FileSender(req.getProt(), 200);
+                    fs.setExtension(ext);
+                    fs.setKeepAlive(req.getKeepAlive());
+                    if (HTAccess.getInstance().shouldETagBeSent(fl.getAbsolutePath(), req.getHost()))
+                        fs.addHeader("ETag", "\"" + new HashComputer(fl).computeHash() + "\"");
+                    if (HTAccess.getInstance().shouldLMBeSent(fl.getAbsolutePath(), req.getHost()))
+                        fs.addHeader("Last-Modified", new LMGenerator(fl).generate());
+                    if (req.shouldBeCompressed() && HTAccess.getInstance().isCompressionAllowed(req.getHost())) {
+                        Logger.glog("Client requested compression by " + req.getCompressionAlg() + " algorithm. Response data will be compressed."
+                                + "  ; debug_id = " + req.getID(), req.getHost());
+                        fl = new CompressorFactory().getCompressor(req.getCompressionAlg()).compress(fl);
+                        fs.addHeader("Content-Encoding", String.valueOf(req.getCompressionAlg()));
+                    }
+                    fs.sendFile(fl, req);
+                }else{
+                    MultipartSender mps = new MultipartSender(req.getProt());
+                    mps.setExtension(ext);
+                    mps.setKeepAlive(req.getKeepAlive());
+                    mps.send(fl,req);
                 }
-                fs.sendFile(fl, req);
             }else
                 this.sendCode(406);
         } else

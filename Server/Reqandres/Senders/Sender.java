@@ -27,7 +27,7 @@ public class Sender {
     }
 
     protected String generateHeaders(Request req,int bodyLength){
-        new HeaderGenerator(null,null,req).generate(this.headers,bodyLength);
+        new HeaderGenerator(null,null,req).generate(this.headers,bodyLength,false);
         return this.turnHeadersIntoString(req.getProt());
     }
 

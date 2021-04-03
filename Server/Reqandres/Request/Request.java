@@ -24,6 +24,7 @@ public class Request {
     private String Path;
     private String orgPath;
     private String errorReason;
+    private String boundary;
     private Socket sck;
     private File TempFile;
     private URL url;
@@ -33,6 +34,7 @@ public class Request {
     public InputStream is;
     private ArrayList<Byte> body = new ArrayList<>();
     private ArrayList<String> accepts = new ArrayList<>();
+    private ArrayList<long[]> ranges = new ArrayList<>();
     private byte[] convertedBody = null;
     private boolean keepAlive = false;
     private boolean compression;
@@ -148,6 +150,18 @@ public class Request {
             this.body.add(b);
     }
 
+    public void addRange(long[] range){
+        this.ranges.add(range);
+    }
+
+    public void setBoundary(){
+        this.boundary = "-----" + this.id;
+    }
+
+    public String getBoundary(){
+        return this.boundary;
+    }
+
     public String getPath(){
         return this.Path;
     }
@@ -231,6 +245,10 @@ public class Request {
         return this.convertedBody;
     }
 
+    public ArrayList<long[]> getRanges(){
+        return this.ranges;
+    }
+
     public void convertBody(){
         if (convertedBody == null){
             convertedBody = new byte[body.size()];
@@ -262,6 +280,10 @@ public class Request {
         this.Host = null;
         this.Prot = null;
         this.headers.clear();
+        this.accepts.clear();
+        this.ranges.clear();
+        this.accepts = null;
+        this.ranges = null;
         this.headers = null;
         this.TempFile = null;
         this.out = null;

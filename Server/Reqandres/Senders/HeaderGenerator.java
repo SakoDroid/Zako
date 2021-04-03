@@ -29,7 +29,7 @@ public class HeaderGenerator {
         this.addUserDefinedHeaders(headers);
     }
 
-    public void generate(HashMap<String,String> headers, long bodyLength){
+    public void generate(HashMap<String,String> headers, long bodyLength,boolean mp){
         headers.put("Date",df.format(new Date()));
         headers.put("Connection",(req.getKeepAlive()? "keep-live" : "close"));
         headers.put("Accept-Ranges",(HTAccess.getInstance().isRangesAccepted(req.getHost()) ? "bytes" : "none"));
@@ -37,7 +37,10 @@ public class HeaderGenerator {
             headers.put("Access-Control-Allow-Credentials", String.valueOf(HTAccess.getInstance().isCredentialsAllowed(req.getHost())));
         if (req.getMethod() != Methods.HEAD){
             headers.put("Content-Length",String.valueOf(bodyLength));
-            headers.put("Content-Type", (ext.equals(".msghtml") ? "message/html" : FileTypes.getContentType(ext,req.getHost())));
+            if (req.getRanges().isEmpty() && !mp)
+                headers.put("Content-Type", (ext.equals(".msghtml") ? "message/html" : FileTypes.getContentType(ext,req.getHost())));
+            else
+                headers.put("Content-Type", "multipart/byteranges ; boundary=" + req.getBoundary());
         }
         this.addUserDefinedHeaders(headers);
     }

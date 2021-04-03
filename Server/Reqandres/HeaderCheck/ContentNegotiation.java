@@ -17,6 +17,8 @@ class ContentNegotiation {
         String accept = req.getHeaders().get("Accept");
         if (accept != null)
             this.processAccept(accept);
+        else
+            req.getAccepts().add("*/*");
         String acceptEncoding = req.getHeaders().get("Accept-Encoding");
         if (acceptEncoding != null)
             this.processAcceptEncoding(acceptEncoding);

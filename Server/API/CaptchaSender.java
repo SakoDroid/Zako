@@ -15,6 +15,7 @@ public class CaptchaSender implements API{
         FileSender fs = new FileSender(req.getProt(),200);
         fs.setExtension(".png");
         fs.setKeepAlive(true);
+        fs.addHeader("Accept-Ranges","none");
         if (req.shouldBeCompressed() && HTAccess.getInstance().isCompressionAllowed(req.getHost())){
             Logger.glog("Client requested compression by " + req.getCompressionAlg() + " algorithm. Response data will be compressed."
                     + "  ; debug_id = " + req.getID(), req.getHost());

@@ -24,6 +24,7 @@ public class HeadersProcessor {
                 req.setResponseCode(cc.getStatus());
                 if (req.getResponseCode() == 200) {
                     new ContentNegotiation(this.req);
+                    new RangeRequests(this.req);
                 }
             }
         }
