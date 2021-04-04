@@ -37,7 +37,7 @@ public class RangeRequests {
     }
 
     private void processIfRange(String header){
-        header = header.replace("w/","");
+        header = header.replace("w/","").replace("\"","");
         String hash = new HashComputer(new File(Configs.getMainDir(req.getHost()) + req.getPath())).computeHash();
         if (header.equals(hash))
             isIfRangeValid = true;
