@@ -3,6 +3,7 @@ package Server.Reqandres.Senders;
 import Server.Reqandres.Request.Request;
 import Server.Utils.Configs.FileTypes;
 import Server.Utils.Configs.HTAccess;
+import Server.Utils.Configs.SSLConfigs;
 import Server.Utils.Enums.Methods;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -24,6 +25,8 @@ public class HeaderGenerator {
     public void generate(HashMap<String,String> headers){
         headers.put("Date",df.format(new Date()));
         headers.put("Connection",(req.getKeepAlive()? "keep-live" : "close"));
+        if (SSLConfigs.isSSLOn(req.getHost()) && SSLConfigs.isHTTPSOnly(req.getHost()))
+            this.addStrictTransportSecurityHeader(headers);
         if (req.getHeaders().containsKey("Origin"))
             headers.put("Access-Control-Allow-Credentials", String.valueOf(HTAccess.getInstance().isCredentialsAllowed(req.getHost())));
         this.addUserDefinedHeaders(headers);
@@ -56,5 +59,13 @@ public class HeaderGenerator {
             if (hds != null)
                 headers.putAll(hds);
         }
+    }
+
+    private void addStrictTransportSecurityHeader(HashMap<String,String> headers){
+        String val = "max-age=";
+        val += SSLConfigs.getMaxAge(req.getHost()) + "; ";
+        if (SSLConfigs.isSubdomainIncluded(req.getHost()))
+            val += "includeSubDomains";
+        headers.put("Strict-Transport-Security",val);
     }
 }

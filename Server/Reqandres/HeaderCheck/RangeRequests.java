@@ -2,8 +2,7 @@ package Server.Reqandres.HeaderCheck;
 
 import Server.Reqandres.Request.Request;
 import Server.Utils.Configs.Configs;
-import Server.Utils.HeaderRelatedTools.HashComputer;
-import Server.Utils.HeaderRelatedTools.LMGenerator;
+import Server.Utils.HeaderRelatedTools.*;
 import java.io.File;
 
 public class RangeRequests {
