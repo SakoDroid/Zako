@@ -11,6 +11,7 @@ public class basicUtils {
 
     private static final File statuses = new File(Configs.getCWD() + "/Data/status_codes.sak");
     private static final File cmds = new File (Configs.getCWD() + "/Data/cmds.sak");
+    private static boolean cacheManagerStarted = false;
     private static HashMap<Integer,String> codes;
     private static HashMap<String,String> execCmds;
     public static String LocalHostIP = "", Zako = "Zako 1.6.3";
@@ -80,6 +81,38 @@ public class basicUtils {
             return res.trim().equals("true");
         }catch (Exception ex){
             Logger.logException(ex);
+            return false;
+        }
+    }
+
+    public static boolean isCacheManagerStarted(){
+        return cacheManagerStarted;
+    }
+
+    public static boolean startCacheManager(long cacheDuration){
+        StringBuilder result = new StringBuilder();
+        try{
+            ProcessBuilder pb = new ProcessBuilder("sudo","java","-cp","./CacheManager.jar","Main",String.valueOf(cacheDuration));
+            Process p = pb.start();
+            BufferedReader bf = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            result.append(bf.readLine());
+            if (result.toString().equals("success"))
+                cacheManagerStarted = true;
+            else{
+                int i;
+                result.append("   ; STDERR : ");
+                while ((i = p.getErrorStream().read()) != -1){
+                    if (i == 13)
+                        break;
+                    result.append((char) i);
+                }
+                cacheManagerStarted = false;
+                Logger.ilog("Failed to start cache manager, reason : " + result);
+            }
+            return cacheManagerStarted;
+        }catch (Exception ex){
+            Logger.logException(ex);
+            cacheManagerStarted = false;
             return false;
         }
     }

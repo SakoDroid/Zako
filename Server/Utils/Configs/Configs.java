@@ -5,6 +5,7 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.HashSet;
 import Server.Utils.Logger;
+import Server.Utils.basicUtils;
 
 public class Configs {
 
@@ -31,6 +32,16 @@ public class Configs {
         autoUpdate = (Boolean) data.get("CFG Update");
         webServer = (Boolean) data.get("Web Server");
         BRS = (Boolean) data.get("BR Sensitivity");
+        long cachingTime = (long) data.get("Request caching duration");
+        if (cachingTime > 0){
+            if (basicUtils.startCacheManager(cachingTime)) {
+                Logger.ilog("Cache manager started, caching duration : " + cachingTime + " ...");
+                System.out.println("Cache manager started, caching duration : " + cachingTime + " ...");
+            }else{
+                Logger.ilog("Cache manager failed to start.");
+                System.out.println("Cache manager failed to start");
+            }
+        }
         Server.Utils.ViewCounter.Controller.load(availableHosts,(Long) data.get("View update frequency"));
     }
 
@@ -105,7 +116,6 @@ public class Configs {
     public static boolean isVCOn(String host){
         return configs.get(host).vc;
     }
-
 
     private static class Config{
 
