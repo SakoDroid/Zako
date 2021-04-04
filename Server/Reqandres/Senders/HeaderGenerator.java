@@ -29,6 +29,7 @@ public class HeaderGenerator {
             this.addStrictTransportSecurityHeader(headers);
         if (req.getHeaders().containsKey("Origin"))
             headers.put("Access-Control-Allow-Credentials", String.valueOf(HTAccess.getInstance().isCredentialsAllowed(req.getHost())));
+        this.addGeneralHeaders(headers);
         this.addUserDefinedHeaders(headers);
     }
 
@@ -45,6 +46,7 @@ public class HeaderGenerator {
             else
                 headers.put("Content-Type", "multipart/byteranges ; boundary=" + req.getBoundary());
         }
+        this.addGeneralHeaders(headers);
         this.addUserDefinedHeaders(headers);
     }
 
@@ -67,5 +69,9 @@ public class HeaderGenerator {
         if (SSLConfigs.isSubdomainIncluded(req.getHost()))
             val += "includeSubDomains";
         headers.put("Strict-Transport-Security",val);
+    }
+
+    private void addGeneralHeaders(HashMap<String,String> headers){
+        headers.putAll(FileTypes.getGeneralHeaders(req.getHost()));
     }
 }

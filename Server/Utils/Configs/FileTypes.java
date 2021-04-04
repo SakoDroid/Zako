@@ -25,10 +25,15 @@ public class FileTypes {
         return configs.get(host).headers.get(extension);
     }
 
+    public static HashMap<String,String> getGeneralHeaders(String host){
+        return configs.get(host).generalHeaders;
+    }
+
     private static class FTConfig{
 
         private final HashMap<String,String> cnts = new HashMap<>();
         private final HashMap<String,HashMap<String,String>> headers = new HashMap<>();
+        private HashMap<String,String> generalHeaders;
 
         public FTConfig(File fl){
             this.loadCnts(fl);
@@ -67,6 +72,7 @@ public class FileTypes {
                 headers.put(Configs.getCWD() + "/Cache/Compressed/" + flkey.getName() + ".df",data);
                 headers.put(Configs.getCWD() + "/Cache/Compressed/" + flkey.getName() + ".gz",data);
             }
+            generalHeaders = (HashMap<String, String>) mainData.get("General");
         }
 
         public String getContentType(String ext){
